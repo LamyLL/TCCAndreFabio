@@ -1,0 +1,2024 @@
+ARM GAS  /tmp/cctHSf5o.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 6
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"uart_at.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/uart_at.c"
+  20              		.global	cmd_buffer
+  21              		.section	.bss.cmd_buffer,"aw",%nobits
+  22              		.align	2
+  25              	cmd_buffer:
+  26 0000 00000000 		.space	20
+  26      00000000 
+  26      00000000 
+  26      00000000 
+  26      00000000 
+  27              		.global	cmd_len
+  28              		.section	.bss.cmd_len,"aw",%nobits
+  31              	cmd_len:
+  32 0000 00       		.space	1
+  33              		.global	byte
+  34              		.section	.bss.byte,"aw",%nobits
+  37              	byte:
+  38 0000 00       		.space	1
+  39              		.global	mpid_ATCMD_MemPool
+  40              		.section	.bss.mpid_ATCMD_MemPool,"aw",%nobits
+  41              		.align	2
+  44              	mpid_ATCMD_MemPool:
+  45 0000 00000000 		.space	4
+  46              		.global	mpid_LoRaPayload_MemPool
+  47              		.section	.bss.mpid_LoRaPayload_MemPool,"aw",%nobits
+  48              		.align	2
+  51              	mpid_LoRaPayload_MemPool:
+  52 0000 00000000 		.space	4
+  53              		.global	AT_COMMANDS
+  54              		.section	.rodata.AT_COMMANDS,"a"
+  55              		.align	2
+  58              	AT_COMMANDS:
+  59 0000 00       		.byte	0
+  60 0001 08       		.byte	8
+  61 0002 03       		.byte	3
+  62 0003 00       		.space	1
+  63 0004 2C010000 		.word	300
+  64 0008 41545A00 		.ascii	"ATZ\000"
+  65 000c 00000000 		.space	12
+ARM GAS  /tmp/cctHSf5o.s 			page 2
+
+
+  65      00000000 
+  65      00000000 
+  66 0018 01       		.byte	1
+  67 0019 00       		.byte	0
+  68 001a 03       		.byte	3
+  69 001b 00       		.space	1
+  70 001c 2C010000 		.word	300
+  71 0020 41542B43 		.ascii	"AT+CFM\000"
+  71      464D00
+  72 0027 00000000 		.space	9
+  72      00000000 
+  72      00
+  73 0030 02       		.byte	2
+  74 0031 00       		.byte	0
+  75 0032 03       		.byte	3
+  76 0033 00       		.space	1
+  77 0034 2C010000 		.word	300
+  78 0038 41542B41 		.ascii	"AT+APPKEY\000"
+  78      50504B45 
+  78      5900
+  79 0042 00000000 		.space	6
+  79      0000
+  80 0048 03       		.byte	3
+  81 0049 00       		.byte	0
+  82 004a 03       		.byte	3
+  83 004b 00       		.space	1
+  84 004c 2C010000 		.word	300
+  85 0050 41542B41 		.ascii	"AT+APPEUI\000"
+  85      50504555 
+  85      4900
+  86 005a 00000000 		.space	6
+  86      0000
+  87 0060 04       		.byte	4
+  88 0061 00       		.byte	0
+  89 0062 03       		.byte	3
+  90 0063 00       		.space	1
+  91 0064 2C010000 		.word	300
+  92 0068 41542B41 		.ascii	"AT+ADR\000"
+  92      445200
+  93 006f 00000000 		.space	9
+  93      00000000 
+  93      00
+  94 0078 05       		.byte	5
+  95 0079 00       		.byte	0
+  96 007a 03       		.byte	3
+  97 007b 00       		.space	1
+  98 007c 2C010000 		.word	300
+  99 0080 41542B4E 		.ascii	"AT+NJM\000"
+  99      4A4D00
+ 100 0087 00000000 		.space	9
+ 100      00000000 
+ 100      00
+ 101 0090 06       		.byte	6
+ 102 0091 00       		.byte	0
+ 103 0092 03       		.byte	3
+ 104 0093 00       		.space	1
+ 105 0094 2C010000 		.word	300
+ARM GAS  /tmp/cctHSf5o.s 			page 3
+
+
+ 106 0098 41542B4A 		.ascii	"AT+JOIN\000"
+ 106      4F494E00 
+ 107 00a0 00000000 		.space	8
+ 107      00000000 
+ 108 00a8 07       		.byte	7
+ 109 00a9 00       		.byte	0
+ 110 00aa 03       		.byte	3
+ 111 00ab 00       		.space	1
+ 112 00ac 2C010000 		.word	300
+ 113 00b0 41542B43 		.ascii	"AT+CHMASK\000"
+ 113      484D4153 
+ 113      4B00
+ 114 00ba 00000000 		.space	6
+ 114      0000
+ 115 00c0 08       		.byte	8
+ 116 00c1 01       		.byte	1
+ 117 00c2 03       		.byte	3
+ 118 00c3 00       		.space	1
+ 119 00c4 2C010000 		.word	300
+ 120 00c8 41542B53 		.ascii	"AT+SENDB\000"
+ 120      454E4442 
+ 120      00
+ 121 00d1 00000000 		.space	7
+ 121      000000
+ 122 00d8 09       		.byte	9
+ 123 00d9 01       		.byte	1
+ 124 00da 03       		.byte	3
+ 125 00db 00       		.space	1
+ 126 00dc 2C010000 		.word	300
+ 127 00e0 41542B53 		.ascii	"AT+SEND\000"
+ 127      454E4400 
+ 128 00e8 00000000 		.space	8
+ 128      00000000 
+ 129 00f0 0A       		.byte	10
+ 130 00f1 00       		.byte	0
+ 131 00f2 03       		.byte	3
+ 132 00f3 00       		.space	1
+ 133 00f4 2C010000 		.word	300
+ 134 00f8 41540D0A 		.ascii	"AT\015\012\000"
+ 134      00
+ 135 00fd 00000000 		.space	11
+ 135      00000000 
+ 135      000000
+ 136 0108 0B       		.byte	11
+ 137 0109 00       		.byte	0
+ 138 010a 03       		.byte	3
+ 139 010b 00       		.space	1
+ 140 010c 2C010000 		.word	300
+ 141 0110 554E4445 		.ascii	"UNDEFINED\000"
+ 141      46494E45 
+ 141      4400
+ 142 011a 00000000 		.space	6
+ 142      0000
+ 143              		.global	AT_RESPONSES
+ 144              		.section	.rodata.AT_RESPONSES,"a"
+ 145              		.align	2
+ 148              	AT_RESPONSES:
+ARM GAS  /tmp/cctHSf5o.s 			page 4
+
+
+ 149 0000 00       		.byte	0
+ 150 0001 41545F4F 		.ascii	"AT_OK\000"
+ 150      4B00
+ 151 0007 00000000 		.space	18
+ 151      00000000 
+ 151      00000000 
+ 151      00000000 
+ 151      0000
+ 152 0019 01       		.byte	1
+ 153 001a 41545F54 		.ascii	"AT_TX_OK\000"
+ 153      585F4F4B 
+ 153      00
+ 154 0023 00000000 		.space	15
+ 154      00000000 
+ 154      00000000 
+ 154      000000
+ 155 0032 02       		.byte	2
+ 156 0033 52583A00 		.ascii	"RX:\000"
+ 157 0037 00000000 		.space	20
+ 157      00000000 
+ 157      00000000 
+ 157      00000000 
+ 157      00000000 
+ 158 004b 03       		.byte	3
+ 159 004c 41545F45 		.ascii	"AT_ERROR\000"
+ 159      52524F52 
+ 159      00
+ 160 0055 00000000 		.space	15
+ 160      00000000 
+ 160      00000000 
+ 160      000000
+ 161 0064 04       		.byte	4
+ 162 0065 41545F4A 		.ascii	"AT_JOIN_OK\000"
+ 162      4F494E5F 
+ 162      4F4B00
+ 163 0070 00000000 		.space	13
+ 163      00000000 
+ 163      00000000 
+ 163      00
+ 164 007d 05       		.byte	5
+ 165 007e 41545F54 		.ascii	"AT_TIMEOUT\000"
+ 165      494D454F 
+ 165      555400
+ 166 0089 00000000 		.space	13
+ 166      00000000 
+ 166      00000000 
+ 166      00
+ 167 0096 06       		.byte	6
+ 168 0097 41545F42 		.ascii	"AT_BUSY\000"
+ 168      55535900 
+ 169 009f 00000000 		.space	16
+ 169      00000000 
+ 169      00000000 
+ 169      00000000 
+ 170 00af 07       		.byte	7
+ 171 00b0 41545F4A 		.ascii	"AT_JOIN_ERROR\000"
+ 171      4F494E5F 
+ARM GAS  /tmp/cctHSf5o.s 			page 5
+
+
+ 171      4552524F 
+ 171      5200
+ 172 00be 00000000 		.space	10
+ 172      00000000 
+ 172      0000
+ 173 00c8 08       		.byte	8
+ 174 00c9 52616469 		.ascii	"Radioenge\000"
+ 174      6F656E67 
+ 174      6500
+ 175 00d3 00000000 		.space	14
+ 175      00000000 
+ 175      00000000 
+ 175      0000
+ 176 00e1 09       		.byte	9
+ 177 00e2 41545F4E 		.ascii	"AT_NO_NETWORK_JOINED\000"
+ 177      4F5F4E45 
+ 177      54574F52 
+ 177      4B5F4A4F 
+ 177      494E4544 
+ 178 00f7 000000   		.space	3
+ 179 00fa 0A       		.byte	10
+ 180 00fb 554E4445 		.ascii	"UNDEFINED\000"
+ 180      46494E45 
+ 180      4400
+ 181 0105 00000000 		.space	14
+ 181      00000000 
+ 181      00000000 
+ 181      0000
+ 182              		.global	gPendingResponse
+ 183              		.section	.bss.gPendingResponse,"aw",%nobits
+ 186              	gPendingResponse:
+ 187 0000 00       		.space	1
+ 188              		.global	gATPayload
+ 189              		.section	.bss.gATPayload,"aw",%nobits
+ 190              		.align	2
+ 193              	gATPayload:
+ 194 0000 00000000 		.space	64
+ 194      00000000 
+ 194      00000000 
+ 194      00000000 
+ 194      00000000 
+ 195              		.section	.text.sendRAWAT,"ax",%progbits
+ 196              		.align	1
+ 197              		.global	sendRAWAT
+ 198              		.syntax unified
+ 199              		.thumb
+ 200              		.thumb_func
+ 202              	sendRAWAT:
+ 203              	.LFB7:
+   1:Core/Src/uart_at.c **** #include "cmsis_os.h"
+   2:Core/Src/uart_at.c **** #include "cmsis_os2.h"
+   3:Core/Src/uart_at.c **** #include "uart_at.h"
+   4:Core/Src/uart_at.c **** #include "uartRingBufDMA.h"
+   5:Core/Src/uart_at.c **** #include <stdio.h>
+   6:Core/Src/uart_at.c **** #include <string.h>
+   7:Core/Src/uart_at.c **** 
+   8:Core/Src/uart_at.c **** uint8_t cmd_buffer[20];
+ARM GAS  /tmp/cctHSf5o.s 			page 6
+
+
+   9:Core/Src/uart_at.c **** uint8_t cmd_len = 0;
+  10:Core/Src/uart_at.c **** uint8_t byte = 0;
+  11:Core/Src/uart_at.c **** osMemoryPoolId_t mpid_ATCMD_MemPool; // memory pool id
+  12:Core/Src/uart_at.c **** osMemoryPoolId_t mpid_LoRaPayload_MemPool; // memory pool id
+  13:Core/Src/uart_at.c **** extern osMessageQueueId_t uartQueueHandle;
+  14:Core/Src/uart_at.c **** 
+  15:Core/Src/uart_at.c **** ATResponse ParseAT(char *buffer);
+  16:Core/Src/uart_at.c **** ATResponse ParseResponse(char *buffer);
+  17:Core/Src/uart_at.c **** 
+  18:Core/Src/uart_at.c **** const AT_CMD_DEF_t AT_COMMANDS[NUM_AT_COMMANDS] =
+  19:Core/Src/uart_at.c ****     {
+  20:Core/Src/uart_at.c ****         {.command = ATZ, .expected_response = AT_RESET, .retries = 3, .timeout_ms = 300, .command_s
+  21:Core/Src/uart_at.c ****         {.command = AT_CFM, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .command_s
+  22:Core/Src/uart_at.c ****         {.command = AT_APPKEY, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .comman
+  23:Core/Src/uart_at.c ****         {.command = AT_APPEUI, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .comman
+  24:Core/Src/uart_at.c ****         {.command = AT_ADR, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .command_s
+  25:Core/Src/uart_at.c ****         {.command = AT_NJM, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .command_s
+  26:Core/Src/uart_at.c ****         {.command = AT_JOIN, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .command_
+  27:Core/Src/uart_at.c ****         {.command = AT_CHMASK, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .comman
+  28:Core/Src/uart_at.c ****         {.command = AT_SENDB, .expected_response = AT_TX_OK, .retries = 3, .timeout_ms = 300, .comm
+  29:Core/Src/uart_at.c ****         {.command = AT_SEND, .expected_response = AT_TX_OK, .retries = 3, .timeout_ms = 300, .comma
+  30:Core/Src/uart_at.c ****         {.command = AT, .expected_response = AT_OK, .retries = 3, .timeout_ms = 300, .command_strin
+  31:Core/Src/uart_at.c ****         {.command = AT_COMMAND_UNDEFINED, .expected_response = AT_OK, .retries = 3, .timeout_ms = 3
+  32:Core/Src/uart_at.c **** 
+  33:Core/Src/uart_at.c **** const AT_RESPONSE_DEF_t AT_RESPONSES[NUM_AT_RESPONSES] =
+  34:Core/Src/uart_at.c ****     {
+  35:Core/Src/uart_at.c ****         {.response = AT_OK, .response_string = "AT_OK"},
+  36:Core/Src/uart_at.c ****         {.response = AT_TX_OK, .response_string = "AT_TX_OK"},
+  37:Core/Src/uart_at.c ****         {.response = AT_RX_OK, .response_string = "RX:"},
+  38:Core/Src/uart_at.c ****         {.response = AT_ERROR, .response_string = "AT_ERROR"},
+  39:Core/Src/uart_at.c ****         {.response = AT_JOINED, .response_string = "AT_JOIN_OK"},
+  40:Core/Src/uart_at.c ****         {.response = AT_TIMEOUT, .response_string = "AT_TIMEOUT"},
+  41:Core/Src/uart_at.c ****         {.response = AT_BUSY, .response_string = "AT_BUSY"},
+  42:Core/Src/uart_at.c ****         {.response = AT_JOIN_ERROR, .response_string = "AT_JOIN_ERROR"},
+  43:Core/Src/uart_at.c ****         {.response = AT_RESET, .response_string = "Radioenge"},
+  44:Core/Src/uart_at.c ****         {.response = AT_NO_NETWORK_JOINED, .response_string = "AT_NO_NETWORK_JOINED"},
+  45:Core/Src/uart_at.c ****         {.response = AT_RESPONSE_UNDEFINED, .response_string = "UNDEFINED"}};
+  46:Core/Src/uart_at.c **** 
+  47:Core/Src/uart_at.c **** extern void LoRaWAN_RxEventCallback(uint8_t *data, uint32_t length, uint32_t port, int32_t rssi, in
+  48:Core/Src/uart_at.c **** extern void LoRaWAN_JoinCallback(ATResponse response);
+  49:Core/Src/uart_at.c **** 
+  50:Core/Src/uart_at.c **** ATResponse gPendingResponse;
+  51:Core/Src/uart_at.c **** UART_MEM_BLOCK_t gATPayload;
+  52:Core/Src/uart_at.c **** 
+  53:Core/Src/uart_at.c **** ATResponse sendRAWAT(uint8_t *cmd)
+  54:Core/Src/uart_at.c **** {    
+ 204              		.loc 1 54 1
+ 205              		.cfi_startproc
+ 206              		@ args = 0, pretend = 0, frame = 24
+ 207              		@ frame_needed = 1, uses_anonymous_args = 0
+ 208 0000 90B5     		push	{r4, r7, lr}
+ 209              	.LCFI0:
+ 210              		.cfi_def_cfa_offset 12
+ 211              		.cfi_offset 4, -12
+ 212              		.cfi_offset 7, -8
+ 213              		.cfi_offset 14, -4
+ 214 0002 87B0     		sub	sp, sp, #28
+ARM GAS  /tmp/cctHSf5o.s 			page 7
+
+
+ 215              	.LCFI1:
+ 216              		.cfi_def_cfa_offset 40
+ 217 0004 00AF     		add	r7, sp, #0
+ 218              	.LCFI2:
+ 219              		.cfi_def_cfa_register 7
+ 220 0006 7860     		str	r0, [r7, #4]
+  55:Core/Src/uart_at.c ****     CMD_t* pATCommand;
+  56:Core/Src/uart_at.c ****     osStatus_t ret;
+  57:Core/Src/uart_at.c ****     uint32_t retries = 0, flags = 0;
+ 221              		.loc 1 57 14
+ 222 0008 0023     		movs	r3, #0
+ 223 000a 7B61     		str	r3, [r7, #20]
+ 224              		.loc 1 57 27
+ 225 000c 0023     		movs	r3, #0
+ 226 000e 3B61     		str	r3, [r7, #16]
+  58:Core/Src/uart_at.c ****     osSemaphoreAcquire(ATCommandSemaphoreHandle, osWaitForever);
+ 227              		.loc 1 58 5
+ 228 0010 424B     		ldr	r3, .L9
+ 229 0012 1B68     		ldr	r3, [r3]
+ 230 0014 4FF0FF31 		mov	r1, #-1
+ 231 0018 1846     		mov	r0, r3
+ 232 001a FFF7FEFF 		bl	osSemaphoreAcquire
+  59:Core/Src/uart_at.c ****     pATCommand = (CMD_t *)osMemoryPoolAlloc(mpid_ATCMD_MemPool, 0U); // get Mem Block
+ 233              		.loc 1 59 27
+ 234 001e 404B     		ldr	r3, .L9+4
+ 235 0020 1B68     		ldr	r3, [r3]
+ 236 0022 0021     		movs	r1, #0
+ 237 0024 1846     		mov	r0, r3
+ 238 0026 FFF7FEFF 		bl	osMemoryPoolAlloc
+ 239 002a 0346     		mov	r3, r0
+ 240              		.loc 1 59 16 discriminator 1
+ 241 002c BB60     		str	r3, [r7, #8]
+  60:Core/Src/uart_at.c ****     if(pATCommand != NULL)
+ 242              		.loc 1 60 19
+ 243 002e BB68     		ldr	r3, [r7, #8]
+ 244              		.loc 1 60 7
+ 245 0030 002B     		cmp	r3, #0
+ 246 0032 65D0     		beq	.L2
+  61:Core/Src/uart_at.c ****     {
+  62:Core/Src/uart_at.c ****         pATCommand->command = ParseAT(cmd);
+ 247              		.loc 1 62 19
+ 248 0034 BC68     		ldr	r4, [r7, #8]
+ 249              		.loc 1 62 31
+ 250 0036 7868     		ldr	r0, [r7, #4]
+ 251 0038 FFF7FEFF 		bl	ParseAT
+ 252 003c 0346     		mov	r3, r0
+ 253              		.loc 1 62 29 discriminator 1
+ 254 003e 2370     		strb	r3, [r4]
+  63:Core/Src/uart_at.c ****         pATCommand->response = AT_RESPONSE_UNDEFINED;
+ 255              		.loc 1 63 19
+ 256 0040 BB68     		ldr	r3, [r7, #8]
+ 257              		.loc 1 63 30
+ 258 0042 0A22     		movs	r2, #10
+ 259 0044 5A70     		strb	r2, [r3, #1]
+  64:Core/Src/uart_at.c ****         if(pATCommand->command != AT_COMMAND_UNDEFINED )
+ 260              		.loc 1 64 22
+ 261 0046 BB68     		ldr	r3, [r7, #8]
+ARM GAS  /tmp/cctHSf5o.s 			page 8
+
+
+ 262 0048 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 263              		.loc 1 64 11
+ 264 004a 0B2B     		cmp	r3, #11
+ 265 004c 4DD0     		beq	.L3
+  65:Core/Src/uart_at.c ****         {
+  66:Core/Src/uart_at.c ****             memcpy(gATPayload.Buf,cmd,strlen(cmd)+1);
+ 266              		.loc 1 66 39
+ 267 004e 7868     		ldr	r0, [r7, #4]
+ 268 0050 FFF7FEFF 		bl	strlen
+ 269 0054 0346     		mov	r3, r0
+ 270              		.loc 1 66 13 discriminator 1
+ 271 0056 0133     		adds	r3, r3, #1
+ 272 0058 1A46     		mov	r2, r3
+ 273 005a 7968     		ldr	r1, [r7, #4]
+ 274 005c 3148     		ldr	r0, .L9+8
+ 275 005e FFF7FEFF 		bl	memcpy
+  67:Core/Src/uart_at.c ****             pATCommand->tx_payload = &gATPayload;
+ 276              		.loc 1 67 23
+ 277 0062 BB68     		ldr	r3, [r7, #8]
+ 278              		.loc 1 67 36
+ 279 0064 2F4A     		ldr	r2, .L9+8
+ 280 0066 5A60     		str	r2, [r3, #4]
+  68:Core/Src/uart_at.c ****             gPendingResponse = AT_RESPONSE_UNDEFINED;
+ 281              		.loc 1 68 30
+ 282 0068 2F4B     		ldr	r3, .L9+12
+ 283 006a 0A22     		movs	r2, #10
+ 284 006c 1A70     		strb	r2, [r3]
+  69:Core/Src/uart_at.c ****             pATCommand->RequestedBy = osThreadGetId();	
+ 285              		.loc 1 69 23
+ 286 006e BC68     		ldr	r4, [r7, #8]
+ 287              		.loc 1 69 39
+ 288 0070 FFF7FEFF 		bl	osThreadGetId
+ 289 0074 0346     		mov	r3, r0
+ 290              		.loc 1 69 37 discriminator 1
+ 291 0076 A360     		str	r3, [r4, #8]
+ 292              	.L6:
+  70:Core/Src/uart_at.c ****             do
+  71:Core/Src/uart_at.c ****             {
+  72:Core/Src/uart_at.c ****                 ret = osMessageQueuePut(ATQueueHandle, &pATCommand, 0U, 250U);
+ 293              		.loc 1 72 23
+ 294 0078 2C4B     		ldr	r3, .L9+16
+ 295 007a 1868     		ldr	r0, [r3]
+ 296 007c 07F10801 		add	r1, r7, #8
+ 297 0080 FA23     		movs	r3, #250
+ 298 0082 0022     		movs	r2, #0
+ 299 0084 FFF7FEFF 		bl	osMessageQueuePut
+ 300 0088 F860     		str	r0, [r7, #12]
+  73:Core/Src/uart_at.c ****                 if (ret != osOK)
+ 301              		.loc 1 73 20
+ 302 008a FB68     		ldr	r3, [r7, #12]
+ 303 008c 002B     		cmp	r3, #0
+ 304 008e 16D0     		beq	.L4
+  74:Core/Src/uart_at.c ****                 {
+  75:Core/Src/uart_at.c ****                     if(retries++>4)
+ 305              		.loc 1 75 31
+ 306 0090 7B69     		ldr	r3, [r7, #20]
+ 307 0092 5A1C     		adds	r2, r3, #1
+ARM GAS  /tmp/cctHSf5o.s 			page 9
+
+
+ 308 0094 7A61     		str	r2, [r7, #20]
+ 309              		.loc 1 75 23
+ 310 0096 042B     		cmp	r3, #4
+ 311 0098 11D9     		bls	.L4
+  76:Core/Src/uart_at.c ****                     {
+  77:Core/Src/uart_at.c ****                         gPendingResponse = AT_ERROR;
+ 312              		.loc 1 77 42
+ 313 009a 234B     		ldr	r3, .L9+12
+ 314 009c 0322     		movs	r2, #3
+ 315 009e 1A70     		strb	r2, [r3]
+  78:Core/Src/uart_at.c ****                         osMemoryPoolFree(mpid_ATCMD_MemPool,pATCommand);
+ 316              		.loc 1 78 25
+ 317 00a0 1F4B     		ldr	r3, .L9+4
+ 318 00a2 1B68     		ldr	r3, [r3]
+ 319 00a4 BA68     		ldr	r2, [r7, #8]
+ 320 00a6 1146     		mov	r1, r2
+ 321 00a8 1846     		mov	r0, r3
+ 322 00aa FFF7FEFF 		bl	osMemoryPoolFree
+  79:Core/Src/uart_at.c ****                         osSemaphoreRelease(ATCommandSemaphoreHandle);
+ 323              		.loc 1 79 25
+ 324 00ae 1B4B     		ldr	r3, .L9
+ 325 00b0 1B68     		ldr	r3, [r3]
+ 326 00b2 1846     		mov	r0, r3
+ 327 00b4 FFF7FEFF 		bl	osSemaphoreRelease
+  80:Core/Src/uart_at.c ****                         return gPendingResponse;
+ 328              		.loc 1 80 32
+ 329 00b8 1B4B     		ldr	r3, .L9+12
+ 330 00ba 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 331 00bc 2AE0     		b	.L8
+ 332              	.L4:
+  81:Core/Src/uart_at.c ****                     }
+  82:Core/Src/uart_at.c ****                 }
+  83:Core/Src/uart_at.c ****             }while(ret != osOK);
+ 333              		.loc 1 83 24
+ 334 00be FB68     		ldr	r3, [r7, #12]
+ 335 00c0 002B     		cmp	r3, #0
+ 336 00c2 D9D1     		bne	.L6
+  84:Core/Src/uart_at.c ****             //wait for response
+  85:Core/Src/uart_at.c ****             osThreadFlagsClear (SEND_RAW_AT_WAIT_SUCCESS_FLAG | SEND_RAW_AT_WAIT_FAILURE_FLAG);    
+ 337              		.loc 1 85 13
+ 338 00c4 C020     		movs	r0, #192
+ 339 00c6 FFF7FEFF 		bl	osThreadFlagsClear
+  86:Core/Src/uart_at.c ****             flags = osThreadFlagsWait (SEND_RAW_AT_WAIT_SUCCESS_FLAG | SEND_RAW_AT_WAIT_FAILURE_FLA
+ 340              		.loc 1 86 21
+ 341 00ca 4FF0FF32 		mov	r2, #-1
+ 342 00ce 0021     		movs	r1, #0
+ 343 00d0 C020     		movs	r0, #192
+ 344 00d2 FFF7FEFF 		bl	osThreadFlagsWait
+ 345 00d6 3861     		str	r0, [r7, #16]
+  87:Core/Src/uart_at.c ****             if(flags & SEND_RAW_AT_WAIT_FAILURE_FLAG)
+ 346              		.loc 1 87 22
+ 347 00d8 3B69     		ldr	r3, [r7, #16]
+ 348 00da 03F08003 		and	r3, r3, #128
+ 349              		.loc 1 87 15
+ 350 00de 002B     		cmp	r3, #0
+ 351 00e0 11D0     		beq	.L7
+  88:Core/Src/uart_at.c ****             {
+ARM GAS  /tmp/cctHSf5o.s 			page 10
+
+
+  89:Core/Src/uart_at.c ****                 gPendingResponse = AT_ERROR;
+ 352              		.loc 1 89 34
+ 353 00e2 114B     		ldr	r3, .L9+12
+ 354 00e4 0322     		movs	r2, #3
+ 355 00e6 1A70     		strb	r2, [r3]
+ 356 00e8 0DE0     		b	.L7
+ 357              	.L3:
+  90:Core/Src/uart_at.c ****             }
+  91:Core/Src/uart_at.c ****         }
+  92:Core/Src/uart_at.c ****         else
+  93:Core/Src/uart_at.c ****         {
+  94:Core/Src/uart_at.c ****             osMemoryPoolFree(mpid_ATCMD_MemPool,pATCommand);
+ 358              		.loc 1 94 13
+ 359 00ea 0D4B     		ldr	r3, .L9+4
+ 360 00ec 1B68     		ldr	r3, [r3]
+ 361 00ee BA68     		ldr	r2, [r7, #8]
+ 362 00f0 1146     		mov	r1, r2
+ 363 00f2 1846     		mov	r0, r3
+ 364 00f4 FFF7FEFF 		bl	osMemoryPoolFree
+  95:Core/Src/uart_at.c ****             gPendingResponse = AT_ERROR;
+ 365              		.loc 1 95 30
+ 366 00f8 0B4B     		ldr	r3, .L9+12
+ 367 00fa 0322     		movs	r2, #3
+ 368 00fc 1A70     		strb	r2, [r3]
+ 369 00fe 02E0     		b	.L7
+ 370              	.L2:
+  96:Core/Src/uart_at.c ****         }
+  97:Core/Src/uart_at.c ****     }
+  98:Core/Src/uart_at.c ****     else
+  99:Core/Src/uart_at.c ****     {
+ 100:Core/Src/uart_at.c ****         gPendingResponse = AT_ERROR;
+ 371              		.loc 1 100 26
+ 372 0100 094B     		ldr	r3, .L9+12
+ 373 0102 0322     		movs	r2, #3
+ 374 0104 1A70     		strb	r2, [r3]
+ 375              	.L7:
+ 101:Core/Src/uart_at.c ****     }
+ 102:Core/Src/uart_at.c ****     
+ 103:Core/Src/uart_at.c ****     osSemaphoreRelease(ATCommandSemaphoreHandle);
+ 376              		.loc 1 103 5
+ 377 0106 054B     		ldr	r3, .L9
+ 378 0108 1B68     		ldr	r3, [r3]
+ 379 010a 1846     		mov	r0, r3
+ 380 010c FFF7FEFF 		bl	osSemaphoreRelease
+ 104:Core/Src/uart_at.c ****     return gPendingResponse;
+ 381              		.loc 1 104 12
+ 382 0110 054B     		ldr	r3, .L9+12
+ 383 0112 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 384              	.L8:
+ 105:Core/Src/uart_at.c **** }
+ 385              		.loc 1 105 1
+ 386 0114 1846     		mov	r0, r3
+ 387 0116 1C37     		adds	r7, r7, #28
+ 388              	.LCFI3:
+ 389              		.cfi_def_cfa_offset 12
+ 390 0118 BD46     		mov	sp, r7
+ 391              	.LCFI4:
+ARM GAS  /tmp/cctHSf5o.s 			page 11
+
+
+ 392              		.cfi_def_cfa_register 13
+ 393              		@ sp needed
+ 394 011a 90BD     		pop	{r4, r7, pc}
+ 395              	.L10:
+ 396              		.align	2
+ 397              	.L9:
+ 398 011c 00000000 		.word	ATCommandSemaphoreHandle
+ 399 0120 00000000 		.word	mpid_ATCMD_MemPool
+ 400 0124 00000000 		.word	gATPayload
+ 401 0128 00000000 		.word	gPendingResponse
+ 402 012c 00000000 		.word	ATQueueHandle
+ 403              		.cfi_endproc
+ 404              	.LFE7:
+ 406              		.section	.text.ParseResponse,"ax",%progbits
+ 407              		.align	1
+ 408              		.global	ParseResponse
+ 409              		.syntax unified
+ 410              		.thumb
+ 411              		.thumb_func
+ 413              	ParseResponse:
+ 414              	.LFB8:
+ 106:Core/Src/uart_at.c **** 
+ 107:Core/Src/uart_at.c **** ATResponse ParseResponse(char *buffer)
+ 108:Core/Src/uart_at.c **** { 
+ 415              		.loc 1 108 1
+ 416              		.cfi_startproc
+ 417              		@ args = 0, pretend = 0, frame = 16
+ 418              		@ frame_needed = 1, uses_anonymous_args = 0
+ 419 0000 90B5     		push	{r4, r7, lr}
+ 420              	.LCFI5:
+ 421              		.cfi_def_cfa_offset 12
+ 422              		.cfi_offset 4, -12
+ 423              		.cfi_offset 7, -8
+ 424              		.cfi_offset 14, -4
+ 425 0002 85B0     		sub	sp, sp, #20
+ 426              	.LCFI6:
+ 427              		.cfi_def_cfa_offset 32
+ 428 0004 00AF     		add	r7, sp, #0
+ 429              	.LCFI7:
+ 430              		.cfi_def_cfa_register 7
+ 431 0006 7860     		str	r0, [r7, #4]
+ 432              	.LBB2:
+ 109:Core/Src/uart_at.c ****     for (uint32_t i = 0; i < NUM_AT_RESPONSES; i++)
+ 433              		.loc 1 109 19
+ 434 0008 0023     		movs	r3, #0
+ 435 000a FB60     		str	r3, [r7, #12]
+ 436              		.loc 1 109 5
+ 437 000c 2AE0     		b	.L12
+ 438              	.L15:
+ 110:Core/Src/uart_at.c ****     {
+ 111:Core/Src/uart_at.c ****         if (strncmp(buffer, AT_RESPONSES[i].response_string, strlen(AT_RESPONSES[i].response_string
+ 439              		.loc 1 111 44
+ 440 000e FA68     		ldr	r2, [r7, #12]
+ 441 0010 1346     		mov	r3, r2
+ 442 0012 9B00     		lsls	r3, r3, #2
+ 443 0014 1344     		add	r3, r3, r2
+ 444 0016 9A00     		lsls	r2, r3, #2
+ARM GAS  /tmp/cctHSf5o.s 			page 12
+
+
+ 445 0018 1344     		add	r3, r3, r2
+ 446 001a 164A     		ldr	r2, .L16
+ 447 001c 1344     		add	r3, r3, r2
+ 448 001e 5C1C     		adds	r4, r3, #1
+ 449              		.loc 1 111 84
+ 450 0020 FA68     		ldr	r2, [r7, #12]
+ 451 0022 1346     		mov	r3, r2
+ 452 0024 9B00     		lsls	r3, r3, #2
+ 453 0026 1344     		add	r3, r3, r2
+ 454 0028 9A00     		lsls	r2, r3, #2
+ 455 002a 1344     		add	r3, r3, r2
+ 456 002c 114A     		ldr	r2, .L16
+ 457 002e 1344     		add	r3, r3, r2
+ 458 0030 0133     		adds	r3, r3, #1
+ 459              		.loc 1 111 13
+ 460 0032 1846     		mov	r0, r3
+ 461 0034 FFF7FEFF 		bl	strlen
+ 462 0038 0346     		mov	r3, r0
+ 463              		.loc 1 111 13 is_stmt 0 discriminator 1
+ 464 003a 1A46     		mov	r2, r3
+ 465 003c 2146     		mov	r1, r4
+ 466 003e 7868     		ldr	r0, [r7, #4]
+ 467 0040 FFF7FEFF 		bl	strncmp
+ 468 0044 0346     		mov	r3, r0
+ 469              		.loc 1 111 12 is_stmt 1 discriminator 2
+ 470 0046 002B     		cmp	r3, #0
+ 471 0048 09D1     		bne	.L13
+ 112:Core/Src/uart_at.c ****         {
+ 113:Core/Src/uart_at.c ****             return AT_RESPONSES[i].response;
+ 472              		.loc 1 113 35
+ 473 004a 0A49     		ldr	r1, .L16
+ 474 004c FA68     		ldr	r2, [r7, #12]
+ 475 004e 1346     		mov	r3, r2
+ 476 0050 9B00     		lsls	r3, r3, #2
+ 477 0052 1344     		add	r3, r3, r2
+ 478 0054 9A00     		lsls	r2, r3, #2
+ 479 0056 1344     		add	r3, r3, r2
+ 480 0058 0B44     		add	r3, r3, r1
+ 481 005a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 482 005c 06E0     		b	.L14
+ 483              	.L13:
+ 109:Core/Src/uart_at.c ****     {
+ 484              		.loc 1 109 49 discriminator 2
+ 485 005e FB68     		ldr	r3, [r7, #12]
+ 486 0060 0133     		adds	r3, r3, #1
+ 487 0062 FB60     		str	r3, [r7, #12]
+ 488              	.L12:
+ 109:Core/Src/uart_at.c ****     {
+ 489              		.loc 1 109 28 discriminator 1
+ 490 0064 FB68     		ldr	r3, [r7, #12]
+ 491 0066 0A2B     		cmp	r3, #10
+ 492 0068 D1D9     		bls	.L15
+ 493              	.LBE2:
+ 114:Core/Src/uart_at.c ****         }
+ 115:Core/Src/uart_at.c ****     }
+ 116:Core/Src/uart_at.c ****     return AT_RESPONSES[NUM_AT_RESPONSES-1].response; //undefined    
+ 494              		.loc 1 116 44
+ARM GAS  /tmp/cctHSf5o.s 			page 13
+
+
+ 495 006a 0A23     		movs	r3, #10
+ 496              	.L14:
+ 117:Core/Src/uart_at.c **** }
+ 497              		.loc 1 117 1
+ 498 006c 1846     		mov	r0, r3
+ 499 006e 1437     		adds	r7, r7, #20
+ 500              	.LCFI8:
+ 501              		.cfi_def_cfa_offset 12
+ 502 0070 BD46     		mov	sp, r7
+ 503              	.LCFI9:
+ 504              		.cfi_def_cfa_register 13
+ 505              		@ sp needed
+ 506 0072 90BD     		pop	{r4, r7, pc}
+ 507              	.L17:
+ 508              		.align	2
+ 509              	.L16:
+ 510 0074 00000000 		.word	AT_RESPONSES
+ 511              		.cfi_endproc
+ 512              	.LFE8:
+ 514              		.section	.text.ParseAT,"ax",%progbits
+ 515              		.align	1
+ 516              		.global	ParseAT
+ 517              		.syntax unified
+ 518              		.thumb
+ 519              		.thumb_func
+ 521              	ParseAT:
+ 522              	.LFB9:
+ 118:Core/Src/uart_at.c **** 
+ 119:Core/Src/uart_at.c **** ATResponse ParseAT(char *buffer)
+ 120:Core/Src/uart_at.c **** {    
+ 523              		.loc 1 120 1
+ 524              		.cfi_startproc
+ 525              		@ args = 0, pretend = 0, frame = 16
+ 526              		@ frame_needed = 1, uses_anonymous_args = 0
+ 527 0000 90B5     		push	{r4, r7, lr}
+ 528              	.LCFI10:
+ 529              		.cfi_def_cfa_offset 12
+ 530              		.cfi_offset 4, -12
+ 531              		.cfi_offset 7, -8
+ 532              		.cfi_offset 14, -4
+ 533 0002 85B0     		sub	sp, sp, #20
+ 534              	.LCFI11:
+ 535              		.cfi_def_cfa_offset 32
+ 536 0004 00AF     		add	r7, sp, #0
+ 537              	.LCFI12:
+ 538              		.cfi_def_cfa_register 7
+ 539 0006 7860     		str	r0, [r7, #4]
+ 540              	.LBB3:
+ 121:Core/Src/uart_at.c ****     for (uint32_t i = 0; i < NUM_AT_COMMANDS; i++)
+ 541              		.loc 1 121 19
+ 542 0008 0023     		movs	r3, #0
+ 543 000a FB60     		str	r3, [r7, #12]
+ 544              		.loc 1 121 5
+ 545 000c 27E0     		b	.L19
+ 546              	.L22:
+ 122:Core/Src/uart_at.c ****     {
+ 123:Core/Src/uart_at.c ****         if (strncmp(buffer, AT_COMMANDS[i].command_string, strlen(AT_COMMANDS[i].command_string)) =
+ARM GAS  /tmp/cctHSf5o.s 			page 14
+
+
+ 547              		.loc 1 123 43
+ 548 000e FA68     		ldr	r2, [r7, #12]
+ 549 0010 1346     		mov	r3, r2
+ 550 0012 5B00     		lsls	r3, r3, #1
+ 551 0014 1344     		add	r3, r3, r2
+ 552 0016 DB00     		lsls	r3, r3, #3
+ 553 0018 0833     		adds	r3, r3, #8
+ 554 001a 154A     		ldr	r2, .L23
+ 555 001c 9C18     		adds	r4, r3, r2
+ 556              		.loc 1 123 81
+ 557 001e FA68     		ldr	r2, [r7, #12]
+ 558 0020 1346     		mov	r3, r2
+ 559 0022 5B00     		lsls	r3, r3, #1
+ 560 0024 1344     		add	r3, r3, r2
+ 561 0026 DB00     		lsls	r3, r3, #3
+ 562 0028 0833     		adds	r3, r3, #8
+ 563 002a 114A     		ldr	r2, .L23
+ 564 002c 1344     		add	r3, r3, r2
+ 565              		.loc 1 123 13
+ 566 002e 1846     		mov	r0, r3
+ 567 0030 FFF7FEFF 		bl	strlen
+ 568 0034 0346     		mov	r3, r0
+ 569              		.loc 1 123 13 is_stmt 0 discriminator 1
+ 570 0036 1A46     		mov	r2, r3
+ 571 0038 2146     		mov	r1, r4
+ 572 003a 7868     		ldr	r0, [r7, #4]
+ 573 003c FFF7FEFF 		bl	strncmp
+ 574 0040 0346     		mov	r3, r0
+ 575              		.loc 1 123 12 is_stmt 1 discriminator 2
+ 576 0042 002B     		cmp	r3, #0
+ 577 0044 08D1     		bne	.L20
+ 124:Core/Src/uart_at.c ****         {
+ 125:Core/Src/uart_at.c ****             return AT_COMMANDS[i].command;
+ 578              		.loc 1 125 34
+ 579 0046 0A49     		ldr	r1, .L23
+ 580 0048 FA68     		ldr	r2, [r7, #12]
+ 581 004a 1346     		mov	r3, r2
+ 582 004c 5B00     		lsls	r3, r3, #1
+ 583 004e 1344     		add	r3, r3, r2
+ 584 0050 DB00     		lsls	r3, r3, #3
+ 585 0052 0B44     		add	r3, r3, r1
+ 586 0054 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 587 0056 06E0     		b	.L21
+ 588              	.L20:
+ 121:Core/Src/uart_at.c ****     {
+ 589              		.loc 1 121 48 discriminator 2
+ 590 0058 FB68     		ldr	r3, [r7, #12]
+ 591 005a 0133     		adds	r3, r3, #1
+ 592 005c FB60     		str	r3, [r7, #12]
+ 593              	.L19:
+ 121:Core/Src/uart_at.c ****     {
+ 594              		.loc 1 121 28 discriminator 1
+ 595 005e FB68     		ldr	r3, [r7, #12]
+ 596 0060 0B2B     		cmp	r3, #11
+ 597 0062 D4D9     		bls	.L22
+ 598              	.LBE3:
+ 126:Core/Src/uart_at.c ****         }
+ARM GAS  /tmp/cctHSf5o.s 			page 15
+
+
+ 127:Core/Src/uart_at.c ****     }
+ 128:Core/Src/uart_at.c ****     return AT_COMMANDS[NUM_AT_COMMANDS - 1].command; // undefined
+ 599              		.loc 1 128 44
+ 600 0064 0B23     		movs	r3, #11
+ 601              	.L21:
+ 129:Core/Src/uart_at.c **** }
+ 602              		.loc 1 129 1
+ 603 0066 1846     		mov	r0, r3
+ 604 0068 1437     		adds	r7, r7, #20
+ 605              	.LCFI13:
+ 606              		.cfi_def_cfa_offset 12
+ 607 006a BD46     		mov	sp, r7
+ 608              	.LCFI14:
+ 609              		.cfi_def_cfa_register 13
+ 610              		@ sp needed
+ 611 006c 90BD     		pop	{r4, r7, pc}
+ 612              	.L24:
+ 613 006e 00BF     		.align	2
+ 614              	.L23:
+ 615 0070 00000000 		.word	AT_COMMANDS
+ 616              		.cfi_endproc
+ 617              	.LFE9:
+ 619              		.section	.text.ATHandlingTaskCode,"ax",%progbits
+ 620              		.align	1
+ 621              		.global	ATHandlingTaskCode
+ 622              		.syntax unified
+ 623              		.thumb
+ 624              		.thumb_func
+ 626              	ATHandlingTaskCode:
+ 627              	.LFB10:
+ 130:Core/Src/uart_at.c **** 
+ 131:Core/Src/uart_at.c **** void ATHandlingTaskCode(void *argument)
+ 132:Core/Src/uart_at.c **** {
+ 628              		.loc 1 132 1
+ 629              		.cfi_startproc
+ 630              		@ args = 0, pretend = 0, frame = 32
+ 631              		@ frame_needed = 1, uses_anonymous_args = 0
+ 632 0000 90B5     		push	{r4, r7, lr}
+ 633              	.LCFI15:
+ 634              		.cfi_def_cfa_offset 12
+ 635              		.cfi_offset 4, -12
+ 636              		.cfi_offset 7, -8
+ 637              		.cfi_offset 14, -4
+ 638 0002 8BB0     		sub	sp, sp, #44
+ 639              	.LCFI16:
+ 640              		.cfi_def_cfa_offset 56
+ 641 0004 02AF     		add	r7, sp, #8
+ 642              	.LCFI17:
+ 643              		.cfi_def_cfa 7, 48
+ 644 0006 7860     		str	r0, [r7, #4]
+ 133:Core/Src/uart_at.c ****     /* USER CODE BEGIN 5 */
+ 134:Core/Src/uart_at.c ****     /* Infinite loop */
+ 135:Core/Src/uart_at.c ****     AT_FSM ATTaskFSM = AT_IDLE;
+ 645              		.loc 1 135 12
+ 646 0008 0023     		movs	r3, #0
+ 647 000a FB77     		strb	r3, [r7, #31]
+ 136:Core/Src/uart_at.c ****     osStatus_t atevent;    
+ARM GAS  /tmp/cctHSf5o.s 			page 16
+
+
+ 137:Core/Src/uart_at.c ****     CMD_t* new_cmd=NULL;
+ 648              		.loc 1 137 12
+ 649 000c 0023     		movs	r3, #0
+ 650 000e BB60     		str	r3, [r7, #8]
+ 138:Core/Src/uart_at.c ****     CMD_t* send_cmd=NULL;
+ 651              		.loc 1 138 12
+ 652 0010 0023     		movs	r3, #0
+ 653 0012 BB61     		str	r3, [r7, #24]
+ 139:Core/Src/uart_at.c ****     CMD_t* PendingCommand = NULL;
+ 654              		.loc 1 139 12
+ 655 0014 0023     		movs	r3, #0
+ 656 0016 7B61     		str	r3, [r7, #20]
+ 140:Core/Src/uart_at.c ****     uint32_t CurrentRetries=0;    
+ 657              		.loc 1 140 14
+ 658 0018 0023     		movs	r3, #0
+ 659 001a 3B61     		str	r3, [r7, #16]
+ 660              	.L45:
+ 141:Core/Src/uart_at.c **** 
+ 142:Core/Src/uart_at.c ****     while (1)
+ 143:Core/Src/uart_at.c ****     {
+ 144:Core/Src/uart_at.c ****         atevent = osMessageQueueGet(ATQueueHandle, &new_cmd, NULL, 3000U);   // wait for message
+ 661              		.loc 1 144 19
+ 662 001c 8E4B     		ldr	r3, .L48
+ 663 001e 1868     		ldr	r0, [r3]
+ 664 0020 07F10801 		add	r1, r7, #8
+ 665 0024 40F6B833 		movw	r3, #3000
+ 666 0028 0022     		movs	r2, #0
+ 667 002a FFF7FEFF 		bl	osMessageQueueGet
+ 668 002e F860     		str	r0, [r7, #12]
+ 145:Core/Src/uart_at.c ****         if(atevent == osErrorTimeout)
+ 669              		.loc 1 145 11
+ 670 0030 FB68     		ldr	r3, [r7, #12]
+ 671 0032 13F1020F 		cmn	r3, #2
+ 672 0036 2CD1     		bne	.L26
+ 146:Core/Src/uart_at.c ****         {
+ 147:Core/Src/uart_at.c ****             if(PendingCommand!=NULL)
+ 673              		.loc 1 147 15
+ 674 0038 7B69     		ldr	r3, [r7, #20]
+ 675 003a 002B     		cmp	r3, #0
+ 676 003c 00F03581 		beq	.L27
+ 148:Core/Src/uart_at.c ****             {
+ 149:Core/Src/uart_at.c ****                 if(CurrentRetries < AT_COMMANDS[PendingCommand->command].retries)
+ 677              		.loc 1 149 63
+ 678 0040 7B69     		ldr	r3, [r7, #20]
+ 679 0042 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 680 0044 1946     		mov	r1, r3
+ 681              		.loc 1 149 73
+ 682 0046 854A     		ldr	r2, .L48+4
+ 683 0048 0B46     		mov	r3, r1
+ 684 004a 5B00     		lsls	r3, r3, #1
+ 685 004c 0B44     		add	r3, r3, r1
+ 686 004e DB00     		lsls	r3, r3, #3
+ 687 0050 1344     		add	r3, r3, r2
+ 688 0052 0233     		adds	r3, r3, #2
+ 689 0054 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 690 0056 1A46     		mov	r2, r3
+ 691              		.loc 1 149 19
+ARM GAS  /tmp/cctHSf5o.s 			page 17
+
+
+ 692 0058 3B69     		ldr	r3, [r7, #16]
+ 693 005a 9342     		cmp	r3, r2
+ 694 005c 05D2     		bcs	.L28
+ 150:Core/Src/uart_at.c ****                 {
+ 151:Core/Src/uart_at.c ****                     send_cmd = PendingCommand;
+ 695              		.loc 1 151 30
+ 696 005e 7B69     		ldr	r3, [r7, #20]
+ 697 0060 BB61     		str	r3, [r7, #24]
+ 152:Core/Src/uart_at.c ****                     CurrentRetries++;
+ 698              		.loc 1 152 35
+ 699 0062 3B69     		ldr	r3, [r7, #16]
+ 700 0064 0133     		adds	r3, r3, #1
+ 701 0066 3B61     		str	r3, [r7, #16]
+ 702 0068 1FE1     		b	.L27
+ 703              	.L28:
+ 153:Core/Src/uart_at.c ****                 }
+ 154:Core/Src/uart_at.c ****                 else
+ 155:Core/Src/uart_at.c ****                 {                    
+ 156:Core/Src/uart_at.c ****                     gPendingResponse = AT_TIMEOUT;
+ 704              		.loc 1 156 38
+ 705 006a 7D4B     		ldr	r3, .L48+8
+ 706 006c 0522     		movs	r2, #5
+ 707 006e 1A70     		strb	r2, [r3]
+ 157:Core/Src/uart_at.c ****                     osThreadFlagsSet(PendingCommand->RequestedBy, SEND_RAW_AT_WAIT_FAILURE_FLAG);
+ 708              		.loc 1 157 21
+ 709 0070 7B69     		ldr	r3, [r7, #20]
+ 710 0072 9B68     		ldr	r3, [r3, #8]
+ 711 0074 8021     		movs	r1, #128
+ 712 0076 1846     		mov	r0, r3
+ 713 0078 FFF7FEFF 		bl	osThreadFlagsSet
+ 158:Core/Src/uart_at.c ****                     osMemoryPoolFree(mpid_ATCMD_MemPool,PendingCommand);
+ 714              		.loc 1 158 21
+ 715 007c 794B     		ldr	r3, .L48+12
+ 716 007e 1B68     		ldr	r3, [r3]
+ 717 0080 7969     		ldr	r1, [r7, #20]
+ 718 0082 1846     		mov	r0, r3
+ 719 0084 FFF7FEFF 		bl	osMemoryPoolFree
+ 159:Core/Src/uart_at.c ****                     PendingCommand = NULL;                    
+ 720              		.loc 1 159 36
+ 721 0088 0023     		movs	r3, #0
+ 722 008a 7B61     		str	r3, [r7, #20]
+ 160:Core/Src/uart_at.c ****                     ATTaskFSM = AT_IDLE;
+ 723              		.loc 1 160 31
+ 724 008c 0023     		movs	r3, #0
+ 725 008e FB77     		strb	r3, [r7, #31]
+ 726 0090 0BE1     		b	.L27
+ 727              	.L26:
+ 161:Core/Src/uart_at.c ****                 }
+ 162:Core/Src/uart_at.c ****             }
+ 163:Core/Src/uart_at.c ****         }
+ 164:Core/Src/uart_at.c ****         else if (atevent == osOK)
+ 728              		.loc 1 164 17
+ 729 0092 FB68     		ldr	r3, [r7, #12]
+ 730 0094 002B     		cmp	r3, #0
+ 731 0096 40F00881 		bne	.L27
+ 165:Core/Src/uart_at.c ****         {         
+ 166:Core/Src/uart_at.c ****             switch (new_cmd->command)
+ARM GAS  /tmp/cctHSf5o.s 			page 18
+
+
+ 732              		.loc 1 166 28
+ 733 009a BB68     		ldr	r3, [r7, #8]
+ 734 009c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 735              		.loc 1 166 13
+ 736 009e 0A2B     		cmp	r3, #10
+ 737 00a0 04D8     		bhi	.L29
+ 167:Core/Src/uart_at.c ****             {
+ 168:Core/Src/uart_at.c ****                 case ATZ:
+ 169:Core/Src/uart_at.c ****                 case AT_CFM:
+ 170:Core/Src/uart_at.c ****                 case AT_APPKEY:
+ 171:Core/Src/uart_at.c ****                 case AT_APPEUI:
+ 172:Core/Src/uart_at.c ****                 case AT_ADR:
+ 173:Core/Src/uart_at.c ****                 case AT_NJM:
+ 174:Core/Src/uart_at.c ****                 case AT_JOIN:
+ 175:Core/Src/uart_at.c ****                 case AT_SENDB:
+ 176:Core/Src/uart_at.c ****                 case AT_SEND:
+ 177:Core/Src/uart_at.c ****                 case AT_CHMASK:
+ 178:Core/Src/uart_at.c ****                 case AT:
+ 179:Core/Src/uart_at.c ****                 {
+ 180:Core/Src/uart_at.c ****                     send_cmd = new_cmd;
+ 738              		.loc 1 180 30
+ 739 00a2 BB68     		ldr	r3, [r7, #8]
+ 740 00a4 BB61     		str	r3, [r7, #24]
+ 181:Core/Src/uart_at.c ****                     CurrentRetries = 0;
+ 741              		.loc 1 181 36
+ 742 00a6 0023     		movs	r3, #0
+ 743 00a8 3B61     		str	r3, [r7, #16]
+ 182:Core/Src/uart_at.c ****                     break;
+ 744              		.loc 1 182 21
+ 745 00aa 21E0     		b	.L30
+ 746              	.L29:
+ 183:Core/Src/uart_at.c ****                 }    
+ 184:Core/Src/uart_at.c ****                 case AT_COMMAND_UNDEFINED:        
+ 185:Core/Src/uart_at.c ****                 default:
+ 186:Core/Src/uart_at.c ****                 {
+ 187:Core/Src/uart_at.c ****                     if(new_cmd->response == AT_RESPONSE_UNDEFINED)
+ 747              		.loc 1 187 31
+ 748 00ac BB68     		ldr	r3, [r7, #8]
+ 749 00ae 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 750              		.loc 1 187 23
+ 751 00b0 0A2B     		cmp	r3, #10
+ 752 00b2 1CD1     		bne	.L46
+ 188:Core/Src/uart_at.c ****                     {
+ 189:Core/Src/uart_at.c ****                         //malformed CMD_t - should not be happening
+ 190:Core/Src/uart_at.c ****                         gPendingResponse = AT_ERROR;
+ 753              		.loc 1 190 42
+ 754 00b4 6A4B     		ldr	r3, .L48+8
+ 755 00b6 0322     		movs	r2, #3
+ 756 00b8 1A70     		strb	r2, [r3]
+ 191:Core/Src/uart_at.c ****                         if(PendingCommand)
+ 757              		.loc 1 191 27
+ 758 00ba 7B69     		ldr	r3, [r7, #20]
+ 759 00bc 002B     		cmp	r3, #0
+ 760 00be 0BD0     		beq	.L32
+ 192:Core/Src/uart_at.c ****                         {
+ 193:Core/Src/uart_at.c ****                             osThreadFlagsSet(PendingCommand->RequestedBy, SEND_RAW_AT_WAIT_FAILURE_
+ 761              		.loc 1 193 29
+ARM GAS  /tmp/cctHSf5o.s 			page 19
+
+
+ 762 00c0 7B69     		ldr	r3, [r7, #20]
+ 763 00c2 9B68     		ldr	r3, [r3, #8]
+ 764 00c4 8021     		movs	r1, #128
+ 765 00c6 1846     		mov	r0, r3
+ 766 00c8 FFF7FEFF 		bl	osThreadFlagsSet
+ 194:Core/Src/uart_at.c ****                             osMemoryPoolFree(mpid_ATCMD_MemPool,PendingCommand);
+ 767              		.loc 1 194 29
+ 768 00cc 654B     		ldr	r3, .L48+12
+ 769 00ce 1B68     		ldr	r3, [r3]
+ 770 00d0 7969     		ldr	r1, [r7, #20]
+ 771 00d2 1846     		mov	r0, r3
+ 772 00d4 FFF7FEFF 		bl	osMemoryPoolFree
+ 773              	.L32:
+ 195:Core/Src/uart_at.c ****                         }
+ 196:Core/Src/uart_at.c ****                         osMemoryPoolFree(mpid_ATCMD_MemPool,new_cmd);                        
+ 774              		.loc 1 196 25
+ 775 00d8 624B     		ldr	r3, .L48+12
+ 776 00da 1B68     		ldr	r3, [r3]
+ 777 00dc BA68     		ldr	r2, [r7, #8]
+ 778 00de 1146     		mov	r1, r2
+ 779 00e0 1846     		mov	r0, r3
+ 780 00e2 FFF7FEFF 		bl	osMemoryPoolFree
+ 197:Core/Src/uart_at.c ****                         PendingCommand = NULL;                        
+ 781              		.loc 1 197 40
+ 782 00e6 0023     		movs	r3, #0
+ 783 00e8 7B61     		str	r3, [r7, #20]
+ 198:Core/Src/uart_at.c ****                         ATTaskFSM = AT_IDLE;
+ 784              		.loc 1 198 35
+ 785 00ea 0023     		movs	r3, #0
+ 786 00ec FB77     		strb	r3, [r7, #31]
+ 787              	.L46:
+ 199:Core/Src/uart_at.c ****                     }                    
+ 200:Core/Src/uart_at.c ****                     break;
+ 788              		.loc 1 200 21
+ 789 00ee 00BF     		nop
+ 790              	.L30:
+ 201:Core/Src/uart_at.c ****                 }                
+ 202:Core/Src/uart_at.c ****             }
+ 203:Core/Src/uart_at.c ****             if (new_cmd->response == AT_RX_OK)
+ 791              		.loc 1 203 24
+ 792 00f0 BB68     		ldr	r3, [r7, #8]
+ 793 00f2 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 794              		.loc 1 203 16
+ 795 00f4 022B     		cmp	r3, #2
+ 796 00f6 23D1     		bne	.L33
+ 204:Core/Src/uart_at.c ****             {
+ 205:Core/Src/uart_at.c ****                 LoRaWAN_RxEventCallback(new_cmd->rx_payload->Buf, new_cmd->rx_payload->rcvDataLen, 
+ 797              		.loc 1 205 48
+ 798 00f8 BB68     		ldr	r3, [r7, #8]
+ 799 00fa 5B68     		ldr	r3, [r3, #4]
+ 800              		.loc 1 205 60
+ 801 00fc 03F11400 		add	r0, r3, #20
+ 802              		.loc 1 205 74
+ 803 0100 BB68     		ldr	r3, [r7, #8]
+ 804 0102 5B68     		ldr	r3, [r3, #4]
+ 805              		.loc 1 205 17
+ 806 0104 9968     		ldr	r1, [r3, #8]
+ARM GAS  /tmp/cctHSf5o.s 			page 20
+
+
+ 807              		.loc 1 205 107
+ 808 0106 BB68     		ldr	r3, [r7, #8]
+ 809 0108 5B68     		ldr	r3, [r3, #4]
+ 810              		.loc 1 205 17
+ 811 010a 1A68     		ldr	r2, [r3]
+ 812              		.loc 1 205 137
+ 813 010c BB68     		ldr	r3, [r7, #8]
+ 814 010e 5B68     		ldr	r3, [r3, #4]
+ 815              		.loc 1 205 17
+ 816 0110 DC68     		ldr	r4, [r3, #12]
+ 817              		.loc 1 205 167
+ 818 0112 BB68     		ldr	r3, [r7, #8]
+ 819 0114 5B68     		ldr	r3, [r3, #4]
+ 820              		.loc 1 205 17
+ 821 0116 1B69     		ldr	r3, [r3, #16]
+ 822 0118 0093     		str	r3, [sp]
+ 823 011a 2346     		mov	r3, r4
+ 824 011c FFF7FEFF 		bl	LoRaWAN_RxEventCallback
+ 206:Core/Src/uart_at.c ****                 //osMemoryPoolFree(mpid_LoRaPayload_MemPool, PendingCommand->rx_payload);          
+ 207:Core/Src/uart_at.c ****                 osMemoryPoolFree(mpid_LoRaPayload_MemPool, new_cmd->rx_payload);
+ 825              		.loc 1 207 17
+ 826 0120 514B     		ldr	r3, .L48+16
+ 827 0122 1A68     		ldr	r2, [r3]
+ 828              		.loc 1 207 67
+ 829 0124 BB68     		ldr	r3, [r7, #8]
+ 830 0126 5B68     		ldr	r3, [r3, #4]
+ 831              		.loc 1 207 17
+ 832 0128 1946     		mov	r1, r3
+ 833 012a 1046     		mov	r0, r2
+ 834 012c FFF7FEFF 		bl	osMemoryPoolFree
+ 208:Core/Src/uart_at.c ****                 osMemoryPoolFree(mpid_ATCMD_MemPool,new_cmd);                        
+ 835              		.loc 1 208 17
+ 836 0130 4C4B     		ldr	r3, .L48+12
+ 837 0132 1B68     		ldr	r3, [r3]
+ 838 0134 BA68     		ldr	r2, [r7, #8]
+ 839 0136 1146     		mov	r1, r2
+ 840 0138 1846     		mov	r0, r3
+ 841 013a FFF7FEFF 		bl	osMemoryPoolFree
+ 842 013e B4E0     		b	.L27
+ 843              	.L33:
+ 209:Core/Src/uart_at.c ****             }
+ 210:Core/Src/uart_at.c ****             else if ((new_cmd->response == AT_JOINED) || (new_cmd->response == AT_JOIN_ERROR))
+ 844              		.loc 1 210 30
+ 845 0140 BB68     		ldr	r3, [r7, #8]
+ 846 0142 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 847              		.loc 1 210 21
+ 848 0144 042B     		cmp	r3, #4
+ 849 0146 03D0     		beq	.L34
+ 850              		.loc 1 210 66 discriminator 1
+ 851 0148 BB68     		ldr	r3, [r7, #8]
+ 852 014a 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 853              		.loc 1 210 55 discriminator 1
+ 854 014c 072B     		cmp	r3, #7
+ 855 014e 12D1     		bne	.L35
+ 856              	.L34:
+ 211:Core/Src/uart_at.c ****             {
+ 212:Core/Src/uart_at.c ****                 LoRaWAN_JoinCallback(new_cmd->response);
+ARM GAS  /tmp/cctHSf5o.s 			page 21
+
+
+ 857              		.loc 1 212 45
+ 858 0150 BB68     		ldr	r3, [r7, #8]
+ 859              		.loc 1 212 17
+ 860 0152 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 861 0154 1846     		mov	r0, r3
+ 862 0156 FFF7FEFF 		bl	LoRaWAN_JoinCallback
+ 213:Core/Src/uart_at.c ****                 osMemoryPoolFree(mpid_ATCMD_MemPool, PendingCommand);
+ 863              		.loc 1 213 17
+ 864 015a 424B     		ldr	r3, .L48+12
+ 865 015c 1B68     		ldr	r3, [r3]
+ 866 015e 7969     		ldr	r1, [r7, #20]
+ 867 0160 1846     		mov	r0, r3
+ 868 0162 FFF7FEFF 		bl	osMemoryPoolFree
+ 214:Core/Src/uart_at.c ****                 osMemoryPoolFree(mpid_ATCMD_MemPool,new_cmd);                        
+ 869              		.loc 1 214 17
+ 870 0166 3F4B     		ldr	r3, .L48+12
+ 871 0168 1B68     		ldr	r3, [r3]
+ 872 016a BA68     		ldr	r2, [r7, #8]
+ 873 016c 1146     		mov	r1, r2
+ 874 016e 1846     		mov	r0, r3
+ 875 0170 FFF7FEFF 		bl	osMemoryPoolFree
+ 876 0174 99E0     		b	.L27
+ 877              	.L35:
+ 215:Core/Src/uart_at.c ****             }
+ 216:Core/Src/uart_at.c ****             else if (new_cmd->command == AT_COMMAND_UNDEFINED) // it is a response
+ 878              		.loc 1 216 29
+ 879 0176 BB68     		ldr	r3, [r7, #8]
+ 880 0178 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 881              		.loc 1 216 21
+ 882 017a 0B2B     		cmp	r3, #11
+ 883 017c 40F09580 		bne	.L27
+ 217:Core/Src/uart_at.c ****             {
+ 218:Core/Src/uart_at.c ****                 switch (ATTaskFSM)
+ 884              		.loc 1 218 17
+ 885 0180 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 886 0182 002B     		cmp	r3, #0
+ 887 0184 02D0     		beq	.L36
+ 888 0186 012B     		cmp	r3, #1
+ 889 0188 11D0     		beq	.L37
+ 890 018a 8EE0     		b	.L27
+ 891              	.L36:
+ 219:Core/Src/uart_at.c ****                 {
+ 220:Core/Src/uart_at.c ****                 case AT_IDLE:
+ 221:Core/Src/uart_at.c ****                 {
+ 222:Core/Src/uart_at.c ****                     //unexpected response - ignore
+ 223:Core/Src/uart_at.c ****                     if (PendingCommand)
+ 892              		.loc 1 223 24
+ 893 018c 7B69     		ldr	r3, [r7, #20]
+ 894 018e 002B     		cmp	r3, #0
+ 895 0190 05D0     		beq	.L38
+ 224:Core/Src/uart_at.c ****                     {
+ 225:Core/Src/uart_at.c ****                         osMemoryPoolFree(mpid_ATCMD_MemPool, PendingCommand);
+ 896              		.loc 1 225 25
+ 897 0192 344B     		ldr	r3, .L48+12
+ 898 0194 1B68     		ldr	r3, [r3]
+ 899 0196 7969     		ldr	r1, [r7, #20]
+ 900 0198 1846     		mov	r0, r3
+ARM GAS  /tmp/cctHSf5o.s 			page 22
+
+
+ 901 019a FFF7FEFF 		bl	osMemoryPoolFree
+ 902              	.L38:
+ 226:Core/Src/uart_at.c ****                     }
+ 227:Core/Src/uart_at.c ****                     osMemoryPoolFree(mpid_ATCMD_MemPool,new_cmd);                        
+ 903              		.loc 1 227 21
+ 904 019e 314B     		ldr	r3, .L48+12
+ 905 01a0 1B68     		ldr	r3, [r3]
+ 906 01a2 BA68     		ldr	r2, [r7, #8]
+ 907 01a4 1146     		mov	r1, r2
+ 908 01a6 1846     		mov	r0, r3
+ 909 01a8 FFF7FEFF 		bl	osMemoryPoolFree
+ 228:Core/Src/uart_at.c ****                     break;
+ 910              		.loc 1 228 21
+ 911 01ac 7DE0     		b	.L27
+ 912              	.L37:
+ 229:Core/Src/uart_at.c ****                 }
+ 230:Core/Src/uart_at.c ****                 case AT_WAITING_RESPONSE:
+ 231:Core/Src/uart_at.c ****                 {
+ 232:Core/Src/uart_at.c ****                     if (new_cmd->response == AT_COMMANDS[PendingCommand->command].expected_response
+ 913              		.loc 1 232 32
+ 914 01ae BB68     		ldr	r3, [r7, #8]
+ 915 01b0 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 916              		.loc 1 232 72
+ 917 01b2 7B69     		ldr	r3, [r7, #20]
+ 918 01b4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 919 01b6 1846     		mov	r0, r3
+ 920              		.loc 1 232 82
+ 921 01b8 2849     		ldr	r1, .L48+4
+ 922 01ba 0346     		mov	r3, r0
+ 923 01bc 5B00     		lsls	r3, r3, #1
+ 924 01be 0344     		add	r3, r3, r0
+ 925 01c0 DB00     		lsls	r3, r3, #3
+ 926 01c2 0B44     		add	r3, r3, r1
+ 927 01c4 0133     		adds	r3, r3, #1
+ 928 01c6 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 929              		.loc 1 232 24
+ 930 01c8 9A42     		cmp	r2, r3
+ 931 01ca 27D1     		bne	.L39
+ 233:Core/Src/uart_at.c ****                     {
+ 234:Core/Src/uart_at.c ****                         // all good
+ 235:Core/Src/uart_at.c ****                         gPendingResponse = AT_COMMANDS[PendingCommand->command].expected_response;
+ 932              		.loc 1 235 70
+ 933 01cc 7B69     		ldr	r3, [r7, #20]
+ 934 01ce 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 935 01d0 1946     		mov	r1, r3
+ 936              		.loc 1 235 80
+ 937 01d2 224A     		ldr	r2, .L48+4
+ 938 01d4 0B46     		mov	r3, r1
+ 939 01d6 5B00     		lsls	r3, r3, #1
+ 940 01d8 0B44     		add	r3, r3, r1
+ 941 01da DB00     		lsls	r3, r3, #3
+ 942 01dc 1344     		add	r3, r3, r2
+ 943 01de 0133     		adds	r3, r3, #1
+ 944 01e0 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 945              		.loc 1 235 42
+ 946 01e2 1F4B     		ldr	r3, .L48+8
+ 947 01e4 1A70     		strb	r2, [r3]
+ARM GAS  /tmp/cctHSf5o.s 			page 23
+
+
+ 236:Core/Src/uart_at.c ****                         if (PendingCommand)
+ 948              		.loc 1 236 28
+ 949 01e6 7B69     		ldr	r3, [r7, #20]
+ 950 01e8 002B     		cmp	r3, #0
+ 951 01ea 0BD0     		beq	.L40
+ 237:Core/Src/uart_at.c ****                         {
+ 238:Core/Src/uart_at.c ****                             osThreadFlagsSet(PendingCommand->RequestedBy, SEND_RAW_AT_WAIT_SUCCESS_
+ 952              		.loc 1 238 29
+ 953 01ec 7B69     		ldr	r3, [r7, #20]
+ 954 01ee 9B68     		ldr	r3, [r3, #8]
+ 955 01f0 4021     		movs	r1, #64
+ 956 01f2 1846     		mov	r0, r3
+ 957 01f4 FFF7FEFF 		bl	osThreadFlagsSet
+ 239:Core/Src/uart_at.c ****                             osMemoryPoolFree(mpid_ATCMD_MemPool, PendingCommand);
+ 958              		.loc 1 239 29
+ 959 01f8 1A4B     		ldr	r3, .L48+12
+ 960 01fa 1B68     		ldr	r3, [r3]
+ 961 01fc 7969     		ldr	r1, [r7, #20]
+ 962 01fe 1846     		mov	r0, r3
+ 963 0200 FFF7FEFF 		bl	osMemoryPoolFree
+ 964              	.L40:
+ 240:Core/Src/uart_at.c ****                         }
+ 241:Core/Src/uart_at.c ****                         osMemoryPoolFree(mpid_ATCMD_MemPool, new_cmd);
+ 965              		.loc 1 241 25
+ 966 0204 174B     		ldr	r3, .L48+12
+ 967 0206 1B68     		ldr	r3, [r3]
+ 968 0208 BA68     		ldr	r2, [r7, #8]
+ 969 020a 1146     		mov	r1, r2
+ 970 020c 1846     		mov	r0, r3
+ 971 020e FFF7FEFF 		bl	osMemoryPoolFree
+ 242:Core/Src/uart_at.c ****                         PendingCommand = NULL;
+ 972              		.loc 1 242 40
+ 973 0212 0023     		movs	r3, #0
+ 974 0214 7B61     		str	r3, [r7, #20]
+ 243:Core/Src/uart_at.c ****                         ATTaskFSM = AT_IDLE;                        
+ 975              		.loc 1 243 35
+ 976 0216 0023     		movs	r3, #0
+ 977 0218 FB77     		strb	r3, [r7, #31]
+ 244:Core/Src/uart_at.c ****                     }
+ 245:Core/Src/uart_at.c ****                     else
+ 246:Core/Src/uart_at.c ****                     {
+ 247:Core/Src/uart_at.c ****                         //unexpected response - retry
+ 248:Core/Src/uart_at.c ****                         if (CurrentRetries < AT_COMMANDS[PendingCommand->command].retries)
+ 249:Core/Src/uart_at.c ****                         {
+ 250:Core/Src/uart_at.c ****                             CurrentRetries++;
+ 251:Core/Src/uart_at.c ****                             send_cmd = PendingCommand;
+ 252:Core/Src/uart_at.c ****                             PendingCommand = NULL;
+ 253:Core/Src/uart_at.c ****                             osMemoryPoolFree(mpid_ATCMD_MemPool, new_cmd);
+ 254:Core/Src/uart_at.c ****                         }
+ 255:Core/Src/uart_at.c ****                         else
+ 256:Core/Src/uart_at.c ****                         {
+ 257:Core/Src/uart_at.c ****                             // command failure after retries
+ 258:Core/Src/uart_at.c ****                             gPendingResponse = new_cmd->response;
+ 259:Core/Src/uart_at.c ****                             if(PendingCommand != NULL)
+ 260:Core/Src/uart_at.c ****                             {
+ 261:Core/Src/uart_at.c ****                                 osThreadFlagsSet(PendingCommand->RequestedBy, SEND_RAW_AT_WAIT_FAIL
+ 262:Core/Src/uart_at.c ****                                 osMemoryPoolFree(mpid_ATCMD_MemPool, PendingCommand);
+ARM GAS  /tmp/cctHSf5o.s 			page 24
+
+
+ 263:Core/Src/uart_at.c ****                             }
+ 264:Core/Src/uart_at.c ****                             osMemoryPoolFree(mpid_ATCMD_MemPool, new_cmd);
+ 265:Core/Src/uart_at.c ****                             PendingCommand = NULL;                            
+ 266:Core/Src/uart_at.c ****                             ATTaskFSM = AT_IDLE;                            
+ 267:Core/Src/uart_at.c ****                         }
+ 268:Core/Src/uart_at.c ****                     }
+ 269:Core/Src/uart_at.c ****                     break;
+ 978              		.loc 1 269 21
+ 979 021a 45E0     		b	.L47
+ 980              	.L39:
+ 248:Core/Src/uart_at.c ****                         {
+ 981              		.loc 1 248 72
+ 982 021c 7B69     		ldr	r3, [r7, #20]
+ 983 021e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 984 0220 1946     		mov	r1, r3
+ 248:Core/Src/uart_at.c ****                         {
+ 985              		.loc 1 248 82
+ 986 0222 0E4A     		ldr	r2, .L48+4
+ 987 0224 0B46     		mov	r3, r1
+ 988 0226 5B00     		lsls	r3, r3, #1
+ 989 0228 0B44     		add	r3, r3, r1
+ 990 022a DB00     		lsls	r3, r3, #3
+ 991 022c 1344     		add	r3, r3, r2
+ 992 022e 0233     		adds	r3, r3, #2
+ 993 0230 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 994 0232 1A46     		mov	r2, r3
+ 248:Core/Src/uart_at.c ****                         {
+ 995              		.loc 1 248 28
+ 996 0234 3B69     		ldr	r3, [r7, #16]
+ 997 0236 9342     		cmp	r3, r2
+ 998 0238 18D2     		bcs	.L42
+ 250:Core/Src/uart_at.c ****                             send_cmd = PendingCommand;
+ 999              		.loc 1 250 43
+ 1000 023a 3B69     		ldr	r3, [r7, #16]
+ 1001 023c 0133     		adds	r3, r3, #1
+ 1002 023e 3B61     		str	r3, [r7, #16]
+ 251:Core/Src/uart_at.c ****                             PendingCommand = NULL;
+ 1003              		.loc 1 251 38
+ 1004 0240 7B69     		ldr	r3, [r7, #20]
+ 1005 0242 BB61     		str	r3, [r7, #24]
+ 252:Core/Src/uart_at.c ****                             osMemoryPoolFree(mpid_ATCMD_MemPool, new_cmd);
+ 1006              		.loc 1 252 44
+ 1007 0244 0023     		movs	r3, #0
+ 1008 0246 7B61     		str	r3, [r7, #20]
+ 253:Core/Src/uart_at.c ****                         }
+ 1009              		.loc 1 253 29
+ 1010 0248 064B     		ldr	r3, .L48+12
+ 1011 024a 1B68     		ldr	r3, [r3]
+ 1012 024c BA68     		ldr	r2, [r7, #8]
+ 1013 024e 1146     		mov	r1, r2
+ 1014 0250 1846     		mov	r0, r3
+ 1015 0252 FFF7FEFF 		bl	osMemoryPoolFree
+ 1016              		.loc 1 269 21
+ 1017 0256 27E0     		b	.L47
+ 1018              	.L49:
+ 1019              		.align	2
+ 1020              	.L48:
+ARM GAS  /tmp/cctHSf5o.s 			page 25
+
+
+ 1021 0258 00000000 		.word	ATQueueHandle
+ 1022 025c 00000000 		.word	AT_COMMANDS
+ 1023 0260 00000000 		.word	gPendingResponse
+ 1024 0264 00000000 		.word	mpid_ATCMD_MemPool
+ 1025 0268 00000000 		.word	mpid_LoRaPayload_MemPool
+ 1026              	.L42:
+ 258:Core/Src/uart_at.c ****                             if(PendingCommand != NULL)
+ 1027              		.loc 1 258 55
+ 1028 026c BB68     		ldr	r3, [r7, #8]
+ 1029 026e 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 258:Core/Src/uart_at.c ****                             if(PendingCommand != NULL)
+ 1030              		.loc 1 258 46
+ 1031 0270 1A4B     		ldr	r3, .L50
+ 1032 0272 1A70     		strb	r2, [r3]
+ 259:Core/Src/uart_at.c ****                             {
+ 1033              		.loc 1 259 31
+ 1034 0274 7B69     		ldr	r3, [r7, #20]
+ 1035 0276 002B     		cmp	r3, #0
+ 1036 0278 0BD0     		beq	.L43
+ 261:Core/Src/uart_at.c ****                                 osMemoryPoolFree(mpid_ATCMD_MemPool, PendingCommand);
+ 1037              		.loc 1 261 33
+ 1038 027a 7B69     		ldr	r3, [r7, #20]
+ 1039 027c 9B68     		ldr	r3, [r3, #8]
+ 1040 027e 8021     		movs	r1, #128
+ 1041 0280 1846     		mov	r0, r3
+ 1042 0282 FFF7FEFF 		bl	osThreadFlagsSet
+ 262:Core/Src/uart_at.c ****                             }
+ 1043              		.loc 1 262 33
+ 1044 0286 164B     		ldr	r3, .L50+4
+ 1045 0288 1B68     		ldr	r3, [r3]
+ 1046 028a 7969     		ldr	r1, [r7, #20]
+ 1047 028c 1846     		mov	r0, r3
+ 1048 028e FFF7FEFF 		bl	osMemoryPoolFree
+ 1049              	.L43:
+ 264:Core/Src/uart_at.c ****                             PendingCommand = NULL;                            
+ 1050              		.loc 1 264 29
+ 1051 0292 134B     		ldr	r3, .L50+4
+ 1052 0294 1B68     		ldr	r3, [r3]
+ 1053 0296 BA68     		ldr	r2, [r7, #8]
+ 1054 0298 1146     		mov	r1, r2
+ 1055 029a 1846     		mov	r0, r3
+ 1056 029c FFF7FEFF 		bl	osMemoryPoolFree
+ 265:Core/Src/uart_at.c ****                             ATTaskFSM = AT_IDLE;                            
+ 1057              		.loc 1 265 44
+ 1058 02a0 0023     		movs	r3, #0
+ 1059 02a2 7B61     		str	r3, [r7, #20]
+ 266:Core/Src/uart_at.c ****                         }
+ 1060              		.loc 1 266 39
+ 1061 02a4 0023     		movs	r3, #0
+ 1062 02a6 FB77     		strb	r3, [r7, #31]
+ 1063              	.L47:
+ 1064              		.loc 1 269 21
+ 1065 02a8 00BF     		nop
+ 1066              	.L27:
+ 270:Core/Src/uart_at.c ****                 }
+ 271:Core/Src/uart_at.c ****                 }
+ 272:Core/Src/uart_at.c ****             }            
+ARM GAS  /tmp/cctHSf5o.s 			page 26
+
+
+ 273:Core/Src/uart_at.c ****         }
+ 274:Core/Src/uart_at.c ****         if (send_cmd != NULL)
+ 1067              		.loc 1 274 12
+ 1068 02aa BB69     		ldr	r3, [r7, #24]
+ 1069 02ac 002B     		cmp	r3, #0
+ 1070 02ae 3FF4B5AE 		beq	.L45
+ 275:Core/Src/uart_at.c ****         {
+ 276:Core/Src/uart_at.c ****             PendingCommand = send_cmd;
+ 1071              		.loc 1 276 28
+ 1072 02b2 BB69     		ldr	r3, [r7, #24]
+ 1073 02b4 7B61     		str	r3, [r7, #20]
+ 277:Core/Src/uart_at.c ****             send_cmd = NULL;
+ 1074              		.loc 1 277 22
+ 1075 02b6 0023     		movs	r3, #0
+ 1076 02b8 BB61     		str	r3, [r7, #24]
+ 278:Core/Src/uart_at.c ****             ATTaskFSM = AT_WAITING_RESPONSE;
+ 1077              		.loc 1 278 23
+ 1078 02ba 0123     		movs	r3, #1
+ 1079 02bc FB77     		strb	r3, [r7, #31]
+ 279:Core/Src/uart_at.c ****             SendToUART(PendingCommand->tx_payload->Buf, strlen(PendingCommand->tx_payload->Buf));
+ 1080              		.loc 1 279 38
+ 1081 02be 7B69     		ldr	r3, [r7, #20]
+ 1082 02c0 5B68     		ldr	r3, [r3, #4]
+ 1083              		.loc 1 279 50
+ 1084 02c2 1C46     		mov	r4, r3
+ 1085              		.loc 1 279 78
+ 1086 02c4 7B69     		ldr	r3, [r7, #20]
+ 1087 02c6 5B68     		ldr	r3, [r3, #4]
+ 1088              		.loc 1 279 13
+ 1089 02c8 1846     		mov	r0, r3
+ 1090 02ca FFF7FEFF 		bl	strlen
+ 1091 02ce 0346     		mov	r3, r0
+ 1092              		.loc 1 279 13 is_stmt 0 discriminator 1
+ 1093 02d0 1946     		mov	r1, r3
+ 1094 02d2 2046     		mov	r0, r4
+ 1095 02d4 FFF7FEFF 		bl	SendToUART
+ 144:Core/Src/uart_at.c ****         if(atevent == osErrorTimeout)
+ 1096              		.loc 1 144 17 is_stmt 1
+ 1097 02d8 A0E6     		b	.L45
+ 1098              	.L51:
+ 1099 02da 00BF     		.align	2
+ 1100              	.L50:
+ 1101 02dc 00000000 		.word	gPendingResponse
+ 1102 02e0 00000000 		.word	mpid_ATCMD_MemPool
+ 1103              		.cfi_endproc
+ 1104              	.LFE10:
+ 1106              		.section	.rodata
+ 1107              		.align	2
+ 1108              	.LC0:
+ 1109 0000 3A00     		.ascii	":\000"
+ 1110              		.section	.text.ATParsingTaskCode,"ax",%progbits
+ 1111              		.align	1
+ 1112              		.global	ATParsingTaskCode
+ 1113              		.syntax unified
+ 1114              		.thumb
+ 1115              		.thumb_func
+ 1117              	ATParsingTaskCode:
+ARM GAS  /tmp/cctHSf5o.s 			page 27
+
+
+ 1118              	.LFB11:
+ 280:Core/Src/uart_at.c ****         }
+ 281:Core/Src/uart_at.c ****     }
+ 282:Core/Src/uart_at.c ****     /* USER CODE END StartCmdProcessing */
+ 283:Core/Src/uart_at.c ****     /* USER CODE END 5 */
+ 284:Core/Src/uart_at.c **** }
+ 285:Core/Src/uart_at.c **** 
+ 286:Core/Src/uart_at.c **** /* USER CODE BEGIN Header_StartATHandling */
+ 287:Core/Src/uart_at.c **** /**
+ 288:Core/Src/uart_at.c ****  * @brief Function implementing the cmdHandlingTask thread.
+ 289:Core/Src/uart_at.c ****  * @param argument: Not used
+ 290:Core/Src/uart_at.c ****  * @retval None
+ 291:Core/Src/uart_at.c ****  */
+ 292:Core/Src/uart_at.c **** /* USER CODE END Header_StartATHandling */
+ 293:Core/Src/uart_at.c **** void ATParsingTaskCode(void const *argument)
+ 294:Core/Src/uart_at.c **** {
+ 1119              		.loc 1 294 1
+ 1120              		.cfi_startproc
+ 1121              		@ args = 0, pretend = 0, frame = 48
+ 1122              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1123 0000 90B5     		push	{r4, r7, lr}
+ 1124              	.LCFI18:
+ 1125              		.cfi_def_cfa_offset 12
+ 1126              		.cfi_offset 4, -12
+ 1127              		.cfi_offset 7, -8
+ 1128              		.cfi_offset 14, -4
+ 1129 0002 8DB0     		sub	sp, sp, #52
+ 1130              	.LCFI19:
+ 1131              		.cfi_def_cfa_offset 64
+ 1132 0004 00AF     		add	r7, sp, #0
+ 1133              	.LCFI20:
+ 1134              		.cfi_def_cfa_register 7
+ 1135 0006 7860     		str	r0, [r7, #4]
+ 295:Core/Src/uart_at.c ****     /* USER CODE BEGIN StartATHandling */
+ 296:Core/Src/uart_at.c ****     /* Infinite loop */
+ 297:Core/Src/uart_at.c ****     // REF: https://www.keil.com/pack/doc/cmsis/RTOS/html/group__CMSIS__RTOS__Mail.html
+ 298:Core/Src/uart_at.c ****     osStatus_t uartevent;
+ 299:Core/Src/uart_at.c ****     UART_MEM_BLOCK_t *pMem;
+ 300:Core/Src/uart_at.c ****     LORA_PAYLOAD_MEM_BLOCK_t *pLoRaPayload;
+ 301:Core/Src/uart_at.c ****     CMD_t *pATResponse;
+ 302:Core/Src/uart_at.c ****     
+ 303:Core/Src/uart_at.c ****     mpid_ATCMD_MemPool = osMemoryPoolNew(ATCMD_MEMPOOL_OBJECTS, sizeof(CMD_t), NULL);
+ 1136              		.loc 1 303 26
+ 1137 0008 0022     		movs	r2, #0
+ 1138 000a 0C21     		movs	r1, #12
+ 1139 000c 0820     		movs	r0, #8
+ 1140 000e FFF7FEFF 		bl	osMemoryPoolNew
+ 1141 0012 0346     		mov	r3, r0
+ 1142              		.loc 1 303 24 discriminator 1
+ 1143 0014 5D4A     		ldr	r2, .L64
+ 1144 0016 1360     		str	r3, [r2]
+ 304:Core/Src/uart_at.c ****     mpid_LoRaPayload_MemPool = osMemoryPoolNew(LORAPAYLOAD_MEMPOOL_OBJECTS, sizeof(LORA_PAYLOAD_MEM
+ 1145              		.loc 1 304 32
+ 1146 0018 0022     		movs	r2, #0
+ 1147 001a 5421     		movs	r1, #84
+ 1148 001c 0220     		movs	r0, #2
+ 1149 001e FFF7FEFF 		bl	osMemoryPoolNew
+ARM GAS  /tmp/cctHSf5o.s 			page 28
+
+
+ 1150 0022 0346     		mov	r3, r0
+ 1151              		.loc 1 304 30 discriminator 1
+ 1152 0024 5A4A     		ldr	r2, .L64+4
+ 1153 0026 1360     		str	r3, [r2]
+ 305:Core/Src/uart_at.c ****     Ringbuf_Init();
+ 1154              		.loc 1 305 5
+ 1155 0028 FFF7FEFF 		bl	Ringbuf_Init
+ 306:Core/Src/uart_at.c ****     uint32_t CurrentRetries = 0;
+ 1156              		.loc 1 306 14
+ 1157 002c 0023     		movs	r3, #0
+ 1158 002e BB62     		str	r3, [r7, #40]
+ 1159              	.L62:
+ 307:Core/Src/uart_at.c ****     while (1)
+ 308:Core/Src/uart_at.c ****     {
+ 309:Core/Src/uart_at.c ****         uartevent = osMessageQueueGet(uartQueueHandle, &pMem, NULL,  osWaitForever); // wait for me
+ 1160              		.loc 1 309 21
+ 1161 0030 584B     		ldr	r3, .L64+8
+ 1162 0032 1868     		ldr	r0, [r3]
+ 1163 0034 07F11001 		add	r1, r7, #16
+ 1164 0038 4FF0FF33 		mov	r3, #-1
+ 1165 003c 0022     		movs	r2, #0
+ 1166 003e FFF7FEFF 		bl	osMessageQueueGet
+ 1167 0042 7862     		str	r0, [r7, #36]
+ 310:Core/Src/uart_at.c ****         if (uartevent == osOK)
+ 1168              		.loc 1 310 12
+ 1169 0044 7B6A     		ldr	r3, [r7, #36]
+ 1170 0046 002B     		cmp	r3, #0
+ 1171 0048 F2D1     		bne	.L62
+ 311:Core/Src/uart_at.c ****         {
+ 312:Core/Src/uart_at.c ****             pATResponse = (CMD_t *)osMemoryPoolAlloc(mpid_ATCMD_MemPool, 0U); // get Mem Block
+ 1172              		.loc 1 312 36
+ 1173 004a 504B     		ldr	r3, .L64
+ 1174 004c 1B68     		ldr	r3, [r3]
+ 1175 004e 0021     		movs	r1, #0
+ 1176 0050 1846     		mov	r0, r3
+ 1177 0052 FFF7FEFF 		bl	osMemoryPoolAlloc
+ 1178 0056 0346     		mov	r3, r0
+ 1179              		.loc 1 312 25 discriminator 1
+ 1180 0058 FB60     		str	r3, [r7, #12]
+ 313:Core/Src/uart_at.c ****             if (pATResponse != NULL)
+ 1181              		.loc 1 313 29
+ 1182 005a FB68     		ldr	r3, [r7, #12]
+ 1183              		.loc 1 313 16
+ 1184 005c 002B     		cmp	r3, #0
+ 1185 005e 00F08C80 		beq	.L54
+ 314:Core/Src/uart_at.c ****             {
+ 315:Core/Src/uart_at.c ****                 pATResponse->command = AT_COMMAND_UNDEFINED;
+ 1186              		.loc 1 315 28
+ 1187 0062 FB68     		ldr	r3, [r7, #12]
+ 1188              		.loc 1 315 38
+ 1189 0064 0B22     		movs	r2, #11
+ 1190 0066 1A70     		strb	r2, [r3]
+ 316:Core/Src/uart_at.c ****                 pATResponse->response = ParseResponse(pMem->Buf);
+ 1191              		.loc 1 316 59
+ 1192 0068 3B69     		ldr	r3, [r7, #16]
+ 1193              		.loc 1 316 28
+ 1194 006a FC68     		ldr	r4, [r7, #12]
+ARM GAS  /tmp/cctHSf5o.s 			page 29
+
+
+ 1195              		.loc 1 316 41
+ 1196 006c 1846     		mov	r0, r3
+ 1197 006e FFF7FEFF 		bl	ParseResponse
+ 1198 0072 0346     		mov	r3, r0
+ 1199              		.loc 1 316 39 discriminator 1
+ 1200 0074 6370     		strb	r3, [r4, #1]
+ 317:Core/Src/uart_at.c ****                 if(pATResponse!=AT_RESPONSE_UNDEFINED)
+ 1201              		.loc 1 317 31
+ 1202 0076 FB68     		ldr	r3, [r7, #12]
+ 1203              		.loc 1 317 19
+ 1204 0078 0A2B     		cmp	r3, #10
+ 1205 007a 76D0     		beq	.L55
+ 318:Core/Src/uart_at.c ****                 {
+ 319:Core/Src/uart_at.c ****                     if(pATResponse->response==AT_RX_OK)
+ 1206              		.loc 1 319 35
+ 1207 007c FB68     		ldr	r3, [r7, #12]
+ 1208 007e 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 1209              		.loc 1 319 23
+ 1210 0080 022B     		cmp	r3, #2
+ 1211 0082 66D1     		bne	.L56
+ 1212              	.LBB4:
+ 320:Core/Src/uart_at.c ****                     {
+ 321:Core/Src/uart_at.c ****                         //parse received data
+ 322:Core/Src/uart_at.c ****                         char *pch;
+ 323:Core/Src/uart_at.c ****                         char *rcvDataPointer, asciiChar[3];  
+ 324:Core/Src/uart_at.c ****                         uint32_t number;                      
+ 325:Core/Src/uart_at.c ****                         pLoRaPayload = (LORA_PAYLOAD_MEM_BLOCK_t *)osMemoryPoolAlloc(mpid_LoRaPaylo
+ 1213              		.loc 1 325 68
+ 1214 0084 424B     		ldr	r3, .L64+4
+ 1215 0086 1B68     		ldr	r3, [r3]
+ 1216 0088 0021     		movs	r1, #0
+ 1217 008a 1846     		mov	r0, r3
+ 1218 008c FFF7FEFF 		bl	osMemoryPoolAlloc
+ 1219 0090 3862     		str	r0, [r7, #32]
+ 326:Core/Src/uart_at.c ****                         // Data Format: RX:616263:2:-43:25
+ 327:Core/Src/uart_at.c ****                         pch = strtok(pMem->Buf, ":");
+ 1220              		.loc 1 327 42
+ 1221 0092 3B69     		ldr	r3, [r7, #16]
+ 1222              		.loc 1 327 31
+ 1223 0094 4049     		ldr	r1, .L64+12
+ 1224 0096 1846     		mov	r0, r3
+ 1225 0098 FFF7FEFF 		bl	strtok
+ 1226 009c F861     		str	r0, [r7, #28]
+ 328:Core/Src/uart_at.c ****                         pch = strtok(NULL, ":");
+ 1227              		.loc 1 328 31
+ 1228 009e 3E49     		ldr	r1, .L64+12
+ 1229 00a0 0020     		movs	r0, #0
+ 1230 00a2 FFF7FEFF 		bl	strtok
+ 1231 00a6 F861     		str	r0, [r7, #28]
+ 329:Core/Src/uart_at.c ****                         rcvDataPointer = pch;
+ 1232              		.loc 1 329 40
+ 1233 00a8 FB69     		ldr	r3, [r7, #28]
+ 1234 00aa BB61     		str	r3, [r7, #24]
+ 330:Core/Src/uart_at.c ****                         asciiChar[3] = '\0';
+ 1235              		.loc 1 330 38
+ 1236 00ac 0023     		movs	r3, #0
+ 1237 00ae FB72     		strb	r3, [r7, #11]
+ARM GAS  /tmp/cctHSf5o.s 			page 30
+
+
+ 331:Core/Src/uart_at.c ****                         pLoRaPayload->Buf[0] = '\0';
+ 1238              		.loc 1 331 46
+ 1239 00b0 3B6A     		ldr	r3, [r7, #32]
+ 1240 00b2 0022     		movs	r2, #0
+ 1241 00b4 1A75     		strb	r2, [r3, #20]
+ 332:Core/Src/uart_at.c ****                         pLoRaPayload->rcvDataLen = strlen(rcvDataPointer);
+ 1242              		.loc 1 332 52
+ 1243 00b6 B869     		ldr	r0, [r7, #24]
+ 1244 00b8 FFF7FEFF 		bl	strlen
+ 1245 00bc 0246     		mov	r2, r0
+ 1246              		.loc 1 332 50 discriminator 1
+ 1247 00be 3B6A     		ldr	r3, [r7, #32]
+ 1248 00c0 9A60     		str	r2, [r3, #8]
+ 1249              	.LBB5:
+ 333:Core/Src/uart_at.c ****                         for (uint32_t i = 0; i < pLoRaPayload->rcvDataLen; i = i + 2)
+ 1250              		.loc 1 333 39
+ 1251 00c2 0023     		movs	r3, #0
+ 1252 00c4 FB62     		str	r3, [r7, #44]
+ 1253              		.loc 1 333 25
+ 1254 00c6 19E0     		b	.L57
+ 1255              	.L58:
+ 1256              	.LBB6:
+ 334:Core/Src/uart_at.c ****                         {
+ 335:Core/Src/uart_at.c ****                             memcpy(asciiChar, rcvDataPointer + i, 2);
+ 1257              		.loc 1 335 62
+ 1258 00c8 BA69     		ldr	r2, [r7, #24]
+ 1259 00ca FB6A     		ldr	r3, [r7, #44]
+ 1260 00cc 1344     		add	r3, r3, r2
+ 1261              		.loc 1 335 29
+ 1262 00ce 1B88     		ldrh	r3, [r3]	@ unaligned
+ 1263 00d0 9BB2     		uxth	r3, r3
+ 1264 00d2 3B81     		strh	r3, [r7, #8]	@ movhi
+ 336:Core/Src/uart_at.c ****                             number = (uint32_t)strtol(asciiChar, NULL, 16);
+ 1265              		.loc 1 336 48
+ 1266 00d4 07F10803 		add	r3, r7, #8
+ 1267 00d8 1022     		movs	r2, #16
+ 1268 00da 0021     		movs	r1, #0
+ 1269 00dc 1846     		mov	r0, r3
+ 1270 00de FFF7FEFF 		bl	strtol
+ 1271 00e2 0346     		mov	r3, r0
+ 1272              		.loc 1 336 36 discriminator 1
+ 1273 00e4 7B61     		str	r3, [r7, #20]
+ 337:Core/Src/uart_at.c ****                             //sprintf(pLoRaPayload->Buf, "%s%c", pLoRaPayload->Buf, number);
+ 338:Core/Src/uart_at.c ****                             pLoRaPayload->Buf[i / 2] = number & 0x00FF;
+ 1274              		.loc 1 338 49
+ 1275 00e6 FB6A     		ldr	r3, [r7, #44]
+ 1276 00e8 5B08     		lsrs	r3, r3, #1
+ 1277              		.loc 1 338 54
+ 1278 00ea 7A69     		ldr	r2, [r7, #20]
+ 1279 00ec D1B2     		uxtb	r1, r2
+ 1280 00ee 3A6A     		ldr	r2, [r7, #32]
+ 1281 00f0 1344     		add	r3, r3, r2
+ 1282 00f2 0A46     		mov	r2, r1
+ 1283 00f4 1A75     		strb	r2, [r3, #20]
+ 1284              	.LBE6:
+ 333:Core/Src/uart_at.c ****                         {
+ 1285              		.loc 1 333 78 discriminator 3
+ARM GAS  /tmp/cctHSf5o.s 			page 31
+
+
+ 1286 00f6 FB6A     		ldr	r3, [r7, #44]
+ 1287 00f8 0233     		adds	r3, r3, #2
+ 1288 00fa FB62     		str	r3, [r7, #44]
+ 1289              	.L57:
+ 333:Core/Src/uart_at.c ****                         {
+ 1290              		.loc 1 333 62 discriminator 1
+ 1291 00fc 3B6A     		ldr	r3, [r7, #32]
+ 1292 00fe 9B68     		ldr	r3, [r3, #8]
+ 333:Core/Src/uart_at.c ****                         {
+ 1293              		.loc 1 333 48 discriminator 1
+ 1294 0100 FA6A     		ldr	r2, [r7, #44]
+ 1295 0102 9A42     		cmp	r2, r3
+ 1296 0104 E0D3     		bcc	.L58
+ 1297              	.LBE5:
+ 339:Core/Src/uart_at.c ****                         }
+ 340:Core/Src/uart_at.c ****                         pch = strtok(NULL, ":");
+ 1298              		.loc 1 340 31
+ 1299 0106 2449     		ldr	r1, .L64+12
+ 1300 0108 0020     		movs	r0, #0
+ 1301 010a FFF7FEFF 		bl	strtok
+ 1302 010e F861     		str	r0, [r7, #28]
+ 341:Core/Src/uart_at.c ****                         pLoRaPayload->rcvPort = atoi(pch);
+ 1303              		.loc 1 341 49
+ 1304 0110 F869     		ldr	r0, [r7, #28]
+ 1305 0112 FFF7FEFF 		bl	atoi
+ 1306 0116 0346     		mov	r3, r0
+ 1307              		.loc 1 341 49 is_stmt 0 discriminator 1
+ 1308 0118 1A46     		mov	r2, r3
+ 1309              		.loc 1 341 47 is_stmt 1 discriminator 1
+ 1310 011a 3B6A     		ldr	r3, [r7, #32]
+ 1311 011c 1A60     		str	r2, [r3]
+ 342:Core/Src/uart_at.c ****                         pch = strtok(NULL, ":");
+ 1312              		.loc 1 342 31
+ 1313 011e 1E49     		ldr	r1, .L64+12
+ 1314 0120 0020     		movs	r0, #0
+ 1315 0122 FFF7FEFF 		bl	strtok
+ 1316 0126 F861     		str	r0, [r7, #28]
+ 343:Core/Src/uart_at.c ****                         pLoRaPayload->rcvRSSI = atoi(pch);
+ 1317              		.loc 1 343 49
+ 1318 0128 F869     		ldr	r0, [r7, #28]
+ 1319 012a FFF7FEFF 		bl	atoi
+ 1320 012e 0246     		mov	r2, r0
+ 1321              		.loc 1 343 47 discriminator 1
+ 1322 0130 3B6A     		ldr	r3, [r7, #32]
+ 1323 0132 DA60     		str	r2, [r3, #12]
+ 344:Core/Src/uart_at.c ****                         pch = strtok(NULL, ":");
+ 1324              		.loc 1 344 31
+ 1325 0134 1849     		ldr	r1, .L64+12
+ 1326 0136 0020     		movs	r0, #0
+ 1327 0138 FFF7FEFF 		bl	strtok
+ 1328 013c F861     		str	r0, [r7, #28]
+ 345:Core/Src/uart_at.c ****                         pLoRaPayload->rcvSNR = atoi(pch);
+ 1329              		.loc 1 345 48
+ 1330 013e F869     		ldr	r0, [r7, #28]
+ 1331 0140 FFF7FEFF 		bl	atoi
+ 1332 0144 0246     		mov	r2, r0
+ 1333              		.loc 1 345 46 discriminator 1
+ARM GAS  /tmp/cctHSf5o.s 			page 32
+
+
+ 1334 0146 3B6A     		ldr	r3, [r7, #32]
+ 1335 0148 1A61     		str	r2, [r3, #16]
+ 346:Core/Src/uart_at.c ****                         pATResponse->rx_payload = pLoRaPayload;
+ 1336              		.loc 1 346 36
+ 1337 014a FB68     		ldr	r3, [r7, #12]
+ 1338              		.loc 1 346 49
+ 1339 014c 3A6A     		ldr	r2, [r7, #32]
+ 1340 014e 5A60     		str	r2, [r3, #4]
+ 1341              	.LBE4:
+ 1342 0150 02E0     		b	.L59
+ 1343              	.L56:
+ 347:Core/Src/uart_at.c ****                     }    
+ 348:Core/Src/uart_at.c ****                     else
+ 349:Core/Src/uart_at.c ****                     {
+ 350:Core/Src/uart_at.c ****                         pATResponse->rx_payload = NULL;
+ 1344              		.loc 1 350 36
+ 1345 0152 FB68     		ldr	r3, [r7, #12]
+ 1346              		.loc 1 350 49
+ 1347 0154 0022     		movs	r2, #0
+ 1348 0156 5A60     		str	r2, [r3, #4]
+ 1349              	.L59:
+ 351:Core/Src/uart_at.c ****                     }                    
+ 352:Core/Src/uart_at.c ****                     // Put command to queue
+ 353:Core/Src/uart_at.c ****                     osMessageQueuePut(ATQueueHandle, &pATResponse, 0U, 0U);
+ 1350              		.loc 1 353 21
+ 1351 0158 104B     		ldr	r3, .L64+16
+ 1352 015a 1868     		ldr	r0, [r3]
+ 1353 015c 07F10C01 		add	r1, r7, #12
+ 1354 0160 0023     		movs	r3, #0
+ 1355 0162 0022     		movs	r2, #0
+ 1356 0164 FFF7FEFF 		bl	osMessageQueuePut
+ 1357 0168 08E0     		b	.L60
+ 1358              	.L55:
+ 354:Core/Src/uart_at.c ****                 }
+ 355:Core/Src/uart_at.c ****                 else
+ 356:Core/Src/uart_at.c ****                 {
+ 357:Core/Src/uart_at.c ****                     osMemoryPoolFree(mpid_ATCMD_MemPool,pATResponse);
+ 1359              		.loc 1 357 21
+ 1360 016a 084B     		ldr	r3, .L64
+ 1361 016c 1B68     		ldr	r3, [r3]
+ 1362 016e FA68     		ldr	r2, [r7, #12]
+ 1363 0170 1146     		mov	r1, r2
+ 1364 0172 1846     		mov	r0, r3
+ 1365 0174 FFF7FEFF 		bl	osMemoryPoolFree
+ 1366 0178 00E0     		b	.L60
+ 1367              	.L63:
+ 1368              	.L54:
+ 358:Core/Src/uart_at.c ****                 }
+ 359:Core/Src/uart_at.c ****             } 
+ 360:Core/Src/uart_at.c ****             else
+ 361:Core/Src/uart_at.c ****             {
+ 362:Core/Src/uart_at.c ****                 while(1);
+ 1369              		.loc 1 362 22
+ 1370 017a FEE7     		b	.L63
+ 1371              	.L60:
+ 363:Core/Src/uart_at.c ****             }           
+ 364:Core/Src/uart_at.c ****             osMemoryPoolFree(mpid_UART_MemPool,pMem);
+ARM GAS  /tmp/cctHSf5o.s 			page 33
+
+
+ 1372              		.loc 1 364 13
+ 1373 017c 084B     		ldr	r3, .L64+20
+ 1374 017e 1B68     		ldr	r3, [r3]
+ 1375 0180 3A69     		ldr	r2, [r7, #16]
+ 1376 0182 1146     		mov	r1, r2
+ 1377 0184 1846     		mov	r0, r3
+ 1378 0186 FFF7FEFF 		bl	osMemoryPoolFree
+ 309:Core/Src/uart_at.c ****         if (uartevent == osOK)
+ 1379              		.loc 1 309 19
+ 1380 018a 51E7     		b	.L62
+ 1381              	.L65:
+ 1382              		.align	2
+ 1383              	.L64:
+ 1384 018c 00000000 		.word	mpid_ATCMD_MemPool
+ 1385 0190 00000000 		.word	mpid_LoRaPayload_MemPool
+ 1386 0194 00000000 		.word	uartQueueHandle
+ 1387 0198 00000000 		.word	.LC0
+ 1388 019c 00000000 		.word	ATQueueHandle
+ 1389 01a0 00000000 		.word	mpid_UART_MemPool
+ 1390              		.cfi_endproc
+ 1391              	.LFE11:
+ 1393              		.text
+ 1394              	.Letext0:
+ 1395              		.file 2 "/home/fabio/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1
+ 1396              		.file 3 "/home/fabio/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/machin
+ 1397              		.file 4 "/home/fabio/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_s
+ 1398              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h"
+ 1399              		.file 6 "Core/Inc/uartRingBufDMA.h"
+ 1400              		.file 7 "Core/Inc/uart_at.h"
+ 1401              		.file 8 "/home/fabio/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/string
+ARM GAS  /tmp/cctHSf5o.s 			page 34
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart_at.c
+     /tmp/cctHSf5o.s:25     .bss.cmd_buffer:00000000 cmd_buffer
+     /tmp/cctHSf5o.s:22     .bss.cmd_buffer:00000000 $d
+     /tmp/cctHSf5o.s:31     .bss.cmd_len:00000000 cmd_len
+     /tmp/cctHSf5o.s:32     .bss.cmd_len:00000000 $d
+     /tmp/cctHSf5o.s:37     .bss.byte:00000000 byte
+     /tmp/cctHSf5o.s:38     .bss.byte:00000000 $d
+     /tmp/cctHSf5o.s:44     .bss.mpid_ATCMD_MemPool:00000000 mpid_ATCMD_MemPool
+     /tmp/cctHSf5o.s:41     .bss.mpid_ATCMD_MemPool:00000000 $d
+     /tmp/cctHSf5o.s:51     .bss.mpid_LoRaPayload_MemPool:00000000 mpid_LoRaPayload_MemPool
+     /tmp/cctHSf5o.s:48     .bss.mpid_LoRaPayload_MemPool:00000000 $d
+     /tmp/cctHSf5o.s:58     .rodata.AT_COMMANDS:00000000 AT_COMMANDS
+     /tmp/cctHSf5o.s:55     .rodata.AT_COMMANDS:00000000 $d
+     /tmp/cctHSf5o.s:148    .rodata.AT_RESPONSES:00000000 AT_RESPONSES
+     /tmp/cctHSf5o.s:145    .rodata.AT_RESPONSES:00000000 $d
+     /tmp/cctHSf5o.s:186    .bss.gPendingResponse:00000000 gPendingResponse
+     /tmp/cctHSf5o.s:187    .bss.gPendingResponse:00000000 $d
+     /tmp/cctHSf5o.s:193    .bss.gATPayload:00000000 gATPayload
+     /tmp/cctHSf5o.s:190    .bss.gATPayload:00000000 $d
+     /tmp/cctHSf5o.s:196    .text.sendRAWAT:00000000 $t
+     /tmp/cctHSf5o.s:202    .text.sendRAWAT:00000000 sendRAWAT
+     /tmp/cctHSf5o.s:521    .text.ParseAT:00000000 ParseAT
+     /tmp/cctHSf5o.s:398    .text.sendRAWAT:0000011c $d
+     /tmp/cctHSf5o.s:407    .text.ParseResponse:00000000 $t
+     /tmp/cctHSf5o.s:413    .text.ParseResponse:00000000 ParseResponse
+     /tmp/cctHSf5o.s:510    .text.ParseResponse:00000074 $d
+     /tmp/cctHSf5o.s:515    .text.ParseAT:00000000 $t
+     /tmp/cctHSf5o.s:615    .text.ParseAT:00000070 $d
+     /tmp/cctHSf5o.s:620    .text.ATHandlingTaskCode:00000000 $t
+     /tmp/cctHSf5o.s:626    .text.ATHandlingTaskCode:00000000 ATHandlingTaskCode
+     /tmp/cctHSf5o.s:1021   .text.ATHandlingTaskCode:00000258 $d
+     /tmp/cctHSf5o.s:1028   .text.ATHandlingTaskCode:0000026c $t
+     /tmp/cctHSf5o.s:1101   .text.ATHandlingTaskCode:000002dc $d
+     /tmp/cctHSf5o.s:1107   .rodata:00000000 $d
+     /tmp/cctHSf5o.s:1111   .text.ATParsingTaskCode:00000000 $t
+     /tmp/cctHSf5o.s:1117   .text.ATParsingTaskCode:00000000 ATParsingTaskCode
+     /tmp/cctHSf5o.s:1384   .text.ATParsingTaskCode:0000018c $d
+
+UNDEFINED SYMBOLS
+osSemaphoreAcquire
+osMemoryPoolAlloc
+strlen
+memcpy
+osThreadGetId
+osMessageQueuePut
+osMemoryPoolFree
+osSemaphoreRelease
+osThreadFlagsClear
+osThreadFlagsWait
+ATCommandSemaphoreHandle
+ATQueueHandle
+strncmp
+osMessageQueueGet
+osThreadFlagsSet
+LoRaWAN_RxEventCallback
+LoRaWAN_JoinCallback
+ARM GAS  /tmp/cctHSf5o.s 			page 35
+
+
+SendToUART
+osMemoryPoolNew
+Ringbuf_Init
+strtok
+strtol
+atoi
+uartQueueHandle
+mpid_UART_MemPool

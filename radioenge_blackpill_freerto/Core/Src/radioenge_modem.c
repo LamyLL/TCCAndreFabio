@@ -1,0 +1,284 @@
+#include "cmsis_os.h"
+#include "radioenge_modem.h"
+#include "uart_at.h"
+#include "main.h"
+#include <string.h>
+#include <stdio.h>
+#include "cmsis_os2.h"
+
+volatile JOINED_STATE gJoinedFSM = JOINED_TX;
+volatile RADIO_STATE gRadioState = RADIO_RESET;
+
+extern osThreadId_t ModemMngrTaskHandle;
+extern osThreadId_t ModemSendTaskHandle;
+extern osSemaphoreId_t RadioStateSemaphoreHandle;
+extern osMessageQueueId_t ModemSendQueueHandle;
+extern osSemaphoreId_t LoRaTXSemaphoreHandle;
+extern osEventFlagsId_t ModemStatusFlagsHandle;
+extern osTimerId_t ModemLedTimerHandle;
+extern osMessageQueueId_t uartQueueHandle;
+extern osTimerId_t DutyCycleTimerHandle;
+
+#define NUMBER_OF_STRINGS (6)
+#define STRING_LENGTH (255)
+char gConfigCmds[NUMBER_OF_STRINGS][STRING_LENGTH + 1] = {
+    "AT+APPKEY=F5:13:69:66:7B:18:9C:C1:8B:33:D3:55:35:38:D4:F7\r\n",
+    "AT+APPEUI=00:11:22:33:44:55:66:77\r\n",
+    "AT+CHMASK=FF00:0000:0000:0000:0002:0000\r\n",
+    "AT+ADR=1\r\n",
+    "AT+NJM=1\r\n",
+    "AT+JOIN\r\n"
+};
+
+// The Things Network TCC
+// "AT+APPKEY=F5:13:69:66:7B:18:9C:C1:8B:33:D3:55:35:38:D4:F7\r\n",
+// "AT+APPEUI=00:11:22:33:44:55:66:77\r\n",
+// "AT+CHMASK=FF00:0000:0000:0000:0002:0000\r\n"
+
+
+// The Things Network
+// "AT+APPKEY=11:01:54:c4:e6:28:4b:e4:90:92:07:1e:dc:25:a6:1f\r\n",
+// "AT+APPEUI=00:00:00:00:00:00:00:02\r\n",
+// "AT+CHMASK=FF00:0000:0000:0000:0002:0000\r\n" 
+
+// Chirpstack UTFPR
+// "AT+APPKEY=31:e6:f4:dc:c5:a6:5c:74:b4:87:14:3d:4b:d4:30:f5\r\n",
+// "AT+APPEUI=11:01:54:c4:e6:28:4b:e4:90:92:07:1e:dc:25:a6:1f\r\n",
+// "AT+CHMASK=0000:00FF:0000:0000:0004:0000\r\n"
+
+uint32_t gConsecutiveJoinErrors = 0;
+
+void LoRaWAN_JoinCallback(ATResponse response)
+{
+    osSemaphoreAcquire(RadioStateSemaphoreHandle, osWaitForever);
+    if (gRadioState == RADIO_JOINING)
+    {
+        if (response == AT_JOINED)
+        {
+            gConsecutiveJoinErrors = 0;
+            SetRadioState(RADIO_READY);
+        }
+        else
+        {
+            gConsecutiveJoinErrors++;
+            if(gConsecutiveJoinErrors>=5) //radioenge modem stops after 9 join errors
+            {
+                gConsecutiveJoinErrors = 0;
+                SetRadioState(RADIO_RESET);
+            }
+        }
+        osThreadFlagsSet(ModemMngrTaskHandle, 0x01);
+    }  
+    osSemaphoreRelease(RadioStateSemaphoreHandle);    
+}
+
+void DutyCycleTimerCallback (void *argument) 
+{
+    osSemaphoreAcquire(RadioStateSemaphoreHandle, osWaitForever);
+    if(gRadioState==RADIO_DUTYCYCLED)
+    {
+        SetRadioState(RADIO_READY);
+    }  
+    osSemaphoreRelease(RadioStateSemaphoreHandle);  
+}
+
+void resetRadio(void)
+{
+    while (sendRAWAT("ATZ\r\n") != AT_RESET)
+    {
+        osDelay(5000);
+    }
+    return;
+}
+
+//calls to this function must be protected by semaphore RadioStateSemaphoreHandle
+void SetRadioState(RADIO_STATE state)
+{    
+    gRadioState = state;
+    osThreadFlagsSet(ModemMngrTaskHandle, 0x01); 
+}
+
+void ModemLedCallback(void *argument) 
+{ 
+    switch(gRadioState)
+    {
+    case RADIO_JOINING:
+    {
+        // Pisca o LED
+        HAL_GPIO_TogglePin(KIT_LED_GPIO_Port, KIT_LED_Pin);
+        break;
+    }
+    case RADIO_READY:
+    {
+        // LED Ligado
+        HAL_GPIO_WritePin(KIT_LED_GPIO_Port, KIT_LED_Pin, GPIO_PIN_SET);      
+        break;       
+    }
+    default:
+    {
+        // LED Desligado
+        HAL_GPIO_WritePin(KIT_LED_GPIO_Port, KIT_LED_Pin, GPIO_PIN_RESET);         
+        break;       
+    }    
+    } 
+}
+
+
+void ModemManagerTaskCode(void *argument)
+{
+    /* USER CODE BEGIN 5 */
+    /* Infinite loop */    
+    uint32_t ConfigCmdIndex = 0;
+    uint32_t flags;
+    uint32_t modemflags;
+    osTimerStart(ModemLedTimerHandle, 50U);
+    osThreadFlagsSet(ModemMngrTaskHandle, 0x01);    
+    while (1)
+    {
+        flags = osThreadFlagsWait (0x01, osFlagsWaitAny,osWaitForever);
+        osSemaphoreAcquire(RadioStateSemaphoreHandle, osWaitForever);
+        osEventFlagsClear(ModemStatusFlagsHandle, RADIO_STATE_ALL);        
+        switch (gRadioState)
+        {
+        case RADIO_RESET:
+        {
+            // CDC_Transmit_FS("Resetting the radio...\r\n", strlen("Resetting the radio...\r\n"));
+            resetRadio();
+            ConfigCmdIndex = 0;
+            SetRadioState(RADIO_CONFIGURING);
+            osThreadFlagsSet(ModemMngrTaskHandle, 0x01);
+            osDelay(1000);
+            break;
+        }
+        case RADIO_CONFIGURING:
+        {
+            if (sendRAWAT(gConfigCmds[ConfigCmdIndex]) == AT_OK)
+            {                
+                ConfigCmdIndex++;
+                if (ConfigCmdIndex == NUMBER_OF_STRINGS)
+                {
+                    SetRadioState(RADIO_JOINING);
+                }
+                osDelay(100);
+            }
+            else
+            {
+                SetRadioState(RADIO_RESET);
+            }
+            osThreadFlagsSet(ModemMngrTaskHandle, 0x01);
+            break;
+        }
+        case RADIO_JOINING:
+        {
+            // wait for radio callback
+            break;
+        }
+        case RADIO_READY:
+        {
+            // now we can send data
+            break;
+        }
+        case RADIO_DUTYCYCLED:
+        {
+            // Wait the dutycycle period and return to ready
+            osTimerStart(DutyCycleTimerHandle, 14000U);
+            break;
+        }
+        }
+        modemflags = osEventFlagsSet(ModemStatusFlagsHandle, gRadioState);
+        osSemaphoreRelease(RadioStateSemaphoreHandle);
+    }
+}
+
+#define OUT_BUFFER_SIZE (64)
+uint8_t gEncodedString[OUT_BUFFER_SIZE]; 
+uint8_t gSendBuffer[OUT_BUFFER_SIZE+16]; 
+
+
+osStatus_t LoRaSend(uint32_t LoraWANPort,uint8_t* msg)
+{   
+    LoRaWaitDutyCycle();
+    return LoRaSendNow(LoraWANPort,msg);    
+}
+
+size_t bin_encode(void* in, size_t in_size, uint8_t* out, size_t max_out_size)
+{
+    uint8_t* in_ptr = (uint8_t*)in;
+    size_t offset=0;
+    size_t iter = in_size;
+    size_t i;
+    //check for buffer overflow
+    if(max_out_size<in_size*2)
+    {
+        iter = max_out_size/2;
+    }
+    else
+    {
+        iter = in_size;
+    }
+    //create the hex string expected by RadioEnge AT
+    for(i=0;i<iter;i++)
+    {
+        sprintf(out+offset,"%02x",*(in_ptr++));
+        offset+=2*sizeof(uint8_t);
+    }
+    return offset; //returns the size of the AT buffer
+}
+
+osStatus_t LoRaSendB(uint32_t LoraWANPort, uint8_t* msg, size_t size)
+{
+    LoRaWaitDutyCycle();     
+    return LoRaSendBNow(LoraWANPort,msg,size);    
+}
+
+
+//LoRaSendNow and LoRaSendBNow should only be used in conjunction with LoRaWaitDutyCycle()
+
+void LoRaWaitDutyCycle()
+{
+   osEventFlagsWait(ModemStatusFlagsHandle, RADIO_READY, osFlagsWaitAny | osFlagsNoClear, osWaitForever);
+   osSemaphoreAcquire(LoRaTXSemaphoreHandle,osWaitForever);    
+   osEventFlagsWait(ModemStatusFlagsHandle, RADIO_READY, osFlagsWaitAny | osFlagsNoClear, osWaitForever);
+}
+
+osStatus_t LoRaSendNow(uint32_t LoraWANPort, uint8_t* msg)
+{
+    osStatus_t ret = osError;    
+    osSemaphoreAcquire(RadioStateSemaphoreHandle, osWaitForever);
+    if (gRadioState == RADIO_READY)
+    {
+        snprintf(gSendBuffer, OUT_BUFFER_SIZE + 16, "AT+SEND=%d:%s\r\n", LoraWANPort, msg);
+        if (sendRAWAT(gSendBuffer) == AT_TX_OK)
+        {
+            SetRadioState(RADIO_DUTYCYCLED);
+            ret = osOK;
+        }        
+    }    
+    osSemaphoreRelease(RadioStateSemaphoreHandle);
+    osSemaphoreRelease(LoRaTXSemaphoreHandle);
+    return ret;
+}
+
+osStatus_t LoRaSendBNow(uint32_t LoraWANPort, uint8_t* msg, size_t size)
+{
+    osStatus_t ret = osError;
+    osSemaphoreAcquire(RadioStateSemaphoreHandle, osWaitForever);
+    if (gRadioState == RADIO_READY)
+    {
+        size_t encoded_size = bin_encode((void *)(msg), size, gEncodedString, OUT_BUFFER_SIZE);
+        snprintf(gSendBuffer, OUT_BUFFER_SIZE + 16, "AT+SENDB=%d:%s\r\n", LoraWANPort, gEncodedString);
+        if (sendRAWAT(gSendBuffer) == AT_TX_OK)
+        {
+            SetRadioState(RADIO_DUTYCYCLED);
+            ret = osOK;
+        }
+        else
+        {
+            SetRadioState(RADIO_RESET);
+        }
+    }
+    osSemaphoreRelease(RadioStateSemaphoreHandle);
+    osSemaphoreRelease(LoRaTXSemaphoreHandle);
+    return ret;
+}
+/* USER CODE END StartATHandling */

@@ -1,0 +1,4887 @@
+ARM GAS  /tmp/cc1AzyH1.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 6
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"ow.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/ow.c"
+  20              		.section	.text.ow_init,"ax",%progbits
+  21              		.align	1
+  22              		.global	ow_init
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	ow_init:
+  28              	.LFB220:
+   1:Core/Src/ow.c **** 
+   2:Core/Src/ow.c **** /*
+   3:Core/Src/ow.c ****  * @file        ow.c
+   4:Core/Src/ow.c ****  * @brief       OneWire communication driver
+   5:Core/Src/ow.c ****  * @author      Nima Askari
+   6:Core/Src/ow.c ****  * @version     1.0.0
+   7:Core/Src/ow.c ****  * @license     See the LICENSE file in the root folder.
+   8:Core/Src/ow.c ****  *
+   9:Core/Src/ow.c ****  * @note        All my libraries are dual-licensed. 
+  10:Core/Src/ow.c ****  *              Please review the licensing terms before using them.
+  11:Core/Src/ow.c ****  *              For any inquiries, feel free to contact me.
+  12:Core/Src/ow.c ****  *
+  13:Core/Src/ow.c ****  * @github      https://www.github.com/nimaltd
+  14:Core/Src/ow.c ****  * @linkedin    https://www.linkedin.com/in/nimaltd
+  15:Core/Src/ow.c ****  * @youtube     https://www.youtube.com/@nimaltd
+  16:Core/Src/ow.c ****  * @instagram   https://instagram.com/github.nimaltd
+  17:Core/Src/ow.c ****  *
+  18:Core/Src/ow.c ****  * Copyright (C) 2025 Nima Askari - NimaLTD. All rights reserved.
+  19:Core/Src/ow.c ****  */
+  20:Core/Src/ow.c **** 
+  21:Core/Src/ow.c **** /*************************************************************************************************/
+  22:Core/Src/ow.c **** /** Includes **/
+  23:Core/Src/ow.c **** /*************************************************************************************************/
+  24:Core/Src/ow.c **** 
+  25:Core/Src/ow.c **** #include <string.h>
+  26:Core/Src/ow.c **** #include "ow.h"
+  27:Core/Src/ow.c **** 
+  28:Core/Src/ow.c **** /*************************************************************************************************/
+  29:Core/Src/ow.c **** /** Private Function prototype **/
+  30:Core/Src/ow.c **** /*************************************************************************************************/
+ARM GAS  /tmp/cc1AzyH1.s 			page 2
+
+
+  31:Core/Src/ow.c **** 
+  32:Core/Src/ow.c **** /* Start OneWire communication */
+  33:Core/Src/ow.c **** ow_err_t  ow_start(ow_t *handle);
+  34:Core/Src/ow.c **** 
+  35:Core/Src/ow.c **** /* Stop OneWire communication */
+  36:Core/Src/ow.c **** void      ow_stop(ow_t *handle);
+  37:Core/Src/ow.c **** 
+  38:Core/Src/ow.c **** /* Handle transfer state machine */
+  39:Core/Src/ow.c **** __STATIC_FORCEINLINE void ow_state_xfer(ow_t *handle);
+  40:Core/Src/ow.c **** 
+  41:Core/Src/ow.c **** #if (OW_MAX_DEVICE > 1)
+  42:Core/Src/ow.c **** /* Handle search state machine */
+  43:Core/Src/ow.c **** __STATIC_FORCEINLINE void ow_state_search(ow_t *handle);
+  44:Core/Src/ow.c **** #endif
+  45:Core/Src/ow.c **** 
+  46:Core/Src/ow.c **** /* Write one bit on bus */
+  47:Core/Src/ow.c **** __STATIC_FORCEINLINE void ow_write_bit(ow_t *handle, bool high);
+  48:Core/Src/ow.c **** 
+  49:Core/Src/ow.c **** /* Read one bit from bus */
+  50:Core/Src/ow.c **** __STATIC_FORCEINLINE uint8_t ow_read_bit(ow_t *handle);
+  51:Core/Src/ow.c **** 
+  52:Core/Src/ow.c **** /*************************************************************************************************/
+  53:Core/Src/ow.c **** /** Function Implementations **/
+  54:Core/Src/ow.c **** /*************************************************************************************************/
+  55:Core/Src/ow.c **** 
+  56:Core/Src/ow.c **** /*************************************************************************************************/
+  57:Core/Src/ow.c **** /**
+  58:Core/Src/ow.c ****  * @brief  Initialize 1-Wire handle with GPIO and timer configuration.
+  59:Core/Src/ow.c ****  * @param[in,out]  handle: Pointer to the 1-Wire handle to initialize.
+  60:Core/Src/ow.c ****  * @param[in]  init: Pointer to initialization data (GPIO, pin, timer, callback).
+  61:Core/Src/ow.c ****  */
+  62:Core/Src/ow.c **** void ow_init(ow_t *handle, const ow_init_t *init)
+  63:Core/Src/ow.c **** {
+  29              		.loc 1 63 1
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 16
+  32              		@ frame_needed = 1, uses_anonymous_args = 0
+  33 0000 80B5     		push	{r7, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 7, -8
+  37              		.cfi_offset 14, -4
+  38 0002 84B0     		sub	sp, sp, #16
+  39              	.LCFI1:
+  40              		.cfi_def_cfa_offset 24
+  41 0004 00AF     		add	r7, sp, #0
+  42              	.LCFI2:
+  43              		.cfi_def_cfa_register 7
+  44 0006 7860     		str	r0, [r7, #4]
+  45 0008 3960     		str	r1, [r7]
+  64:Core/Src/ow.c ****   assert_param(handle != NULL);
+  65:Core/Src/ow.c ****   assert_param(init != NULL);
+  66:Core/Src/ow.c ****   assert_param(init->tim_handle != NULL);
+  67:Core/Src/ow.c ****   assert_param(init->tim_cb != NULL);
+  68:Core/Src/ow.c **** 
+  69:Core/Src/ow.c ****   /* Save configuration */
+  70:Core/Src/ow.c **** #if (OW_DUAL_PINS == 0)
+ARM GAS  /tmp/cc1AzyH1.s 			page 3
+
+
+  71:Core/Src/ow.c ****   assert_param(init->gpio != NULL);
+  72:Core/Src/ow.c ****   assert_param(IS_GPIO_PIN(init->pin) != false);
+  73:Core/Src/ow.c ****   handle->config.pin_set = init->pin;
+  46              		.loc 1 73 32
+  47 000a 3B68     		ldr	r3, [r7]
+  48 000c 9B8A     		ldrh	r3, [r3, #20]
+  49 000e 1A46     		mov	r2, r3
+  50              		.loc 1 73 26
+  51 0010 7B68     		ldr	r3, [r7, #4]
+  52 0012 DA60     		str	r2, [r3, #12]
+  74:Core/Src/ow.c ****   handle->config.pin_reset = init->pin << 16UL;
+  53              		.loc 1 74 34
+  54 0014 3B68     		ldr	r3, [r7]
+  55 0016 9B8A     		ldrh	r3, [r3, #20]
+  56              		.loc 1 74 40
+  57 0018 1A04     		lsls	r2, r3, #16
+  58              		.loc 1 74 28
+  59 001a 7B68     		ldr	r3, [r7, #4]
+  60 001c 1A61     		str	r2, [r3, #16]
+  75:Core/Src/ow.c ****   handle->config.pin_read = init->pin;
+  61              		.loc 1 75 33
+  62 001e 3B68     		ldr	r3, [r7]
+  63 0020 9B8A     		ldrh	r3, [r3, #20]
+  64 0022 1A46     		mov	r2, r3
+  65              		.loc 1 75 27
+  66 0024 7B68     		ldr	r3, [r7, #4]
+  67 0026 5A61     		str	r2, [r3, #20]
+  76:Core/Src/ow.c ****   handle->config.gpio = init->gpio;
+  68              		.loc 1 76 29
+  69 0028 3B68     		ldr	r3, [r7]
+  70 002a 1A69     		ldr	r2, [r3, #16]
+  71              		.loc 1 76 23
+  72 002c 7B68     		ldr	r3, [r7, #4]
+  73 002e 9A60     		str	r2, [r3, #8]
+  77:Core/Src/ow.c **** #else
+  78:Core/Src/ow.c ****   assert_param(init->gpio_tx != NULL);
+  79:Core/Src/ow.c ****   assert_param(init->gpio_rx != NULL);
+  80:Core/Src/ow.c ****   assert_param(IS_GPIO_PIN(init->pin_rx) != false);
+  81:Core/Src/ow.c ****   assert_param(IS_GPIO_PIN(init->pin_tx) != false);
+  82:Core/Src/ow.c **** #if (OW_INVERT_TX == 1)
+  83:Core/Src/ow.c ****   handle->config.pin_set = init->pin_tx;
+  84:Core/Src/ow.c ****   handle->config.pin_reset = init->pin_tx << 16UL;
+  85:Core/Src/ow.c **** #else
+  86:Core/Src/ow.c ****   handle->config.pin_reset = init->pin_tx;
+  87:Core/Src/ow.c ****   handle->config.pin_set = init->pin_tx << 16UL;
+  88:Core/Src/ow.c **** #endif
+  89:Core/Src/ow.c ****   handle->config.gpio_rx = init->gpio_rx;
+  90:Core/Src/ow.c ****   handle->config.pin_read = init->pin_rx;
+  91:Core/Src/ow.c ****   handle->config.gpio = init->gpio_tx;
+  92:Core/Src/ow.c **** #endif
+  93:Core/Src/ow.c ****   handle->config.tim_handle = init->tim_handle;
+  74              		.loc 1 93 35
+  75 0030 3B68     		ldr	r3, [r7]
+  76 0032 1A68     		ldr	r2, [r3]
+  77              		.loc 1 93 29
+  78 0034 7B68     		ldr	r3, [r7, #4]
+  79 0036 1A60     		str	r2, [r3]
+ARM GAS  /tmp/cc1AzyH1.s 			page 4
+
+
+  94:Core/Src/ow.c ****   handle->config.done_cb = init->done_cb;
+  80              		.loc 1 94 32
+  81 0038 3B68     		ldr	r3, [r7]
+  82 003a 9A68     		ldr	r2, [r3, #8]
+  83              		.loc 1 94 26
+  84 003c 7B68     		ldr	r3, [r7, #4]
+  85 003e 5A60     		str	r2, [r3, #4]
+  95:Core/Src/ow.c **** 
+  96:Core/Src/ow.c ****   /* ROM ID Filter, 0 == Accept All */
+  97:Core/Src/ow.c **** #if (OW_MAX_DEVICE > 1)
+  98:Core/Src/ow.c ****   handle->rom_id_filter = init->rom_id_filter;
+  86              		.loc 1 98 31
+  87 0040 3B68     		ldr	r3, [r7]
+  88 0042 1A7B     		ldrb	r2, [r3, #12]	@ zero_extendqisi2
+  89              		.loc 1 98 25
+  90 0044 7B68     		ldr	r3, [r7, #4]
+  91 0046 83F84C20 		strb	r2, [r3, #76]
+  99:Core/Src/ow.c **** #endif
+ 100:Core/Src/ow.c **** 
+ 101:Core/Src/ow.c ****   /* Register user timer callback for timing events */
+ 102:Core/Src/ow.c ****   HAL_TIM_RegisterCallback(handle->config.tim_handle, HAL_TIM_PERIOD_ELAPSED_CB_ID, init->tim_cb);
+  92              		.loc 1 102 3
+  93 004a 7B68     		ldr	r3, [r7, #4]
+  94 004c 1868     		ldr	r0, [r3]
+  95              		.loc 1 102 89
+  96 004e 3B68     		ldr	r3, [r7]
+  97 0050 5B68     		ldr	r3, [r3, #4]
+  98              		.loc 1 102 3
+  99 0052 1A46     		mov	r2, r3
+ 100 0054 0E21     		movs	r1, #14
+ 101 0056 FFF7FEFF 		bl	HAL_TIM_RegisterCallback
+ 102 005a 7B68     		ldr	r3, [r7, #4]
+ 103 005c FB60     		str	r3, [r7, #12]
+ 104 005e 0123     		movs	r3, #1
+ 105 0060 FB72     		strb	r3, [r7, #11]
+ 106              	.LBB102:
+ 107              	.LBB103:
+ 103:Core/Src/ow.c **** 
+ 104:Core/Src/ow.c ****   /* Set bus to idle state (high) */
+ 105:Core/Src/ow.c ****   ow_write_bit(handle, true);
+ 106:Core/Src/ow.c **** }
+ 107:Core/Src/ow.c **** 
+ 108:Core/Src/ow.c **** /*************************************************************************************************/
+ 109:Core/Src/ow.c **** /**
+ 110:Core/Src/ow.c ****  * @brief Handle 1-Wire timer callback and call state handlers.
+ 111:Core/Src/ow.c ****  * @param[in] handle: Pointer to the 1-Wire handle.
+ 112:Core/Src/ow.c ****  */
+ 113:Core/Src/ow.c **** void ow_callback(ow_t *handle)
+ 114:Core/Src/ow.c **** {
+ 115:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 116:Core/Src/ow.c **** 
+ 117:Core/Src/ow.c ****   switch (handle->state)
+ 118:Core/Src/ow.c ****   {
+ 119:Core/Src/ow.c ****     /* Ongoing data transfer */
+ 120:Core/Src/ow.c ****     case OW_STATE_XFER:       
+ 121:Core/Src/ow.c ****       ow_state_xfer(handle);
+ 122:Core/Src/ow.c ****       break;
+ARM GAS  /tmp/cc1AzyH1.s 			page 5
+
+
+ 123:Core/Src/ow.c **** 
+ 124:Core/Src/ow.c **** #if (OW_MAX_DEVICE > 1)
+ 125:Core/Src/ow.c ****     /* ROM search operation */
+ 126:Core/Src/ow.c ****     case OW_STATE_SEARCH:     
+ 127:Core/Src/ow.c ****       ow_state_search(handle);
+ 128:Core/Src/ow.c ****       break;
+ 129:Core/Src/ow.c **** #endif
+ 130:Core/Src/ow.c **** 
+ 131:Core/Src/ow.c ****     /* Any invalid state -> stop */
+ 132:Core/Src/ow.c ****     default:                  
+ 133:Core/Src/ow.c ****       ow_stop(handle);
+ 134:Core/Src/ow.c ****       break;
+ 135:Core/Src/ow.c ****   }
+ 136:Core/Src/ow.c **** }
+ 137:Core/Src/ow.c **** 
+ 138:Core/Src/ow.c **** /*************************************************************************************************/
+ 139:Core/Src/ow.c **** /**
+ 140:Core/Src/ow.c ****  * @brief Calculate 8-bit CRC for given data.
+ 141:Core/Src/ow.c ****  * @param[in] data: Pointer to the data buffer.
+ 142:Core/Src/ow.c ****  * @param[in] len: Length of the data in bytes.
+ 143:Core/Src/ow.c ****  * @retval Calculated CRC8 value.
+ 144:Core/Src/ow.c ****  */
+ 145:Core/Src/ow.c **** uint8_t ow_crc(const uint8_t *data, uint16_t len)
+ 146:Core/Src/ow.c **** {
+ 147:Core/Src/ow.c ****   uint8_t crc = 0;
+ 148:Core/Src/ow.c ****   assert_param(data != NULL);
+ 149:Core/Src/ow.c ****   assert_param(len > 0);
+ 150:Core/Src/ow.c **** 
+ 151:Core/Src/ow.c ****   while (len--)
+ 152:Core/Src/ow.c ****   {
+ 153:Core/Src/ow.c ****     uint8_t inbyte = *data++;
+ 154:Core/Src/ow.c ****     for (uint8_t i = 8; i > 0; i--)
+ 155:Core/Src/ow.c ****     {
+ 156:Core/Src/ow.c ****       /* Compute CRC using polynomial x^8 + x^5 + x^4 + 1 (0x8C) */
+ 157:Core/Src/ow.c ****       uint8_t mix = (uint8_t)(crc ^ inbyte) & 0x01;
+ 158:Core/Src/ow.c ****       crc >>= 1;
+ 159:Core/Src/ow.c ****       if (mix)
+ 160:Core/Src/ow.c ****       {
+ 161:Core/Src/ow.c ****         crc ^= 0x8C;
+ 162:Core/Src/ow.c ****       }
+ 163:Core/Src/ow.c ****       inbyte >>= 1;
+ 164:Core/Src/ow.c ****     }
+ 165:Core/Src/ow.c ****   }
+ 166:Core/Src/ow.c ****   return crc;
+ 167:Core/Src/ow.c **** }
+ 168:Core/Src/ow.c **** 
+ 169:Core/Src/ow.c **** /*************************************************************************************************/
+ 170:Core/Src/ow.c **** /**
+ 171:Core/Src/ow.c ****  * @brief Check if 1-Wire bus is busy.
+ 172:Core/Src/ow.c ****  * @param[in] handle: Pointer to the 1-Wire handle.
+ 173:Core/Src/ow.c ****  * @retval true if busy, false if idle
+ 174:Core/Src/ow.c ****  */
+ 175:Core/Src/ow.c **** bool ow_is_busy(ow_t *handle)
+ 176:Core/Src/ow.c **** {
+ 177:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 178:Core/Src/ow.c ****   return (handle->state != OW_STATE_IDLE) ? true : false;
+ 179:Core/Src/ow.c **** }
+ARM GAS  /tmp/cc1AzyH1.s 			page 6
+
+
+ 180:Core/Src/ow.c **** 
+ 181:Core/Src/ow.c **** /*************************************************************************************************/
+ 182:Core/Src/ow.c **** /**
+ 183:Core/Src/ow.c ****  * @brief Get the last 1-Wire error.
+ 184:Core/Src/ow.c ****  * @param[in] handle: Pointer to the 1-Wire handle.
+ 185:Core/Src/ow.c ****  * @retval Last error code (ow_err_t)
+ 186:Core/Src/ow.c ****  */
+ 187:Core/Src/ow.c **** ow_err_t ow_last_error(ow_t *handle)
+ 188:Core/Src/ow.c **** {
+ 189:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 190:Core/Src/ow.c ****   return handle->error;
+ 191:Core/Src/ow.c **** }
+ 192:Core/Src/ow.c **** 
+ 193:Core/Src/ow.c **** #if (OW_MAX_DEVICE == 1)
+ 194:Core/Src/ow.c **** /*************************************************************************************************/
+ 195:Core/Src/ow.c **** /**
+ 196:Core/Src/ow.c ****  * @brief Start reading a single ROM ID from the 1-Wire bus.
+ 197:Core/Src/ow.c ****  * @param[in] handle: Pointer to the 1-Wire handle.
+ 198:Core/Src/ow.c ****  * @retval Last error code (ow_err_t)
+ 199:Core/Src/ow.c ****  */
+ 200:Core/Src/ow.c **** ow_err_t ow_update_rom_id(ow_t *handle)
+ 201:Core/Src/ow.c **** {
+ 202:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 203:Core/Src/ow.c **** 
+ 204:Core/Src/ow.c ****   do
+ 205:Core/Src/ow.c ****   {
+ 206:Core/Src/ow.c ****     /* Start 1-Wire communication */
+ 207:Core/Src/ow.c ****     handle->error = ow_start(handle);
+ 208:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 209:Core/Src/ow.c ****     {
+ 210:Core/Src/ow.c ****         /* Stop bus if start failed */
+ 211:Core/Src/ow.c ****         ow_stop(handle);
+ 212:Core/Src/ow.c ****         break;
+ 213:Core/Src/ow.c ****     }
+ 214:Core/Src/ow.c **** 
+ 215:Core/Src/ow.c ****     /* Set state to transfer for next operation */
+ 216:Core/Src/ow.c ****     handle->state = OW_STATE_XFER;
+ 217:Core/Src/ow.c **** 
+ 218:Core/Src/ow.c ****     /* Prepare buffer to read ROM command (1 byte command + 8 byte response) */
+ 219:Core/Src/ow.c ****     handle->buf.data[0]   = OW_CMD_READ_ROM;
+ 220:Core/Src/ow.c ****     handle->buf.write_len = 1;
+ 221:Core/Src/ow.c ****     handle->buf.read_len  = 8;
+ 222:Core/Src/ow.c **** 
+ 223:Core/Src/ow.c ****   } while (0);
+ 224:Core/Src/ow.c **** 
+ 225:Core/Src/ow.c ****   /* Return result of operation */
+ 226:Core/Src/ow.c ****   return handle->error;
+ 227:Core/Src/ow.c **** }
+ 228:Core/Src/ow.c **** 
+ 229:Core/Src/ow.c **** #else
+ 230:Core/Src/ow.c **** /*************************************************************************************************/
+ 231:Core/Src/ow.c **** /**
+ 232:Core/Src/ow.c ****  * @brief Start search to update all ROM IDs on the 1-Wire bus.
+ 233:Core/Src/ow.c ****  * @param[in] handle: Pointer to the 1-Wire handle.
+ 234:Core/Src/ow.c ****  * @retval Last error code (ow_err_t)
+ 235:Core/Src/ow.c ****  */
+ 236:Core/Src/ow.c **** ow_err_t ow_update_rom_id(ow_t *handle)
+ARM GAS  /tmp/cc1AzyH1.s 			page 7
+
+
+ 237:Core/Src/ow.c **** {
+ 238:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 239:Core/Src/ow.c **** 
+ 240:Core/Src/ow.c ****   do
+ 241:Core/Src/ow.c ****   {
+ 242:Core/Src/ow.c ****     /* Start 1-Wire communication */
+ 243:Core/Src/ow.c ****     handle->error = ow_start(handle);
+ 244:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 245:Core/Src/ow.c ****     {
+ 246:Core/Src/ow.c ****       /* Stop bus if start failed */
+ 247:Core/Src/ow.c ****       ow_stop(handle);
+ 248:Core/Src/ow.c ****       break;
+ 249:Core/Src/ow.c ****     }
+ 250:Core/Src/ow.c **** 
+ 251:Core/Src/ow.c ****     /* Prepare for ROM search */
+ 252:Core/Src/ow.c ****     handle->state = OW_STATE_SEARCH;
+ 253:Core/Src/ow.c ****     handle->buf.data[0] = OW_CMD_SEARCH_ROM;
+ 254:Core/Src/ow.c ****     handle->rom_id_found = 0;
+ 255:Core/Src/ow.c **** 
+ 256:Core/Src/ow.c ****     /* Clear previous search and ROM ID data */
+ 257:Core/Src/ow.c ****     memset(&handle->search, 0, sizeof(ow_search_t));
+ 258:Core/Src/ow.c ****     memset(handle->rom_id, 0, sizeof(handle->rom_id));
+ 259:Core/Src/ow.c **** 
+ 260:Core/Src/ow.c ****   } while (0);
+ 261:Core/Src/ow.c **** 
+ 262:Core/Src/ow.c ****   return handle->error;
+ 263:Core/Src/ow.c **** }
+ 264:Core/Src/ow.c **** #endif
+ 265:Core/Src/ow.c **** 
+ 266:Core/Src/ow.c **** /*************************************************************************************************/
+ 267:Core/Src/ow.c **** /**
+ 268:Core/Src/ow.c ****  * @brief Transfer a command and optional data to/from a specific 1-Wire device by Skip ROM.
+ 269:Core/Src/ow.c ****  * @param[in] handle Pointer to the 1-Wire handle structure.
+ 270:Core/Src/ow.c ****  * @param[in] fn_cmd Function or command byte to send.
+ 271:Core/Src/ow.c ****  * @param[in] w_data Pointer to the data buffer to write (can be NULL if w_len is 0).
+ 272:Core/Src/ow.c ****  * @param[in] w_len Number of bytes to write from w_data (can be 0).
+ 273:Core/Src/ow.c ****  * @param[in] r_len Number of bytes to read (can be 0).
+ 274:Core/Src/ow.c ****  * @retval Error code (ow_err_t).
+ 275:Core/Src/ow.c ****  */
+ 276:Core/Src/ow.c **** ow_err_t ow_xfer(ow_t *handle, uint8_t fn_cmd, const uint8_t *w_data, uint16_t w_len, uint16_t r_le
+ 277:Core/Src/ow.c **** {
+ 278:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 279:Core/Src/ow.c **** 
+ 280:Core/Src/ow.c ****   do
+ 281:Core/Src/ow.c ****   {
+ 282:Core/Src/ow.c ****     /* Check if w_data is NULL but requested write data */
+ 283:Core/Src/ow.c ****     if ((w_data == NULL) && (w_len > 0))
+ 284:Core/Src/ow.c ****     {
+ 285:Core/Src/ow.c ****       handle->error = OW_ERR_LEN;
+ 286:Core/Src/ow.c ****       ow_stop(handle);
+ 287:Core/Src/ow.c ****       break;
+ 288:Core/Src/ow.c ****     }
+ 289:Core/Src/ow.c **** 
+ 290:Core/Src/ow.c ****     /* Check if requested read/read length exceeds buffer */
+ 291:Core/Src/ow.c ****     if (w_len + r_len > OW_MAX_DATA_LEN)
+ 292:Core/Src/ow.c ****     {
+ 293:Core/Src/ow.c ****       handle->error = OW_ERR_LEN;
+ARM GAS  /tmp/cc1AzyH1.s 			page 8
+
+
+ 294:Core/Src/ow.c ****       ow_stop(handle);
+ 295:Core/Src/ow.c ****       break;
+ 296:Core/Src/ow.c ****     }
+ 297:Core/Src/ow.c **** 
+ 298:Core/Src/ow.c ****     /* Start 1-Wire communication */
+ 299:Core/Src/ow.c ****     handle->error = ow_start(handle);
+ 300:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 301:Core/Src/ow.c ****     {
+ 302:Core/Src/ow.c ****       ow_stop(handle);
+ 303:Core/Src/ow.c ****       break;
+ 304:Core/Src/ow.c ****     }
+ 305:Core/Src/ow.c **** 
+ 306:Core/Src/ow.c ****     /* Prepare transfer buffer */
+ 307:Core/Src/ow.c ****     handle->state = OW_STATE_XFER;
+ 308:Core/Src/ow.c **** 
+ 309:Core/Src/ow.c ****     /* Skip ROM for single device */
+ 310:Core/Src/ow.c ****     handle->buf.data[0] = OW_CMD_SKIP_ROM;
+ 311:Core/Src/ow.c **** 
+ 312:Core/Src/ow.c ****     /* Send function command */
+ 313:Core/Src/ow.c ****     handle->buf.data[1] = fn_cmd;
+ 314:Core/Src/ow.c **** 
+ 315:Core/Src/ow.c ****     /* Copy user data if provided */
+ 316:Core/Src/ow.c ****     if (w_data != NULL)
+ 317:Core/Src/ow.c ****     {
+ 318:Core/Src/ow.c ****       for (uint16_t idx = 0; idx < w_len; idx++)
+ 319:Core/Src/ow.c ****       {
+ 320:Core/Src/ow.c ****         handle->buf.data[2 + idx] = w_data[idx];
+ 321:Core/Src/ow.c ****       }
+ 322:Core/Src/ow.c ****       handle->buf.write_len = w_len + 2;
+ 323:Core/Src/ow.c ****     }
+ 324:Core/Src/ow.c ****     else
+ 325:Core/Src/ow.c ****     {
+ 326:Core/Src/ow.c ****       handle->buf.write_len = 2;
+ 327:Core/Src/ow.c ****     }
+ 328:Core/Src/ow.c **** 
+ 329:Core/Src/ow.c ****     /* Set expected read length */
+ 330:Core/Src/ow.c ****     handle->buf.read_len  = r_len;
+ 331:Core/Src/ow.c **** 
+ 332:Core/Src/ow.c ****   } while (0);
+ 333:Core/Src/ow.c **** 
+ 334:Core/Src/ow.c ****   return handle->error;
+ 335:Core/Src/ow.c **** }
+ 336:Core/Src/ow.c **** 
+ 337:Core/Src/ow.c **** #if (OW_MAX_DEVICE > 1)
+ 338:Core/Src/ow.c **** /*************************************************************************************************/
+ 339:Core/Src/ow.c **** /**
+ 340:Core/Src/ow.c ****  * @brief Transfer a command and optional data to/from a specific 1-Wire device by ROM ID index.
+ 341:Core/Src/ow.c ****  * @param[in] handle Pointer to the 1-Wire handle structure.
+ 342:Core/Src/ow.c ****  * @param[in] rom_id Index of the target ROM ID in the handle's rom_id array.
+ 343:Core/Src/ow.c ****  * @param[in] fn_cmd Function or command byte to send.
+ 344:Core/Src/ow.c ****  * @param[in] w_data Pointer to the data buffer to write (can be NULL if w_len is 0).
+ 345:Core/Src/ow.c ****  * @param[in] w_len Number of bytes to write from w_data (can be 0).
+ 346:Core/Src/ow.c ****  * @param[in] r_len Number of bytes to read into the internal buffer (can be 0).
+ 347:Core/Src/ow.c ****  * @retval Error code (ow_err_t).
+ 348:Core/Src/ow.c ****  */
+ 349:Core/Src/ow.c **** ow_err_t ow_xfer_by_id(ow_t *handle, uint8_t rom_id, uint8_t fn_cmd, const uint8_t *w_data, uint16_
+ 350:Core/Src/ow.c **** {
+ARM GAS  /tmp/cc1AzyH1.s 			page 9
+
+
+ 351:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 352:Core/Src/ow.c **** 
+ 353:Core/Src/ow.c ****   do
+ 354:Core/Src/ow.c ****   {
+ 355:Core/Src/ow.c ****     /* Check if w_data is NULL but requested write data */
+ 356:Core/Src/ow.c ****     if ((w_data == NULL) && (w_len > 0))
+ 357:Core/Src/ow.c ****     {
+ 358:Core/Src/ow.c ****       handle->error = OW_ERR_LEN;
+ 359:Core/Src/ow.c ****       ow_stop(handle);
+ 360:Core/Src/ow.c ****       break;
+ 361:Core/Src/ow.c ****     }
+ 362:Core/Src/ow.c **** 
+ 363:Core/Src/ow.c ****     /* Check if requested read/read length exceeds buffer */
+ 364:Core/Src/ow.c ****     if (w_len + r_len > OW_MAX_DATA_LEN)
+ 365:Core/Src/ow.c ****     {
+ 366:Core/Src/ow.c ****       handle->error = OW_ERR_LEN;
+ 367:Core/Src/ow.c ****       ow_stop(handle);
+ 368:Core/Src/ow.c ****       break;
+ 369:Core/Src/ow.c ****     }
+ 370:Core/Src/ow.c **** 
+ 371:Core/Src/ow.c ****     /* Validate ROM ID index */
+ 372:Core/Src/ow.c ****     if ((handle->rom_id_found == 0) || (rom_id >= handle->rom_id_found))
+ 373:Core/Src/ow.c ****     {
+ 374:Core/Src/ow.c ****       handle->error = OW_ERR_ROM_ID;
+ 375:Core/Src/ow.c ****       ow_stop(handle);
+ 376:Core/Src/ow.c ****       break;
+ 377:Core/Src/ow.c ****     }
+ 378:Core/Src/ow.c **** 
+ 379:Core/Src/ow.c ****     /* Start 1-Wire communication */
+ 380:Core/Src/ow.c ****     handle->error = ow_start(handle);
+ 381:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 382:Core/Src/ow.c ****     {
+ 383:Core/Src/ow.c ****       ow_stop(handle);
+ 384:Core/Src/ow.c ****       break;
+ 385:Core/Src/ow.c ****     }
+ 386:Core/Src/ow.c **** 
+ 387:Core/Src/ow.c ****     /* Prepare transfer buffer */
+ 388:Core/Src/ow.c ****     handle->state = OW_STATE_XFER;
+ 389:Core/Src/ow.c ****     
+ 390:Core/Src/ow.c ****     /* Select device by ROM */
+ 391:Core/Src/ow.c ****     handle->buf.data[0] = OW_CMD_MATCH_ROM;
+ 392:Core/Src/ow.c ****     for (uint8_t idx = 0; idx < 8; idx++)
+ 393:Core/Src/ow.c ****     {
+ 394:Core/Src/ow.c ****       handle->buf.data[1 + idx] = handle->rom_id[rom_id].array[idx];
+ 395:Core/Src/ow.c ****     }
+ 396:Core/Src/ow.c ****     
+ 397:Core/Src/ow.c ****     /* Function command */
+ 398:Core/Src/ow.c ****     handle->buf.data[9] = fn_cmd;
+ 399:Core/Src/ow.c **** 
+ 400:Core/Src/ow.c ****     /* Copy user data if provided */
+ 401:Core/Src/ow.c ****     if (w_data != NULL)
+ 402:Core/Src/ow.c ****     {
+ 403:Core/Src/ow.c ****       for (uint16_t idx = 0; idx < w_len; idx++)
+ 404:Core/Src/ow.c ****       {
+ 405:Core/Src/ow.c ****         handle->buf.data[10 + idx] = w_data[idx];
+ 406:Core/Src/ow.c ****       }
+ 407:Core/Src/ow.c ****       handle->buf.write_len = w_len + 10;
+ARM GAS  /tmp/cc1AzyH1.s 			page 10
+
+
+ 408:Core/Src/ow.c ****     }
+ 409:Core/Src/ow.c ****     else
+ 410:Core/Src/ow.c ****     {
+ 411:Core/Src/ow.c ****       handle->buf.write_len = 10;
+ 412:Core/Src/ow.c ****     }
+ 413:Core/Src/ow.c ****     
+ 414:Core/Src/ow.c ****     /* Set expected read length */
+ 415:Core/Src/ow.c ****     handle->buf.read_len  = r_len;
+ 416:Core/Src/ow.c **** 
+ 417:Core/Src/ow.c ****   } while (0);
+ 418:Core/Src/ow.c **** 
+ 419:Core/Src/ow.c ****   return handle->error;
+ 420:Core/Src/ow.c **** }
+ 421:Core/Src/ow.c **** 
+ 422:Core/Src/ow.c **** /*************************************************************************************************/
+ 423:Core/Src/ow.c **** /**
+ 424:Core/Src/ow.c ****  * @brief Get number of detected 1-Wire devices.
+ 425:Core/Src/ow.c ****  * @param[in] handle: Pointer to 1-Wire handle.
+ 426:Core/Src/ow.c ****  * @retval Count of found devices
+ 427:Core/Src/ow.c ****  */
+ 428:Core/Src/ow.c **** uint8_t ow_devices(ow_t *handle)
+ 429:Core/Src/ow.c **** {
+ 430:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 431:Core/Src/ow.c ****   return handle->rom_id_found;
+ 432:Core/Src/ow.c **** }
+ 433:Core/Src/ow.c **** #endif
+ 434:Core/Src/ow.c **** 
+ 435:Core/Src/ow.c **** /*************************************************************************************************/
+ 436:Core/Src/ow.c **** /**
+ 437:Core/Src/ow.c ****  * @brief Retrieve read response data from the 1-Wire buffer.
+ 438:Core/Src/ow.c ****  * @param[in] handle: Pointer to the 1-Wire handle.
+ 439:Core/Src/ow.c ****  * @param[in] data: Pointer to user buffer to store the response.
+ 440:Core/Src/ow.c ****  * @param[in] data_size: Size of the user buffer in bytes.
+ 441:Core/Src/ow.c ****  * @retval Number of bytes copied to the user buffer.
+ 442:Core/Src/ow.c ****  */
+ 443:Core/Src/ow.c **** uint16_t ow_read_resp(ow_t *handle, uint8_t *data, uint16_t data_size)
+ 444:Core/Src/ow.c **** {
+ 445:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 446:Core/Src/ow.c ****   assert_param(data != NULL);
+ 447:Core/Src/ow.c **** 
+ 448:Core/Src/ow.c ****   uint16_t len = handle->buf.read_len;
+ 449:Core/Src/ow.c **** 
+ 450:Core/Src/ow.c ****   /* Adjust length if user buffer is smaller */
+ 451:Core/Src/ow.c ****   if (data_size < len)
+ 452:Core/Src/ow.c ****   {
+ 453:Core/Src/ow.c ****     len = data_size;
+ 454:Core/Src/ow.c ****   }
+ 455:Core/Src/ow.c **** 
+ 456:Core/Src/ow.c ****   /* Defensive: ensure we do not read past internal buffer */
+ 457:Core/Src/ow.c ****   if ((uint32_t)(handle->buf.write_len) + (uint32_t)len > sizeof(handle->buf.data))
+ 458:Core/Src/ow.c ****   {
+ 459:Core/Src/ow.c ****     /* Truncate to available bytes */
+ 460:Core/Src/ow.c ****     if (handle->buf.write_len < sizeof(handle->buf.data))
+ 461:Core/Src/ow.c ****     {
+ 462:Core/Src/ow.c ****       len = (uint16_t)(sizeof(handle->buf.data) - (uint32_t)handle->buf.write_len);
+ 463:Core/Src/ow.c ****     }
+ 464:Core/Src/ow.c ****     else
+ARM GAS  /tmp/cc1AzyH1.s 			page 11
+
+
+ 465:Core/Src/ow.c ****     {
+ 466:Core/Src/ow.c ****       return 0;
+ 467:Core/Src/ow.c ****     }
+ 468:Core/Src/ow.c ****   }
+ 469:Core/Src/ow.c **** 
+ 470:Core/Src/ow.c ****   /* Copy response data from internal buffer to user buffer */
+ 471:Core/Src/ow.c ****   for (uint16_t idx = 0; idx < len; ++idx)
+ 472:Core/Src/ow.c ****   {
+ 473:Core/Src/ow.c ****     data[idx] = handle->buf.data[handle->buf.write_len + idx];
+ 474:Core/Src/ow.c ****   }
+ 475:Core/Src/ow.c **** 
+ 476:Core/Src/ow.c ****   return len;
+ 477:Core/Src/ow.c **** }
+ 478:Core/Src/ow.c **** 
+ 479:Core/Src/ow.c **** /*************************************************************************************************/
+ 480:Core/Src/ow.c **** /** Private Function Implementations **/
+ 481:Core/Src/ow.c **** /*************************************************************************************************/
+ 482:Core/Src/ow.c **** 
+ 483:Core/Src/ow.c **** /*************************************************************************************************/
+ 484:Core/Src/ow.c **** /**
+ 485:Core/Src/ow.c ****  * @brief Start a 1-Wire transfer on the bus.
+ 486:Core/Src/ow.c ****  * @param[in] handle: Pointer to the 1-Wire handle.
+ 487:Core/Src/ow.c ****  * @retval OW_ERR_NONE on success, or error code (OW_ERR_BUSY, OW_ERR_BUS).
+ 488:Core/Src/ow.c ****  */
+ 489:Core/Src/ow.c **** ow_err_t ow_start(ow_t *handle)
+ 490:Core/Src/ow.c **** {
+ 491:Core/Src/ow.c ****   ow_err_t ow_err = OW_ERR_NONE;
+ 492:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 493:Core/Src/ow.c **** 
+ 494:Core/Src/ow.c ****   do
+ 495:Core/Src/ow.c ****   {
+ 496:Core/Src/ow.c ****     /* Ensure bus is idle before starting transfer */
+ 497:Core/Src/ow.c ****     if (handle->state != OW_STATE_IDLE)
+ 498:Core/Src/ow.c ****     {
+ 499:Core/Src/ow.c ****       ow_err = OW_ERR_BUSY;
+ 500:Core/Src/ow.c ****       break;
+ 501:Core/Src/ow.c ****     }
+ 502:Core/Src/ow.c **** 
+ 503:Core/Src/ow.c ****     /* Pull bus high and check if line is idle */
+ 504:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 505:Core/Src/ow.c ****     if (!ow_read_bit(handle))
+ 506:Core/Src/ow.c ****     {
+ 507:Core/Src/ow.c ****       ow_err = OW_ERR_BUS;
+ 508:Core/Src/ow.c ****       break;
+ 509:Core/Src/ow.c ****     }
+ 510:Core/Src/ow.c **** 
+ 511:Core/Src/ow.c ****     /* Clear timer interrupt and reset internal buffer */
+ 512:Core/Src/ow.c ****     __HAL_TIM_CLEAR_IT(handle->config.tim_handle, 0xFFFFFFFFUL);
+ 513:Core/Src/ow.c ****     memset(&handle->buf, 0, sizeof(ow_buf_t));
+ 514:Core/Src/ow.c **** 
+ 515:Core/Src/ow.c ****     /* Configure timer for reset detection */
+ 516:Core/Src/ow.c ****     __HAL_TIM_SET_COUNTER(handle->config.tim_handle, 0);
+ 517:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST_DET - 1);
+ 518:Core/Src/ow.c ****     HAL_TIM_Base_Start_IT(handle->config.tim_handle);
+ 519:Core/Src/ow.c **** 
+ 520:Core/Src/ow.c ****   } while (0);
+ 521:Core/Src/ow.c **** 
+ARM GAS  /tmp/cc1AzyH1.s 			page 12
+
+
+ 522:Core/Src/ow.c ****   return ow_err;
+ 523:Core/Src/ow.c **** }
+ 524:Core/Src/ow.c **** 
+ 525:Core/Src/ow.c **** /*************************************************************************************************/
+ 526:Core/Src/ow.c **** /**
+ 527:Core/Src/ow.c ****  * @brief Stop 1-Wire transfer and release the bus.
+ 528:Core/Src/ow.c ****  * @param[in] handle Pointer to the 1-Wire handle.
+ 529:Core/Src/ow.c ****  */
+ 530:Core/Src/ow.c **** void ow_stop(ow_t *handle)
+ 531:Core/Src/ow.c **** {
+ 532:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 533:Core/Src/ow.c **** 
+ 534:Core/Src/ow.c ****   /* Stop timer interrupts */
+ 535:Core/Src/ow.c ****   HAL_TIM_Base_Stop_IT(handle->config.tim_handle);
+ 536:Core/Src/ow.c **** 
+ 537:Core/Src/ow.c ****   /* Release bus (set high) */
+ 538:Core/Src/ow.c ****   ow_write_bit(handle, true);
+ 539:Core/Src/ow.c **** 
+ 540:Core/Src/ow.c ****   /* Set state to idle */
+ 541:Core/Src/ow.c ****   handle->state = OW_STATE_IDLE;
+ 542:Core/Src/ow.c **** 
+ 543:Core/Src/ow.c ****   /* Call user callback if registered */
+ 544:Core/Src/ow.c ****   if (handle->config.done_cb != NULL)
+ 545:Core/Src/ow.c ****   {
+ 546:Core/Src/ow.c ****     handle->config.done_cb(handle->error);
+ 547:Core/Src/ow.c ****   }
+ 548:Core/Src/ow.c **** }
+ 549:Core/Src/ow.c **** 
+ 550:Core/Src/ow.c **** /*************************************************************************************************/
+ 551:Core/Src/ow.c **** /**
+ 552:Core/Src/ow.c ****  * @brief 1-Wire state machine: handle transfer phases (reset, write, read).
+ 553:Core/Src/ow.c ****  * @param[in] handle Pointer to the 1-Wire handle.
+ 554:Core/Src/ow.c ****  */
+ 555:Core/Src/ow.c **** __STATIC_FORCEINLINE void ow_state_xfer(ow_t *handle)
+ 556:Core/Src/ow.c **** {
+ 557:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 558:Core/Src/ow.c **** 
+ 559:Core/Src/ow.c ****   switch (handle->buf.bit_ph)
+ 560:Core/Src/ow.c ****   {
+ 561:Core/Src/ow.c ****     /************ Reset phase: pull bus low ************/
+ 562:Core/Src/ow.c ****     case 0:
+ 563:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST - 1);
+ 564:Core/Src/ow.c ****       ow_write_bit(handle, false);
+ 565:Core/Src/ow.c ****       handle->buf.bit_ph++;
+ 566:Core/Src/ow.c ****       break;
+ 567:Core/Src/ow.c **** 
+ 568:Core/Src/ow.c ****     /************ Reset phase: release bus (high) ************/
+ 569:Core/Src/ow.c ****     case 1:
+ 570:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST_DET - 1);
+ 571:Core/Src/ow.c ****       ow_write_bit(handle, true);
+ 572:Core/Src/ow.c ****       handle->buf.bit_ph++;
+ 573:Core/Src/ow.c ****       break;
+ 574:Core/Src/ow.c **** 
+ 575:Core/Src/ow.c ****     /************ Reset phase: check presence pulse ************/
+ 576:Core/Src/ow.c ****     case 2:
+ 577:Core/Src/ow.c ****       if (ow_read_bit(handle) != 0)
+ 578:Core/Src/ow.c ****       {
+ARM GAS  /tmp/cc1AzyH1.s 			page 13
+
+
+ 579:Core/Src/ow.c ****         handle->error = OW_ERR_RESET;
+ 580:Core/Src/ow.c ****         ow_stop(handle);
+ 581:Core/Src/ow.c ****       }
+ 582:Core/Src/ow.c ****       else
+ 583:Core/Src/ow.c ****       {
+ 584:Core/Src/ow.c ****         __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST - 1);
+ 585:Core/Src/ow.c ****         handle->buf.bit_ph++;
+ 586:Core/Src/ow.c ****       }
+ 587:Core/Src/ow.c ****       break;
+ 588:Core/Src/ow.c **** 
+ 589:Core/Src/ow.c ****     /************ Writing, phase 1: pull low ************/
+ 590:Core/Src/ow.c ****     case 3:
+ 591:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle,
+ 592:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 593:Core/Src/ow.c ****       ow_write_bit(handle, false);
+ 594:Core/Src/ow.c ****       handle->buf.bit_ph++;
+ 595:Core/Src/ow.c ****       break;
+ 596:Core/Src/ow.c **** 
+ 597:Core/Src/ow.c ****     /************ Writing, phase 2: release bus ************/
+ 598:Core/Src/ow.c ****     case 4:
+ 599:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle,
+ 600:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ 601:Core/Src/ow.c ****       ow_write_bit(handle, true);
+ 602:Core/Src/ow.c ****       handle->buf.bit_idx++;
+ 603:Core/Src/ow.c **** 
+ 604:Core/Src/ow.c ****       /* Move to next byte or reading phase */
+ 605:Core/Src/ow.c ****       if (handle->buf.bit_idx == 8)
+ 606:Core/Src/ow.c ****       {
+ 607:Core/Src/ow.c ****         handle->buf.bit_idx = 0;
+ 608:Core/Src/ow.c ****         handle->buf.byte_idx++;
+ 609:Core/Src/ow.c ****         if (handle->buf.byte_idx == handle->buf.write_len)
+ 610:Core/Src/ow.c ****         {
+ 611:Core/Src/ow.c ****           if (handle->buf.read_len > 0)
+ 612:Core/Src/ow.c ****           {
+ 613:Core/Src/ow.c ****             /* Start reading phase */
+ 614:Core/Src/ow.c ****             handle->buf.bit_ph = 5;
+ 615:Core/Src/ow.c ****             handle->buf.byte_idx = 0;
+ 616:Core/Src/ow.c ****           }
+ 617:Core/Src/ow.c ****           else
+ 618:Core/Src/ow.c ****           {
+ 619:Core/Src/ow.c ****             /* Writing complete, no reading */
+ 620:Core/Src/ow.c ****             handle->state = OW_STATE_DONE;
+ 621:Core/Src/ow.c ****           }
+ 622:Core/Src/ow.c ****         }
+ 623:Core/Src/ow.c ****         else
+ 624:Core/Src/ow.c ****         {
+ 625:Core/Src/ow.c ****           /* Continue writing next byte */
+ 626:Core/Src/ow.c ****           handle->buf.bit_ph = 3;
+ 627:Core/Src/ow.c ****         }
+ 628:Core/Src/ow.c ****       }
+ 629:Core/Src/ow.c ****       else
+ 630:Core/Src/ow.c ****       {
+ 631:Core/Src/ow.c ****         /* Continue writing next bit */
+ 632:Core/Src/ow.c ****         handle->buf.bit_ph = 3;
+ 633:Core/Src/ow.c ****       }
+ 634:Core/Src/ow.c ****       break;
+ 635:Core/Src/ow.c **** 
+ARM GAS  /tmp/cc1AzyH1.s 			page 14
+
+
+ 636:Core/Src/ow.c ****     /************ Reading, phase 1: pull low ************/
+ 637:Core/Src/ow.c ****     case 5:
+ 638:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_LOW - 1);
+ 639:Core/Src/ow.c ****       ow_write_bit(handle, false);
+ 640:Core/Src/ow.c ****       handle->buf.bit_ph++;
+ 641:Core/Src/ow.c ****       break;
+ 642:Core/Src/ow.c **** 
+ 643:Core/Src/ow.c ****     /************ Reading, phase 2: release bus ************/
+ 644:Core/Src/ow.c ****     case 6:
+ 645:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_SAMPLE - 1);
+ 646:Core/Src/ow.c ****       ow_write_bit(handle, true);
+ 647:Core/Src/ow.c ****       handle->buf.bit_ph++;
+ 648:Core/Src/ow.c ****       break;
+ 649:Core/Src/ow.c **** 
+ 650:Core/Src/ow.c ****     /************ Reading, phase 3: sample bus ************/
+ 651:Core/Src/ow.c ****     case 7:
+ 652:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_HIGH - 1);
+ 653:Core/Src/ow.c ****       if (ow_read_bit(handle))
+ 654:Core/Src/ow.c ****       {
+ 655:Core/Src/ow.c ****         handle->buf.data[handle->buf.write_len + handle->buf.byte_idx] |= (1 << handle->buf.bit_idx
+ 656:Core/Src/ow.c ****       }
+ 657:Core/Src/ow.c **** 
+ 658:Core/Src/ow.c ****       /* Update bit/byte counters */
+ 659:Core/Src/ow.c ****       handle->buf.bit_ph = 5;
+ 660:Core/Src/ow.c ****       handle->buf.bit_idx++;
+ 661:Core/Src/ow.c ****       if (handle->buf.bit_idx == 8)
+ 662:Core/Src/ow.c ****       {
+ 663:Core/Src/ow.c ****         handle->buf.bit_idx = 0;
+ 664:Core/Src/ow.c ****         handle->buf.byte_idx++;
+ 665:Core/Src/ow.c ****         if (handle->buf.byte_idx == handle->buf.read_len)
+ 666:Core/Src/ow.c ****         {
+ 667:Core/Src/ow.c **** #if (OW_MAX_DEVICE == 1)
+ 668:Core/Src/ow.c ****           /* Single device: verify ROM ID if READ_ROM command */
+ 669:Core/Src/ow.c ****           if (handle->buf.data[0] == OW_CMD_READ_ROM)
+ 670:Core/Src/ow.c ****           {
+ 671:Core/Src/ow.c ****             if (ow_crc(&handle->buf.data[1], 7) == handle->buf.data[7])
+ 672:Core/Src/ow.c ****             {
+ 673:Core/Src/ow.c ****               memcpy(handle->rom_id[0].array, &handle->buf.data[1], 8);
+ 674:Core/Src/ow.c ****               handle->error = OW_ERR_NONE;
+ 675:Core/Src/ow.c ****             }
+ 676:Core/Src/ow.c ****             else
+ 677:Core/Src/ow.c ****             {
+ 678:Core/Src/ow.c ****               handle->error = OW_ERR_ROM_ID;
+ 679:Core/Src/ow.c ****             }
+ 680:Core/Src/ow.c ****           }
+ 681:Core/Src/ow.c **** #endif
+ 682:Core/Src/ow.c ****           handle->state = OW_STATE_DONE;
+ 683:Core/Src/ow.c ****         }
+ 684:Core/Src/ow.c ****       }
+ 685:Core/Src/ow.c ****       break;
+ 686:Core/Src/ow.c **** 
+ 687:Core/Src/ow.c ****     default:
+ 688:Core/Src/ow.c ****       break;
+ 689:Core/Src/ow.c ****   }
+ 690:Core/Src/ow.c **** }
+ 691:Core/Src/ow.c **** 
+ 692:Core/Src/ow.c **** #if (OW_MAX_DEVICE > 1)
+ARM GAS  /tmp/cc1AzyH1.s 			page 15
+
+
+ 693:Core/Src/ow.c **** /*************************************************************************************************/
+ 694:Core/Src/ow.c **** /**
+ 695:Core/Src/ow.c ****  * @brief  1-Wire ROM search state machine.
+ 696:Core/Src/ow.c ****  * @param  handle: Pointer to 1-Wire handle.
+ 697:Core/Src/ow.c ****  * @retval None
+ 698:Core/Src/ow.c ****  *
+ 699:Core/Src/ow.c ****  * @details
+ 700:Core/Src/ow.c ****  * Implements non-blocking search, handles reset, read/write bits,
+ 701:Core/Src/ow.c ****  * resolves discrepancies, stores found ROMs, and sets state done.
+ 702:Core/Src/ow.c ****  */
+ 703:Core/Src/ow.c **** __STATIC_FORCEINLINE void ow_state_search(ow_t *handle)
+ 704:Core/Src/ow.c **** {
+ 705:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 706:Core/Src/ow.c **** 
+ 707:Core/Src/ow.c ****   switch (handle->buf.bit_ph)
+ 708:Core/Src/ow.c ****   {
+ 709:Core/Src/ow.c ****   /************ Reset phase: pull bus low ************/
+ 710:Core/Src/ow.c ****   case 0:
+ 711:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST - 1);
+ 712:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 713:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 714:Core/Src/ow.c ****     break;
+ 715:Core/Src/ow.c **** 
+ 716:Core/Src/ow.c ****     /************ Reset phase: release bus (high) ************/
+ 717:Core/Src/ow.c ****   case 1:
+ 718:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST_DET - 1);
+ 719:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 720:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 721:Core/Src/ow.c ****     break;
+ 722:Core/Src/ow.c **** 
+ 723:Core/Src/ow.c ****   /************ Reset phase: check presence pulse ************/
+ 724:Core/Src/ow.c ****   case 2:
+ 725:Core/Src/ow.c ****     if (ow_read_bit(handle) != 0)
+ 726:Core/Src/ow.c ****     {
+ 727:Core/Src/ow.c ****       handle->error = OW_ERR_RESET;
+ 728:Core/Src/ow.c ****       ow_stop(handle);
+ 729:Core/Src/ow.c ****     }
+ 730:Core/Src/ow.c ****     else
+ 731:Core/Src/ow.c ****     {
+ 732:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST - 1);
+ 733:Core/Src/ow.c ****       handle->buf.bit_ph++;
+ 734:Core/Src/ow.c ****     }
+ 735:Core/Src/ow.c ****     break;
+ 736:Core/Src/ow.c **** 
+ 737:Core/Src/ow.c ****   /************ Writing, phase 1: pull low ************/
+ 738:Core/Src/ow.c ****   case 3:
+ 739:Core/Src/ow.c ****     if (handle->buf.data[0] & (1 << handle->buf.bit_idx))
+ 740:Core/Src/ow.c ****     {
+ 741:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_LOW - 1);
+ 742:Core/Src/ow.c ****     }
+ 743:Core/Src/ow.c ****     else
+ 744:Core/Src/ow.c ****     {
+ 745:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_HIGH - 1);
+ 746:Core/Src/ow.c ****     }
+ 747:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 748:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 749:Core/Src/ow.c ****     break;
+ARM GAS  /tmp/cc1AzyH1.s 			page 16
+
+
+ 750:Core/Src/ow.c **** 
+ 751:Core/Src/ow.c ****   /************ Writing, phase 2: release bus ************/
+ 752:Core/Src/ow.c ****   case 4:
+ 753:Core/Src/ow.c ****     if (handle->buf.data[0] & (1 << handle->buf.bit_idx))
+ 754:Core/Src/ow.c ****     {
+ 755:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_HIGH - 1);
+ 756:Core/Src/ow.c ****     }
+ 757:Core/Src/ow.c ****     else
+ 758:Core/Src/ow.c ****     {
+ 759:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_LOW - 1);
+ 760:Core/Src/ow.c ****     }
+ 761:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 762:Core/Src/ow.c ****     handle->buf.bit_idx++;
+ 763:Core/Src/ow.c **** 
+ 764:Core/Src/ow.c ****     /* command complete */
+ 765:Core/Src/ow.c ****     if (handle->buf.bit_idx == 8)
+ 766:Core/Src/ow.c ****     {
+ 767:Core/Src/ow.c ****       handle->buf.bit_idx = 0;
+ 768:Core/Src/ow.c ****       /* Start reading phase */
+ 769:Core/Src/ow.c ****       handle->buf.bit_ph = 5;
+ 770:Core/Src/ow.c ****     }
+ 771:Core/Src/ow.c ****     else
+ 772:Core/Src/ow.c ****     {
+ 773:Core/Src/ow.c ****       /* Writing next command bit */
+ 774:Core/Src/ow.c ****       handle->buf.bit_ph = 3;
+ 775:Core/Src/ow.c ****     }
+ 776:Core/Src/ow.c ****     break;
+ 777:Core/Src/ow.c **** 
+ 778:Core/Src/ow.c ****   /************ Reading, phase 1: pull low ************/
+ 779:Core/Src/ow.c ****   case 5:
+ 780:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_LOW - 1);
+ 781:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 782:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 783:Core/Src/ow.c ****     break;
+ 784:Core/Src/ow.c **** 
+ 785:Core/Src/ow.c ****   /************ reading bit, phase 2 ************/
+ 786:Core/Src/ow.c ****   case 6:
+ 787:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_SAMPLE - 1);
+ 788:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 789:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 790:Core/Src/ow.c ****     break;
+ 791:Core/Src/ow.c **** 
+ 792:Core/Src/ow.c ****   /************ reading bit, phase 3 ************/
+ 793:Core/Src/ow.c ****   case 7:
+ 794:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_HIGH - 1);
+ 795:Core/Src/ow.c ****     if (ow_read_bit(handle))
+ 796:Core/Src/ow.c ****     {
+ 797:Core/Src/ow.c ****       handle->search.val = OW_VAL_1;
+ 798:Core/Src/ow.c ****     }
+ 799:Core/Src/ow.c ****     else
+ 800:Core/Src/ow.c ****     {
+ 801:Core/Src/ow.c ****       handle->search.val = OW_VAL_DIFF;
+ 802:Core/Src/ow.c ****     }
+ 803:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 804:Core/Src/ow.c ****     break;
+ 805:Core/Src/ow.c **** 
+ 806:Core/Src/ow.c ****   /************ reading complement bit, phase 1 ************/
+ARM GAS  /tmp/cc1AzyH1.s 			page 17
+
+
+ 807:Core/Src/ow.c ****   case 8:
+ 808:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_LOW - 1);
+ 809:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 810:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 811:Core/Src/ow.c ****     break;
+ 812:Core/Src/ow.c **** 
+ 813:Core/Src/ow.c ****   /************ Reading, phase 2: release bus ************/
+ 814:Core/Src/ow.c ****   case 9:
+ 815:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_SAMPLE - 1);
+ 816:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 817:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 818:Core/Src/ow.c ****     break;
+ 819:Core/Src/ow.c **** 
+ 820:Core/Src/ow.c ****   /************ Reading, phase 3: sample bus ************/
+ 821:Core/Src/ow.c ****   case 10:
+ 822:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_READ_HIGH - 1);
+ 823:Core/Src/ow.c ****     if (ow_read_bit(handle))
+ 824:Core/Src/ow.c ****     {
+ 825:Core/Src/ow.c ****       handle->search.val |= OW_VAL_0;
+ 826:Core/Src/ow.c ****     }
+ 827:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 828:Core/Src/ow.c **** 
+ 829:Core/Src/ow.c ****     /* resolve discrepancy */
+ 830:Core/Src/ow.c ****     /* Dallas counts bits 1..64 */
+ 831:Core/Src/ow.c ****     uint8_t bit_number = handle->buf.bit_idx + 1;
+ 832:Core/Src/ow.c ****     if (handle->search.val == OW_VAL_DIFF)
+ 833:Core/Src/ow.c ****     {
+ 834:Core/Src/ow.c ****       uint8_t bit_choice = 0;
+ 835:Core/Src/ow.c ****       if (bit_number < handle->search.last_discrepancy)
+ 836:Core/Src/ow.c ****       {
+ 837:Core/Src/ow.c ****         /* repeat previous path */
+ 838:Core/Src/ow.c ****         bit_choice = (handle->search.rom_id[handle->buf.bit_idx / 8] >> (handle->buf.bit_idx % 8)) 
+ 839:Core/Src/ow.c ****       }
+ 840:Core/Src/ow.c ****       else if (bit_number == handle->search.last_discrepancy)
+ 841:Core/Src/ow.c ****       {
+ 842:Core/Src/ow.c ****         /* this time choose 1 */
+ 843:Core/Src/ow.c ****         bit_choice = 1;
+ 844:Core/Src/ow.c ****       }
+ 845:Core/Src/ow.c ****       else
+ 846:Core/Src/ow.c ****       {
+ 847:Core/Src/ow.c ****         /* choose 0 and remember as last zero */
+ 848:Core/Src/ow.c ****         bit_choice = 0;
+ 849:Core/Src/ow.c ****         handle->search.last_zero = bit_number;
+ 850:Core/Src/ow.c ****       }
+ 851:Core/Src/ow.c ****       handle->search.val = bit_choice ? OW_VAL_1 : OW_VAL_0;
+ 852:Core/Src/ow.c ****     }
+ 853:Core/Src/ow.c ****     else if (handle->search.val == OW_VAL_ERR)
+ 854:Core/Src/ow.c ****     {
+ 855:Core/Src/ow.c ****       handle->error = OW_ERR_ROM_ID;
+ 856:Core/Src/ow.c ****       ow_stop(handle);
+ 857:Core/Src/ow.c ****     }
+ 858:Core/Src/ow.c ****     break;
+ 859:Core/Src/ow.c **** 
+ 860:Core/Src/ow.c ****   /************ Writing selected bit, phase 1: pull low ************/
+ 861:Core/Src/ow.c ****   case 11:
+ 862:Core/Src/ow.c ****     if (handle->search.val == OW_VAL_1)
+ 863:Core/Src/ow.c ****     {
+ARM GAS  /tmp/cc1AzyH1.s 			page 18
+
+
+ 864:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_LOW - 1);
+ 865:Core/Src/ow.c ****       handle->search.rom_id[handle->buf.bit_idx / 8] |= (1 << (handle->buf.bit_idx % 8));
+ 866:Core/Src/ow.c ****     }
+ 867:Core/Src/ow.c ****     else
+ 868:Core/Src/ow.c ****     {
+ 869:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_HIGH - 1);
+ 870:Core/Src/ow.c ****     }
+ 871:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 872:Core/Src/ow.c ****     handle->buf.bit_ph++;
+ 873:Core/Src/ow.c ****     break;
+ 874:Core/Src/ow.c **** 
+ 875:Core/Src/ow.c ****   /************ Writing selected bit, phase 2: release bus ************/
+ 876:Core/Src/ow.c ****   case 12:
+ 877:Core/Src/ow.c ****     if (handle->search.val == OW_VAL_1)
+ 878:Core/Src/ow.c ****     {
+ 879:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_HIGH - 1);
+ 880:Core/Src/ow.c ****     }
+ 881:Core/Src/ow.c ****     else
+ 882:Core/Src/ow.c ****     {
+ 883:Core/Src/ow.c ****       __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_WRITE_LOW - 1);
+ 884:Core/Src/ow.c ****     }
+ 885:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 886:Core/Src/ow.c ****     handle->buf.bit_idx++;
+ 887:Core/Src/ow.c ****     if (handle->buf.bit_idx == 64)
+ 888:Core/Src/ow.c ****     {
+ 889:Core/Src/ow.c ****       /* full ROM read */
+ 890:Core/Src/ow.c ****       handle->buf.bit_idx = 0;
+ 891:Core/Src/ow.c ****       handle->buf.bit_ph = 0;
+ 892:Core/Src/ow.c ****       if (ow_crc(handle->search.rom_id, 7) == handle->search.rom_id[7])
+ 893:Core/Src/ow.c ****       {
+ 894:Core/Src/ow.c ****         /* ROM ID Filter not enabled */
+ 895:Core/Src/ow.c ****         if (handle->rom_id_filter == 0)
+ 896:Core/Src/ow.c ****         {
+ 897:Core/Src/ow.c ****           memcpy(&handle->rom_id[handle->rom_id_found], handle->search.rom_id, 8);
+ 898:Core/Src/ow.c ****           handle->rom_id_found++;
+ 899:Core/Src/ow.c ****         }
+ 900:Core/Src/ow.c ****         /* Selected ROM ID Filter */
+ 901:Core/Src/ow.c ****         else if (handle->rom_id_filter == handle->search.rom_id[0])
+ 902:Core/Src/ow.c ****         {
+ 903:Core/Src/ow.c ****           memcpy(&handle->rom_id[handle->rom_id_found], handle->search.rom_id, 8);
+ 904:Core/Src/ow.c ****           handle->rom_id_found++;
+ 905:Core/Src/ow.c ****         }
+ 906:Core/Src/ow.c ****       }
+ 907:Core/Src/ow.c ****       memset(handle->search.rom_id, 0, 8);
+ 908:Core/Src/ow.c **** 
+ 909:Core/Src/ow.c ****       /* update discrepancy */
+ 910:Core/Src/ow.c ****       handle->search.last_discrepancy = handle->search.last_zero;
+ 911:Core/Src/ow.c ****       handle->search.last_zero = 0;
+ 912:Core/Src/ow.c ****       if (handle->search.last_discrepancy == 0 || handle->rom_id_found == OW_MAX_DEVICE)
+ 913:Core/Src/ow.c ****       {
+ 914:Core/Src/ow.c ****         handle->search.last_device_flag = 1;
+ 915:Core/Src/ow.c ****         handle->state = OW_STATE_DONE;
+ 916:Core/Src/ow.c ****       }
+ 917:Core/Src/ow.c ****       else
+ 918:Core/Src/ow.c ****       {
+ 919:Core/Src/ow.c ****         /* prepare next search */
+ 920:Core/Src/ow.c ****         handle->buf.data[0] = OW_CMD_SEARCH_ROM;
+ARM GAS  /tmp/cc1AzyH1.s 			page 19
+
+
+ 921:Core/Src/ow.c ****         handle->buf.bit_idx = 0;
+ 922:Core/Src/ow.c ****         handle->buf.bit_ph = 0;
+ 923:Core/Src/ow.c ****       }
+ 924:Core/Src/ow.c ****     }
+ 925:Core/Src/ow.c ****     else
+ 926:Core/Src/ow.c ****     {
+ 927:Core/Src/ow.c ****       /* next search bit */
+ 928:Core/Src/ow.c ****       handle->buf.bit_ph = 5;
+ 929:Core/Src/ow.c ****     }
+ 930:Core/Src/ow.c ****     break;
+ 931:Core/Src/ow.c ****   default:
+ 932:Core/Src/ow.c ****     break;
+ 933:Core/Src/ow.c ****   }
+ 934:Core/Src/ow.c **** }
+ 935:Core/Src/ow.c **** #endif
+ 936:Core/Src/ow.c **** 
+ 937:Core/Src/ow.c **** /*************************************************************************************************/
+ 938:Core/Src/ow.c **** /**
+ 939:Core/Src/ow.c ****  * @brief Set 1-Wire bus pin high or low.
+ 940:Core/Src/ow.c ****  * @param[in] handle: Pointer to 1-Wire handle.
+ 941:Core/Src/ow.c ****  * @param[in] high: true to set high, false to set low.
+ 942:Core/Src/ow.c ****  */
+ 943:Core/Src/ow.c **** __STATIC_FORCEINLINE void ow_write_bit(ow_t *handle, bool high)
+ 944:Core/Src/ow.c **** {
+ 945:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 946:Core/Src/ow.c **** 
+ 947:Core/Src/ow.c ****   handle->config.gpio->BSRR = (high ? handle->config.pin_set : handle->config.pin_reset);
+ 108              		.loc 1 947 62
+ 109 0062 FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 110 0064 002B     		cmp	r3, #0
+ 111 0066 02D0     		beq	.L2
+ 112              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 113 0068 FB68     		ldr	r3, [r7, #12]
+ 114 006a DB68     		ldr	r3, [r3, #12]
+ 115 006c 01E0     		b	.L3
+ 116              	.L2:
+ 117              		.loc 1 947 62 discriminator 2
+ 118 006e FB68     		ldr	r3, [r7, #12]
+ 119 0070 1B69     		ldr	r3, [r3, #16]
+ 120              	.L3:
+ 121              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 122 0072 FA68     		ldr	r2, [r7, #12]
+ 123 0074 9268     		ldr	r2, [r2, #8]
+ 124              		.loc 1 947 29 discriminator 4
+ 125 0076 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** }
+ 126              		.loc 1 948 1
+ 127 0078 00BF     		nop
+ 128              	.LBE103:
+ 129              	.LBE102:
+ 106:Core/Src/ow.c **** 
+ 130              		.loc 1 106 1
+ 131 007a 00BF     		nop
+ 132 007c 1037     		adds	r7, r7, #16
+ 133              	.LCFI3:
+ 134              		.cfi_def_cfa_offset 8
+ 135 007e BD46     		mov	sp, r7
+ARM GAS  /tmp/cc1AzyH1.s 			page 20
+
+
+ 136              	.LCFI4:
+ 137              		.cfi_def_cfa_register 13
+ 138              		@ sp needed
+ 139 0080 80BD     		pop	{r7, pc}
+ 140              		.cfi_endproc
+ 141              	.LFE220:
+ 143              		.section	.text.ow_callback,"ax",%progbits
+ 144              		.align	1
+ 145              		.global	ow_callback
+ 146              		.syntax unified
+ 147              		.thumb
+ 148              		.thumb_func
+ 150              	ow_callback:
+ 151              	.LFB221:
+ 114:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 152              		.loc 1 114 1
+ 153              		.cfi_startproc
+ 154              		@ args = 0, pretend = 0, frame = 168
+ 155              		@ frame_needed = 1, uses_anonymous_args = 0
+ 156 0000 80B5     		push	{r7, lr}
+ 157              	.LCFI5:
+ 158              		.cfi_def_cfa_offset 8
+ 159              		.cfi_offset 7, -8
+ 160              		.cfi_offset 14, -4
+ 161 0002 AAB0     		sub	sp, sp, #168
+ 162              	.LCFI6:
+ 163              		.cfi_def_cfa_offset 176
+ 164 0004 00AF     		add	r7, sp, #0
+ 165              	.LCFI7:
+ 166              		.cfi_def_cfa_register 7
+ 167 0006 7860     		str	r0, [r7, #4]
+ 117:Core/Src/ow.c ****   {
+ 168              		.loc 1 117 17
+ 169 0008 7B68     		ldr	r3, [r7, #4]
+ 170 000a 93F84A30 		ldrb	r3, [r3, #74]	@ zero_extendqisi2
+ 117:Core/Src/ow.c ****   {
+ 171              		.loc 1 117 3
+ 172 000e 012B     		cmp	r3, #1
+ 173 0010 04D0     		beq	.L5
+ 174 0012 022B     		cmp	r3, #2
+ 175 0014 00F08482 		beq	.L6
+ 176 0018 00F006BE 		b	.L116
+ 177              	.L5:
+ 178 001c 7B68     		ldr	r3, [r7, #4]
+ 179 001e C7F8A430 		str	r3, [r7, #164]
+ 180              	.LBB104:
+ 181              	.LBB105:
+ 559:Core/Src/ow.c ****   {
+ 182              		.loc 1 559 22
+ 183 0022 D7F8A430 		ldr	r3, [r7, #164]
+ 184 0026 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 559:Core/Src/ow.c ****   {
+ 185              		.loc 1 559 3
+ 186 002a 072B     		cmp	r3, #7
+ 187 002c 00F0FB81 		beq	.L8
+ 188 0030 072B     		cmp	r3, #7
+ 189 0032 00F37082 		bgt	.L117
+ARM GAS  /tmp/cc1AzyH1.s 			page 21
+
+
+ 190 0036 062B     		cmp	r3, #6
+ 191 0038 00F0CC81 		beq	.L10
+ 192 003c 062B     		cmp	r3, #6
+ 193 003e 00F36A82 		bgt	.L117
+ 194 0042 052B     		cmp	r3, #5
+ 195 0044 00F09D81 		beq	.L11
+ 196 0048 052B     		cmp	r3, #5
+ 197 004a 00F36482 		bgt	.L117
+ 198 004e 042B     		cmp	r3, #4
+ 199 0050 00F0FD80 		beq	.L12
+ 200 0054 042B     		cmp	r3, #4
+ 201 0056 00F35E82 		bgt	.L117
+ 202 005a 032B     		cmp	r3, #3
+ 203 005c 00F09E80 		beq	.L13
+ 204 0060 032B     		cmp	r3, #3
+ 205 0062 00F35882 		bgt	.L117
+ 206 0066 022B     		cmp	r3, #2
+ 207 0068 63D0     		beq	.L14
+ 208 006a 022B     		cmp	r3, #2
+ 209 006c 00F35382 		bgt	.L117
+ 210 0070 002B     		cmp	r3, #0
+ 211 0072 02D0     		beq	.L15
+ 212 0074 012B     		cmp	r3, #1
+ 213 0076 2FD0     		beq	.L16
+ 688:Core/Src/ow.c ****   }
+ 214              		.loc 1 688 7
+ 215 0078 4DE2     		b	.L117
+ 216              	.L15:
+ 563:Core/Src/ow.c ****       ow_write_bit(handle, false);
+ 217              		.loc 1 563 7
+ 218 007a D7F8A430 		ldr	r3, [r7, #164]
+ 219 007e 1B68     		ldr	r3, [r3]
+ 220 0080 1B68     		ldr	r3, [r3]
+ 221 0082 40F2F312 		movw	r2, #499
+ 222 0086 DA62     		str	r2, [r3, #44]
+ 223 0088 D7F8A430 		ldr	r3, [r7, #164]
+ 224 008c 1B68     		ldr	r3, [r3]
+ 225 008e 40F2F312 		movw	r2, #499
+ 226 0092 DA60     		str	r2, [r3, #12]
+ 227 0094 D7F8A430 		ldr	r3, [r7, #164]
+ 228 0098 C7F8A030 		str	r3, [r7, #160]
+ 229 009c 0023     		movs	r3, #0
+ 230 009e 87F89F30 		strb	r3, [r7, #159]
+ 231              	.LBB106:
+ 232              	.LBB107:
+ 947:Core/Src/ow.c **** }
+ 233              		.loc 1 947 62
+ 234 00a2 97F89F30 		ldrb	r3, [r7, #159]	@ zero_extendqisi2
+ 235 00a6 002B     		cmp	r3, #0
+ 236 00a8 03D0     		beq	.L17
+ 947:Core/Src/ow.c **** }
+ 237              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 238 00aa D7F8A030 		ldr	r3, [r7, #160]
+ 239 00ae DB68     		ldr	r3, [r3, #12]
+ 240 00b0 02E0     		b	.L18
+ 241              	.L17:
+ 947:Core/Src/ow.c **** }
+ARM GAS  /tmp/cc1AzyH1.s 			page 22
+
+
+ 242              		.loc 1 947 62 discriminator 2
+ 243 00b2 D7F8A030 		ldr	r3, [r7, #160]
+ 244 00b6 1B69     		ldr	r3, [r3, #16]
+ 245              	.L18:
+ 947:Core/Src/ow.c **** }
+ 246              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 247 00b8 D7F8A020 		ldr	r2, [r7, #160]
+ 248 00bc 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 249              		.loc 1 947 29 discriminator 4
+ 250 00be 9361     		str	r3, [r2, #24]
+ 251              		.loc 1 948 1
+ 252 00c0 00BF     		nop
+ 253              	.LBE107:
+ 254              	.LBE106:
+ 565:Core/Src/ow.c ****       break;
+ 255              		.loc 1 565 18
+ 256 00c2 D7F8A430 		ldr	r3, [r7, #164]
+ 257 00c6 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 565:Core/Src/ow.c ****       break;
+ 258              		.loc 1 565 25
+ 259 00ca 0133     		adds	r3, r3, #1
+ 260 00cc DAB2     		uxtb	r2, r3
+ 261 00ce D7F8A430 		ldr	r3, [r7, #164]
+ 262 00d2 83F84220 		strb	r2, [r3, #66]
+ 566:Core/Src/ow.c **** 
+ 263              		.loc 1 566 7
+ 264 00d6 21E2     		b	.L19
+ 265              	.L16:
+ 570:Core/Src/ow.c ****       ow_write_bit(handle, true);
+ 266              		.loc 1 570 7
+ 267 00d8 D7F8A430 		ldr	r3, [r7, #164]
+ 268 00dc 1B68     		ldr	r3, [r3]
+ 269 00de 1B68     		ldr	r3, [r3]
+ 270 00e0 6322     		movs	r2, #99
+ 271 00e2 DA62     		str	r2, [r3, #44]
+ 272 00e4 D7F8A430 		ldr	r3, [r7, #164]
+ 273 00e8 1B68     		ldr	r3, [r3]
+ 274 00ea 6322     		movs	r2, #99
+ 275 00ec DA60     		str	r2, [r3, #12]
+ 276 00ee D7F8A430 		ldr	r3, [r7, #164]
+ 277 00f2 C7F89830 		str	r3, [r7, #152]
+ 278 00f6 0123     		movs	r3, #1
+ 279 00f8 87F89730 		strb	r3, [r7, #151]
+ 280              	.LBB108:
+ 281              	.LBB109:
+ 947:Core/Src/ow.c **** }
+ 282              		.loc 1 947 62
+ 283 00fc 97F89730 		ldrb	r3, [r7, #151]	@ zero_extendqisi2
+ 284 0100 002B     		cmp	r3, #0
+ 285 0102 03D0     		beq	.L20
+ 947:Core/Src/ow.c **** }
+ 286              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 287 0104 D7F89830 		ldr	r3, [r7, #152]
+ 288 0108 DB68     		ldr	r3, [r3, #12]
+ 289 010a 02E0     		b	.L21
+ 290              	.L20:
+ARM GAS  /tmp/cc1AzyH1.s 			page 23
+
+
+ 947:Core/Src/ow.c **** }
+ 291              		.loc 1 947 62 discriminator 2
+ 292 010c D7F89830 		ldr	r3, [r7, #152]
+ 293 0110 1B69     		ldr	r3, [r3, #16]
+ 294              	.L21:
+ 947:Core/Src/ow.c **** }
+ 295              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 296 0112 D7F89820 		ldr	r2, [r7, #152]
+ 297 0116 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 298              		.loc 1 947 29 discriminator 4
+ 299 0118 9361     		str	r3, [r2, #24]
+ 300              		.loc 1 948 1
+ 301 011a 00BF     		nop
+ 302              	.LBE109:
+ 303              	.LBE108:
+ 572:Core/Src/ow.c ****       break;
+ 304              		.loc 1 572 18
+ 305 011c D7F8A430 		ldr	r3, [r7, #164]
+ 306 0120 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 572:Core/Src/ow.c ****       break;
+ 307              		.loc 1 572 25
+ 308 0124 0133     		adds	r3, r3, #1
+ 309 0126 DAB2     		uxtb	r2, r3
+ 310 0128 D7F8A430 		ldr	r3, [r7, #164]
+ 311 012c 83F84220 		strb	r2, [r3, #66]
+ 573:Core/Src/ow.c **** 
+ 312              		.loc 1 573 7
+ 313 0130 F4E1     		b	.L19
+ 314              	.L14:
+ 315 0132 D7F8A430 		ldr	r3, [r7, #164]
+ 316 0136 C7F89030 		str	r3, [r7, #144]
+ 317              	.LBB110:
+ 318              	.LBB111:
+ 949:Core/Src/ow.c **** 
+ 950:Core/Src/ow.c **** /*************************************************************************************************/
+ 951:Core/Src/ow.c **** /**
+ 952:Core/Src/ow.c ****  * @brief Read current level of 1-Wire bus pin.
+ 953:Core/Src/ow.c ****  * @param[in] handle: Pointer to 1-Wire handle.
+ 954:Core/Src/ow.c ****  * @retval 1 if high, 0 if low
+ 955:Core/Src/ow.c ****  */
+ 956:Core/Src/ow.c **** __STATIC_FORCEINLINE uint8_t ow_read_bit(ow_t *handle)
+ 957:Core/Src/ow.c **** {
+ 958:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 959:Core/Src/ow.c **** 
+ 960:Core/Src/ow.c **** #if (OW_DUAL_PINS == 0)
+ 961:Core/Src/ow.c ****   return ((handle->config.gpio->IDR & handle->config.pin_read) ? 1 : 0);
+ 319              		.loc 1 961 26
+ 320 013a D7F89030 		ldr	r3, [r7, #144]
+ 321 013e 9B68     		ldr	r3, [r3, #8]
+ 322              		.loc 1 961 31
+ 323 0140 1A69     		ldr	r2, [r3, #16]
+ 324              		.loc 1 961 53
+ 325 0142 D7F89030 		ldr	r3, [r7, #144]
+ 326 0146 5B69     		ldr	r3, [r3, #20]
+ 327              		.loc 1 961 37
+ 328 0148 1340     		ands	r3, r3, r2
+ARM GAS  /tmp/cc1AzyH1.s 			page 24
+
+
+ 329              		.loc 1 961 68
+ 330 014a 002B     		cmp	r3, #0
+ 331 014c 14BF     		ite	ne
+ 332 014e 0123     		movne	r3, #1
+ 333 0150 0023     		moveq	r3, #0
+ 334 0152 DBB2     		uxtb	r3, r3
+ 335              	.LBE111:
+ 336              	.LBE110:
+ 577:Core/Src/ow.c ****       {
+ 337              		.loc 1 577 10 discriminator 1
+ 338 0154 002B     		cmp	r3, #0
+ 339 0156 09D0     		beq	.L23
+ 579:Core/Src/ow.c ****         ow_stop(handle);
+ 340              		.loc 1 579 23
+ 341 0158 D7F8A430 		ldr	r3, [r7, #164]
+ 342 015c 0322     		movs	r2, #3
+ 343 015e 83F84B20 		strb	r2, [r3, #75]
+ 580:Core/Src/ow.c ****       }
+ 344              		.loc 1 580 9
+ 345 0162 D7F8A400 		ldr	r0, [r7, #164]
+ 346 0166 FFF7FEFF 		bl	ow_stop
+ 587:Core/Src/ow.c **** 
+ 347              		.loc 1 587 7
+ 348 016a D7E1     		b	.L19
+ 349              	.L23:
+ 584:Core/Src/ow.c ****         handle->buf.bit_ph++;
+ 350              		.loc 1 584 9
+ 351 016c D7F8A430 		ldr	r3, [r7, #164]
+ 352 0170 1B68     		ldr	r3, [r3]
+ 353 0172 1B68     		ldr	r3, [r3]
+ 354 0174 40F2F312 		movw	r2, #499
+ 355 0178 DA62     		str	r2, [r3, #44]
+ 356 017a D7F8A430 		ldr	r3, [r7, #164]
+ 357 017e 1B68     		ldr	r3, [r3]
+ 358 0180 40F2F312 		movw	r2, #499
+ 359 0184 DA60     		str	r2, [r3, #12]
+ 585:Core/Src/ow.c ****       }
+ 360              		.loc 1 585 20
+ 361 0186 D7F8A430 		ldr	r3, [r7, #164]
+ 362 018a 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 585:Core/Src/ow.c ****       }
+ 363              		.loc 1 585 27
+ 364 018e 0133     		adds	r3, r3, #1
+ 365 0190 DAB2     		uxtb	r2, r3
+ 366 0192 D7F8A430 		ldr	r3, [r7, #164]
+ 367 0196 83F84220 		strb	r2, [r3, #66]
+ 587:Core/Src/ow.c **** 
+ 368              		.loc 1 587 7
+ 369 019a BFE1     		b	.L19
+ 370              	.L13:
+ 591:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 371              		.loc 1 591 7
+ 372 019c D7F8A430 		ldr	r3, [r7, #164]
+ 373 01a0 B3F84430 		ldrh	r3, [r3, #68]
+ 374 01a4 1A46     		mov	r2, r3
+ 375 01a6 D7F8A430 		ldr	r3, [r7, #164]
+ 376 01aa 1344     		add	r3, r3, r2
+ARM GAS  /tmp/cc1AzyH1.s 			page 25
+
+
+ 377 01ac 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+ 378 01ae 1A46     		mov	r2, r3
+ 379 01b0 D7F8A430 		ldr	r3, [r7, #164]
+ 380 01b4 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 381 01b8 42FA03F3 		asr	r3, r2, r3
+ 382 01bc 03F00103 		and	r3, r3, #1
+ 383 01c0 002B     		cmp	r3, #0
+ 384 01c2 01D0     		beq	.L25
+ 591:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 385              		.loc 1 591 7 is_stmt 0 discriminator 1
+ 386 01c4 0922     		movs	r2, #9
+ 387 01c6 00E0     		b	.L26
+ 388              	.L25:
+ 591:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 389              		.loc 1 591 7 discriminator 2
+ 390 01c8 4522     		movs	r2, #69
+ 391              	.L26:
+ 591:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 392              		.loc 1 591 7 discriminator 4
+ 393 01ca D7F8A430 		ldr	r3, [r7, #164]
+ 394 01ce 1B68     		ldr	r3, [r3]
+ 395 01d0 1B68     		ldr	r3, [r3]
+ 396 01d2 DA62     		str	r2, [r3, #44]
+ 397 01d4 D7F8A430 		ldr	r3, [r7, #164]
+ 398 01d8 B3F84430 		ldrh	r3, [r3, #68]
+ 399 01dc 1A46     		mov	r2, r3
+ 400 01de D7F8A430 		ldr	r3, [r7, #164]
+ 401 01e2 1344     		add	r3, r3, r2
+ 402 01e4 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+ 403 01e6 1A46     		mov	r2, r3
+ 404 01e8 D7F8A430 		ldr	r3, [r7, #164]
+ 405 01ec 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 406 01f0 42FA03F3 		asr	r3, r2, r3
+ 407 01f4 03F00103 		and	r3, r3, #1
+ 408 01f8 002B     		cmp	r3, #0
+ 409 01fa 01D0     		beq	.L27
+ 591:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 410              		.loc 1 591 7 discriminator 5
+ 411 01fc 0922     		movs	r2, #9
+ 412 01fe 00E0     		b	.L28
+ 413              	.L27:
+ 591:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 414              		.loc 1 591 7 discriminator 6
+ 415 0200 4522     		movs	r2, #69
+ 416              	.L28:
+ 591:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_LOW - 
+ 417              		.loc 1 591 7 discriminator 8
+ 418 0202 D7F8A430 		ldr	r3, [r7, #164]
+ 419 0206 1B68     		ldr	r3, [r3]
+ 420 0208 DA60     		str	r2, [r3, #12]
+ 421 020a D7F8A430 		ldr	r3, [r7, #164]
+ 422 020e C7F88C30 		str	r3, [r7, #140]
+ 423 0212 0023     		movs	r3, #0
+ 424 0214 87F88B30 		strb	r3, [r7, #139]
+ 425              	.LBB112:
+ 426              	.LBB113:
+ 947:Core/Src/ow.c **** }
+ARM GAS  /tmp/cc1AzyH1.s 			page 26
+
+
+ 427              		.loc 1 947 62 is_stmt 1
+ 428 0218 97F88B30 		ldrb	r3, [r7, #139]	@ zero_extendqisi2
+ 429 021c 002B     		cmp	r3, #0
+ 430 021e 03D0     		beq	.L29
+ 947:Core/Src/ow.c **** }
+ 431              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 432 0220 D7F88C30 		ldr	r3, [r7, #140]
+ 433 0224 DB68     		ldr	r3, [r3, #12]
+ 434 0226 02E0     		b	.L30
+ 435              	.L29:
+ 947:Core/Src/ow.c **** }
+ 436              		.loc 1 947 62 discriminator 2
+ 437 0228 D7F88C30 		ldr	r3, [r7, #140]
+ 438 022c 1B69     		ldr	r3, [r3, #16]
+ 439              	.L30:
+ 947:Core/Src/ow.c **** }
+ 440              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 441 022e D7F88C20 		ldr	r2, [r7, #140]
+ 442 0232 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 443              		.loc 1 947 29 discriminator 4
+ 444 0234 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 445              		.loc 1 948 1
+ 446 0236 00BF     		nop
+ 447              	.LBE113:
+ 448              	.LBE112:
+ 594:Core/Src/ow.c ****       break;
+ 449              		.loc 1 594 18
+ 450 0238 D7F8A430 		ldr	r3, [r7, #164]
+ 451 023c 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 594:Core/Src/ow.c ****       break;
+ 452              		.loc 1 594 25
+ 453 0240 0133     		adds	r3, r3, #1
+ 454 0242 DAB2     		uxtb	r2, r3
+ 455 0244 D7F8A430 		ldr	r3, [r7, #164]
+ 456 0248 83F84220 		strb	r2, [r3, #66]
+ 595:Core/Src/ow.c **** 
+ 457              		.loc 1 595 7
+ 458 024c 66E1     		b	.L19
+ 459              	.L12:
+ 599:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ 460              		.loc 1 599 7
+ 461 024e D7F8A430 		ldr	r3, [r7, #164]
+ 462 0252 B3F84430 		ldrh	r3, [r3, #68]
+ 463 0256 1A46     		mov	r2, r3
+ 464 0258 D7F8A430 		ldr	r3, [r7, #164]
+ 465 025c 1344     		add	r3, r3, r2
+ 466 025e 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+ 467 0260 1A46     		mov	r2, r3
+ 468 0262 D7F8A430 		ldr	r3, [r7, #164]
+ 469 0266 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 470 026a 42FA03F3 		asr	r3, r2, r3
+ 471 026e 03F00103 		and	r3, r3, #1
+ 472 0272 002B     		cmp	r3, #0
+ 473 0274 01D0     		beq	.L31
+ 599:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ARM GAS  /tmp/cc1AzyH1.s 			page 27
+
+
+ 474              		.loc 1 599 7 is_stmt 0 discriminator 1
+ 475 0276 4522     		movs	r2, #69
+ 476 0278 00E0     		b	.L32
+ 477              	.L31:
+ 599:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ 478              		.loc 1 599 7 discriminator 2
+ 479 027a 0922     		movs	r2, #9
+ 480              	.L32:
+ 599:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ 481              		.loc 1 599 7 discriminator 4
+ 482 027c D7F8A430 		ldr	r3, [r7, #164]
+ 483 0280 1B68     		ldr	r3, [r3]
+ 484 0282 1B68     		ldr	r3, [r3]
+ 485 0284 DA62     		str	r2, [r3, #44]
+ 486 0286 D7F8A430 		ldr	r3, [r7, #164]
+ 487 028a B3F84430 		ldrh	r3, [r3, #68]
+ 488 028e 1A46     		mov	r2, r3
+ 489 0290 D7F8A430 		ldr	r3, [r7, #164]
+ 490 0294 1344     		add	r3, r3, r2
+ 491 0296 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+ 492 0298 1A46     		mov	r2, r3
+ 493 029a D7F8A430 		ldr	r3, [r7, #164]
+ 494 029e 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 495 02a2 42FA03F3 		asr	r3, r2, r3
+ 496 02a6 03F00103 		and	r3, r3, #1
+ 497 02aa 002B     		cmp	r3, #0
+ 498 02ac 01D0     		beq	.L33
+ 599:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ 499              		.loc 1 599 7 discriminator 5
+ 500 02ae 4522     		movs	r2, #69
+ 501 02b0 00E0     		b	.L34
+ 502              	.L33:
+ 599:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ 503              		.loc 1 599 7 discriminator 6
+ 504 02b2 0922     		movs	r2, #9
+ 505              	.L34:
+ 599:Core/Src/ow.c ****         (handle->buf.data[handle->buf.byte_idx] & (1 << handle->buf.bit_idx)) ? OW_TIM_WRITE_HIGH -
+ 506              		.loc 1 599 7 discriminator 8
+ 507 02b4 D7F8A430 		ldr	r3, [r7, #164]
+ 508 02b8 1B68     		ldr	r3, [r3]
+ 509 02ba DA60     		str	r2, [r3, #12]
+ 510 02bc D7F8A430 		ldr	r3, [r7, #164]
+ 511 02c0 C7F88430 		str	r3, [r7, #132]
+ 512 02c4 0123     		movs	r3, #1
+ 513 02c6 87F88330 		strb	r3, [r7, #131]
+ 514              	.LBB114:
+ 515              	.LBB115:
+ 947:Core/Src/ow.c **** }
+ 516              		.loc 1 947 62 is_stmt 1
+ 517 02ca 97F88330 		ldrb	r3, [r7, #131]	@ zero_extendqisi2
+ 518 02ce 002B     		cmp	r3, #0
+ 519 02d0 03D0     		beq	.L35
+ 947:Core/Src/ow.c **** }
+ 520              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 521 02d2 D7F88430 		ldr	r3, [r7, #132]
+ 522 02d6 DB68     		ldr	r3, [r3, #12]
+ 523 02d8 02E0     		b	.L36
+ARM GAS  /tmp/cc1AzyH1.s 			page 28
+
+
+ 524              	.L35:
+ 947:Core/Src/ow.c **** }
+ 525              		.loc 1 947 62 discriminator 2
+ 526 02da D7F88430 		ldr	r3, [r7, #132]
+ 527 02de 1B69     		ldr	r3, [r3, #16]
+ 528              	.L36:
+ 947:Core/Src/ow.c **** }
+ 529              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 530 02e0 D7F88420 		ldr	r2, [r7, #132]
+ 531 02e4 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 532              		.loc 1 947 29 discriminator 4
+ 533 02e6 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 534              		.loc 1 948 1
+ 535 02e8 00BF     		nop
+ 536              	.LBE115:
+ 537              	.LBE114:
+ 602:Core/Src/ow.c **** 
+ 538              		.loc 1 602 18
+ 539 02ea D7F8A430 		ldr	r3, [r7, #164]
+ 540 02ee 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 602:Core/Src/ow.c **** 
+ 541              		.loc 1 602 26
+ 542 02f2 0133     		adds	r3, r3, #1
+ 543 02f4 DAB2     		uxtb	r2, r3
+ 544 02f6 D7F8A430 		ldr	r3, [r7, #164]
+ 545 02fa 83F84320 		strb	r2, [r3, #67]
+ 605:Core/Src/ow.c ****       {
+ 546              		.loc 1 605 22
+ 547 02fe D7F8A430 		ldr	r3, [r7, #164]
+ 548 0302 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 605:Core/Src/ow.c ****       {
+ 549              		.loc 1 605 10
+ 550 0306 082B     		cmp	r3, #8
+ 551 0308 35D1     		bne	.L37
+ 607:Core/Src/ow.c ****         handle->buf.byte_idx++;
+ 552              		.loc 1 607 29
+ 553 030a D7F8A430 		ldr	r3, [r7, #164]
+ 554 030e 0022     		movs	r2, #0
+ 555 0310 83F84320 		strb	r2, [r3, #67]
+ 608:Core/Src/ow.c ****         if (handle->buf.byte_idx == handle->buf.write_len)
+ 556              		.loc 1 608 20
+ 557 0314 D7F8A430 		ldr	r3, [r7, #164]
+ 558 0318 B3F84430 		ldrh	r3, [r3, #68]
+ 608:Core/Src/ow.c ****         if (handle->buf.byte_idx == handle->buf.write_len)
+ 559              		.loc 1 608 29
+ 560 031c 0133     		adds	r3, r3, #1
+ 561 031e 9AB2     		uxth	r2, r3
+ 562 0320 D7F8A430 		ldr	r3, [r7, #164]
+ 563 0324 A3F84420 		strh	r2, [r3, #68]	@ movhi
+ 609:Core/Src/ow.c ****         {
+ 564              		.loc 1 609 24
+ 565 0328 D7F8A430 		ldr	r3, [r7, #164]
+ 566 032c B3F84420 		ldrh	r2, [r3, #68]
+ 609:Core/Src/ow.c ****         {
+ 567              		.loc 1 609 48
+ARM GAS  /tmp/cc1AzyH1.s 			page 29
+
+
+ 568 0330 D7F8A430 		ldr	r3, [r7, #164]
+ 569 0334 B3F84630 		ldrh	r3, [r3, #70]
+ 609:Core/Src/ow.c ****         {
+ 570              		.loc 1 609 12
+ 571 0338 9A42     		cmp	r2, r3
+ 572 033a 16D1     		bne	.L38
+ 611:Core/Src/ow.c ****           {
+ 573              		.loc 1 611 26
+ 574 033c D7F8A430 		ldr	r3, [r7, #164]
+ 575 0340 B3F84830 		ldrh	r3, [r3, #72]
+ 611:Core/Src/ow.c ****           {
+ 576              		.loc 1 611 14
+ 577 0344 002B     		cmp	r3, #0
+ 578 0346 0AD0     		beq	.L39
+ 614:Core/Src/ow.c ****             handle->buf.byte_idx = 0;
+ 579              		.loc 1 614 32
+ 580 0348 D7F8A430 		ldr	r3, [r7, #164]
+ 581 034c 0522     		movs	r2, #5
+ 582 034e 83F84220 		strb	r2, [r3, #66]
+ 615:Core/Src/ow.c ****           }
+ 583              		.loc 1 615 34
+ 584 0352 D7F8A430 		ldr	r3, [r7, #164]
+ 585 0356 0022     		movs	r2, #0
+ 586 0358 A3F84420 		strh	r2, [r3, #68]	@ movhi
+ 634:Core/Src/ow.c **** 
+ 587              		.loc 1 634 7
+ 588 035c DEE0     		b	.L19
+ 589              	.L39:
+ 620:Core/Src/ow.c ****           }
+ 590              		.loc 1 620 27
+ 591 035e D7F8A430 		ldr	r3, [r7, #164]
+ 592 0362 0322     		movs	r2, #3
+ 593 0364 83F84A20 		strb	r2, [r3, #74]
+ 634:Core/Src/ow.c **** 
+ 594              		.loc 1 634 7
+ 595 0368 D8E0     		b	.L19
+ 596              	.L38:
+ 626:Core/Src/ow.c ****         }
+ 597              		.loc 1 626 30
+ 598 036a D7F8A430 		ldr	r3, [r7, #164]
+ 599 036e 0322     		movs	r2, #3
+ 600 0370 83F84220 		strb	r2, [r3, #66]
+ 634:Core/Src/ow.c **** 
+ 601              		.loc 1 634 7
+ 602 0374 D2E0     		b	.L19
+ 603              	.L37:
+ 632:Core/Src/ow.c ****       }
+ 604              		.loc 1 632 28
+ 605 0376 D7F8A430 		ldr	r3, [r7, #164]
+ 606 037a 0322     		movs	r2, #3
+ 607 037c 83F84220 		strb	r2, [r3, #66]
+ 634:Core/Src/ow.c **** 
+ 608              		.loc 1 634 7
+ 609 0380 CCE0     		b	.L19
+ 610              	.L11:
+ 638:Core/Src/ow.c ****       ow_write_bit(handle, false);
+ 611              		.loc 1 638 7
+ARM GAS  /tmp/cc1AzyH1.s 			page 30
+
+
+ 612 0382 D7F8A430 		ldr	r3, [r7, #164]
+ 613 0386 1B68     		ldr	r3, [r3]
+ 614 0388 1B68     		ldr	r3, [r3]
+ 615 038a 0922     		movs	r2, #9
+ 616 038c DA62     		str	r2, [r3, #44]
+ 617 038e D7F8A430 		ldr	r3, [r7, #164]
+ 618 0392 1B68     		ldr	r3, [r3]
+ 619 0394 0922     		movs	r2, #9
+ 620 0396 DA60     		str	r2, [r3, #12]
+ 621 0398 D7F8A430 		ldr	r3, [r7, #164]
+ 622 039c FB67     		str	r3, [r7, #124]
+ 623 039e 0023     		movs	r3, #0
+ 624 03a0 87F87B30 		strb	r3, [r7, #123]
+ 625              	.LBB116:
+ 626              	.LBB117:
+ 947:Core/Src/ow.c **** }
+ 627              		.loc 1 947 62
+ 628 03a4 97F87B30 		ldrb	r3, [r7, #123]	@ zero_extendqisi2
+ 629 03a8 002B     		cmp	r3, #0
+ 630 03aa 02D0     		beq	.L41
+ 947:Core/Src/ow.c **** }
+ 631              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 632 03ac FB6F     		ldr	r3, [r7, #124]
+ 633 03ae DB68     		ldr	r3, [r3, #12]
+ 634 03b0 01E0     		b	.L42
+ 635              	.L41:
+ 947:Core/Src/ow.c **** }
+ 636              		.loc 1 947 62 discriminator 2
+ 637 03b2 FB6F     		ldr	r3, [r7, #124]
+ 638 03b4 1B69     		ldr	r3, [r3, #16]
+ 639              	.L42:
+ 947:Core/Src/ow.c **** }
+ 640              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 641 03b6 FA6F     		ldr	r2, [r7, #124]
+ 642 03b8 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 643              		.loc 1 947 29 discriminator 4
+ 644 03ba 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 645              		.loc 1 948 1
+ 646 03bc 00BF     		nop
+ 647              	.LBE117:
+ 648              	.LBE116:
+ 640:Core/Src/ow.c ****       break;
+ 649              		.loc 1 640 18
+ 650 03be D7F8A430 		ldr	r3, [r7, #164]
+ 651 03c2 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 640:Core/Src/ow.c ****       break;
+ 652              		.loc 1 640 25
+ 653 03c6 0133     		adds	r3, r3, #1
+ 654 03c8 DAB2     		uxtb	r2, r3
+ 655 03ca D7F8A430 		ldr	r3, [r7, #164]
+ 656 03ce 83F84220 		strb	r2, [r3, #66]
+ 641:Core/Src/ow.c **** 
+ 657              		.loc 1 641 7
+ 658 03d2 A3E0     		b	.L19
+ 659              	.L10:
+ARM GAS  /tmp/cc1AzyH1.s 			page 31
+
+
+ 645:Core/Src/ow.c ****       ow_write_bit(handle, true);
+ 660              		.loc 1 645 7
+ 661 03d4 D7F8A430 		ldr	r3, [r7, #164]
+ 662 03d8 1B68     		ldr	r3, [r3]
+ 663 03da 1B68     		ldr	r3, [r3]
+ 664 03dc 0922     		movs	r2, #9
+ 665 03de DA62     		str	r2, [r3, #44]
+ 666 03e0 D7F8A430 		ldr	r3, [r7, #164]
+ 667 03e4 1B68     		ldr	r3, [r3]
+ 668 03e6 0922     		movs	r2, #9
+ 669 03e8 DA60     		str	r2, [r3, #12]
+ 670 03ea D7F8A430 		ldr	r3, [r7, #164]
+ 671 03ee 7B67     		str	r3, [r7, #116]
+ 672 03f0 0123     		movs	r3, #1
+ 673 03f2 87F87330 		strb	r3, [r7, #115]
+ 674              	.LBB118:
+ 675              	.LBB119:
+ 947:Core/Src/ow.c **** }
+ 676              		.loc 1 947 62
+ 677 03f6 97F87330 		ldrb	r3, [r7, #115]	@ zero_extendqisi2
+ 678 03fa 002B     		cmp	r3, #0
+ 679 03fc 02D0     		beq	.L43
+ 947:Core/Src/ow.c **** }
+ 680              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 681 03fe 7B6F     		ldr	r3, [r7, #116]
+ 682 0400 DB68     		ldr	r3, [r3, #12]
+ 683 0402 01E0     		b	.L44
+ 684              	.L43:
+ 947:Core/Src/ow.c **** }
+ 685              		.loc 1 947 62 discriminator 2
+ 686 0404 7B6F     		ldr	r3, [r7, #116]
+ 687 0406 1B69     		ldr	r3, [r3, #16]
+ 688              	.L44:
+ 947:Core/Src/ow.c **** }
+ 689              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 690 0408 7A6F     		ldr	r2, [r7, #116]
+ 691 040a 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 692              		.loc 1 947 29 discriminator 4
+ 693 040c 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 694              		.loc 1 948 1
+ 695 040e 00BF     		nop
+ 696              	.LBE119:
+ 697              	.LBE118:
+ 647:Core/Src/ow.c ****       break;
+ 698              		.loc 1 647 18
+ 699 0410 D7F8A430 		ldr	r3, [r7, #164]
+ 700 0414 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 647:Core/Src/ow.c ****       break;
+ 701              		.loc 1 647 25
+ 702 0418 0133     		adds	r3, r3, #1
+ 703 041a DAB2     		uxtb	r2, r3
+ 704 041c D7F8A430 		ldr	r3, [r7, #164]
+ 705 0420 83F84220 		strb	r2, [r3, #66]
+ 648:Core/Src/ow.c **** 
+ 706              		.loc 1 648 7
+ARM GAS  /tmp/cc1AzyH1.s 			page 32
+
+
+ 707 0424 7AE0     		b	.L19
+ 708              	.L8:
+ 652:Core/Src/ow.c ****       if (ow_read_bit(handle))
+ 709              		.loc 1 652 7
+ 710 0426 D7F8A430 		ldr	r3, [r7, #164]
+ 711 042a 1B68     		ldr	r3, [r3]
+ 712 042c 1B68     		ldr	r3, [r3]
+ 713 042e 3B22     		movs	r2, #59
+ 714 0430 DA62     		str	r2, [r3, #44]
+ 715 0432 D7F8A430 		ldr	r3, [r7, #164]
+ 716 0436 1B68     		ldr	r3, [r3]
+ 717 0438 3B22     		movs	r2, #59
+ 718 043a DA60     		str	r2, [r3, #12]
+ 719 043c D7F8A430 		ldr	r3, [r7, #164]
+ 720 0440 FB66     		str	r3, [r7, #108]
+ 721              	.LBB120:
+ 722              	.LBB121:
+ 723              		.loc 1 961 26
+ 724 0442 FB6E     		ldr	r3, [r7, #108]
+ 725 0444 9B68     		ldr	r3, [r3, #8]
+ 726              		.loc 1 961 31
+ 727 0446 1A69     		ldr	r2, [r3, #16]
+ 728              		.loc 1 961 53
+ 729 0448 FB6E     		ldr	r3, [r7, #108]
+ 730 044a 5B69     		ldr	r3, [r3, #20]
+ 731              		.loc 1 961 37
+ 732 044c 1340     		ands	r3, r3, r2
+ 733              		.loc 1 961 68
+ 734 044e 002B     		cmp	r3, #0
+ 735 0450 14BF     		ite	ne
+ 736 0452 0123     		movne	r3, #1
+ 737 0454 0023     		moveq	r3, #0
+ 738 0456 DBB2     		uxtb	r3, r3
+ 739              	.LBE121:
+ 740              	.LBE120:
+ 653:Core/Src/ow.c ****       {
+ 741              		.loc 1 653 10 discriminator 1
+ 742 0458 002B     		cmp	r3, #0
+ 743 045a 28D0     		beq	.L46
+ 655:Core/Src/ow.c ****       }
+ 744              		.loc 1 655 37
+ 745 045c D7F8A430 		ldr	r3, [r7, #164]
+ 746 0460 B3F84630 		ldrh	r3, [r3, #70]
+ 655:Core/Src/ow.c ****       }
+ 747              		.loc 1 655 25
+ 748 0464 1A46     		mov	r2, r3
+ 655:Core/Src/ow.c ****       }
+ 749              		.loc 1 655 61
+ 750 0466 D7F8A430 		ldr	r3, [r7, #164]
+ 751 046a B3F84430 		ldrh	r3, [r3, #68]
+ 655:Core/Src/ow.c ****       }
+ 752              		.loc 1 655 25
+ 753 046e 1344     		add	r3, r3, r2
+ 754 0470 D7F8A420 		ldr	r2, [r7, #164]
+ 755 0474 1344     		add	r3, r3, r2
+ 756 0476 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+ 757 0478 5AB2     		sxtb	r2, r3
+ARM GAS  /tmp/cc1AzyH1.s 			page 33
+
+
+ 655:Core/Src/ow.c ****       }
+ 758              		.loc 1 655 92
+ 759 047a D7F8A430 		ldr	r3, [r7, #164]
+ 760 047e 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 761 0482 1946     		mov	r1, r3
+ 655:Core/Src/ow.c ****       }
+ 762              		.loc 1 655 78
+ 763 0484 0123     		movs	r3, #1
+ 764 0486 8B40     		lsls	r3, r3, r1
+ 655:Core/Src/ow.c ****       }
+ 765              		.loc 1 655 72
+ 766 0488 5BB2     		sxtb	r3, r3
+ 767 048a 1343     		orrs	r3, r3, r2
+ 768 048c 5AB2     		sxtb	r2, r3
+ 655:Core/Src/ow.c ****       }
+ 769              		.loc 1 655 37
+ 770 048e D7F8A430 		ldr	r3, [r7, #164]
+ 771 0492 B3F84630 		ldrh	r3, [r3, #70]
+ 655:Core/Src/ow.c ****       }
+ 772              		.loc 1 655 25
+ 773 0496 1946     		mov	r1, r3
+ 655:Core/Src/ow.c ****       }
+ 774              		.loc 1 655 61
+ 775 0498 D7F8A430 		ldr	r3, [r7, #164]
+ 776 049c B3F84430 		ldrh	r3, [r3, #68]
+ 655:Core/Src/ow.c ****       }
+ 777              		.loc 1 655 25
+ 778 04a0 0B44     		add	r3, r3, r1
+ 655:Core/Src/ow.c ****       }
+ 779              		.loc 1 655 72
+ 780 04a2 D1B2     		uxtb	r1, r2
+ 781 04a4 D7F8A420 		ldr	r2, [r7, #164]
+ 782 04a8 1344     		add	r3, r3, r2
+ 783 04aa 0A46     		mov	r2, r1
+ 784 04ac 1A76     		strb	r2, [r3, #24]
+ 785              	.L46:
+ 659:Core/Src/ow.c ****       handle->buf.bit_idx++;
+ 786              		.loc 1 659 26
+ 787 04ae D7F8A430 		ldr	r3, [r7, #164]
+ 788 04b2 0522     		movs	r2, #5
+ 789 04b4 83F84220 		strb	r2, [r3, #66]
+ 660:Core/Src/ow.c ****       if (handle->buf.bit_idx == 8)
+ 790              		.loc 1 660 18
+ 791 04b8 D7F8A430 		ldr	r3, [r7, #164]
+ 792 04bc 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 660:Core/Src/ow.c ****       if (handle->buf.bit_idx == 8)
+ 793              		.loc 1 660 26
+ 794 04c0 0133     		adds	r3, r3, #1
+ 795 04c2 DAB2     		uxtb	r2, r3
+ 796 04c4 D7F8A430 		ldr	r3, [r7, #164]
+ 797 04c8 83F84320 		strb	r2, [r3, #67]
+ 661:Core/Src/ow.c ****       {
+ 798              		.loc 1 661 22
+ 799 04cc D7F8A430 		ldr	r3, [r7, #164]
+ 800 04d0 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 661:Core/Src/ow.c ****       {
+ 801              		.loc 1 661 10
+ARM GAS  /tmp/cc1AzyH1.s 			page 34
+
+
+ 802 04d4 082B     		cmp	r3, #8
+ 803 04d6 20D1     		bne	.L118
+ 663:Core/Src/ow.c ****         handle->buf.byte_idx++;
+ 804              		.loc 1 663 29
+ 805 04d8 D7F8A430 		ldr	r3, [r7, #164]
+ 806 04dc 0022     		movs	r2, #0
+ 807 04de 83F84320 		strb	r2, [r3, #67]
+ 664:Core/Src/ow.c ****         if (handle->buf.byte_idx == handle->buf.read_len)
+ 808              		.loc 1 664 20
+ 809 04e2 D7F8A430 		ldr	r3, [r7, #164]
+ 810 04e6 B3F84430 		ldrh	r3, [r3, #68]
+ 664:Core/Src/ow.c ****         if (handle->buf.byte_idx == handle->buf.read_len)
+ 811              		.loc 1 664 29
+ 812 04ea 0133     		adds	r3, r3, #1
+ 813 04ec 9AB2     		uxth	r2, r3
+ 814 04ee D7F8A430 		ldr	r3, [r7, #164]
+ 815 04f2 A3F84420 		strh	r2, [r3, #68]	@ movhi
+ 665:Core/Src/ow.c ****         {
+ 816              		.loc 1 665 24
+ 817 04f6 D7F8A430 		ldr	r3, [r7, #164]
+ 818 04fa B3F84420 		ldrh	r2, [r3, #68]
+ 665:Core/Src/ow.c ****         {
+ 819              		.loc 1 665 48
+ 820 04fe D7F8A430 		ldr	r3, [r7, #164]
+ 821 0502 B3F84830 		ldrh	r3, [r3, #72]
+ 665:Core/Src/ow.c ****         {
+ 822              		.loc 1 665 12
+ 823 0506 9A42     		cmp	r2, r3
+ 824 0508 07D1     		bne	.L118
+ 682:Core/Src/ow.c ****         }
+ 825              		.loc 1 682 25
+ 826 050a D7F8A430 		ldr	r3, [r7, #164]
+ 827 050e 0322     		movs	r2, #3
+ 828 0510 83F84A20 		strb	r2, [r3, #74]
+ 685:Core/Src/ow.c **** 
+ 829              		.loc 1 685 7
+ 830 0514 01E0     		b	.L118
+ 831              	.L117:
+ 688:Core/Src/ow.c ****   }
+ 832              		.loc 1 688 7
+ 833 0516 00BF     		nop
+ 834 0518 00E0     		b	.L19
+ 835              	.L118:
+ 685:Core/Src/ow.c **** 
+ 836              		.loc 1 685 7
+ 837 051a 00BF     		nop
+ 838              	.L19:
+ 690:Core/Src/ow.c **** 
+ 839              		.loc 1 690 1
+ 840 051c 00BF     		nop
+ 841              	.LBE105:
+ 842              	.LBE104:
+ 122:Core/Src/ow.c **** 
+ 843              		.loc 1 122 7
+ 844 051e 87E3     		b	.L48
+ 845              	.L6:
+ 846 0520 7B68     		ldr	r3, [r7, #4]
+ARM GAS  /tmp/cc1AzyH1.s 			page 35
+
+
+ 847 0522 BB66     		str	r3, [r7, #104]
+ 848              	.LBB122:
+ 849              	.LBB123:
+ 707:Core/Src/ow.c ****   {
+ 850              		.loc 1 707 22
+ 851 0524 BB6E     		ldr	r3, [r7, #104]
+ 852 0526 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 707:Core/Src/ow.c ****   {
+ 853              		.loc 1 707 3
+ 854 052a 0C2B     		cmp	r3, #12
+ 855 052c 00F0BE82 		beq	.L49
+ 856 0530 0C2B     		cmp	r3, #12
+ 857 0532 00F37483 		bgt	.L119
+ 858 0536 0B2B     		cmp	r3, #11
+ 859 0538 00F06B82 		beq	.L51
+ 860 053c 0B2B     		cmp	r3, #11
+ 861 053e 00F36E83 		bgt	.L119
+ 862 0542 0A2B     		cmp	r3, #10
+ 863 0544 00F0EC81 		beq	.L52
+ 864 0548 0A2B     		cmp	r3, #10
+ 865 054a 00F36883 		bgt	.L119
+ 866 054e 092B     		cmp	r3, #9
+ 867 0550 00F0C281 		beq	.L53
+ 868 0554 092B     		cmp	r3, #9
+ 869 0556 00F36283 		bgt	.L119
+ 870 055a 082B     		cmp	r3, #8
+ 871 055c 00F09881 		beq	.L54
+ 872 0560 082B     		cmp	r3, #8
+ 873 0562 00F35C83 		bgt	.L119
+ 874 0566 072B     		cmp	r3, #7
+ 875 0568 00F06881 		beq	.L55
+ 876 056c 072B     		cmp	r3, #7
+ 877 056e 00F35683 		bgt	.L119
+ 878 0572 062B     		cmp	r3, #6
+ 879 0574 00F03E81 		beq	.L56
+ 880 0578 062B     		cmp	r3, #6
+ 881 057a 00F35083 		bgt	.L119
+ 882 057e 052B     		cmp	r3, #5
+ 883 0580 00F01481 		beq	.L57
+ 884 0584 052B     		cmp	r3, #5
+ 885 0586 00F34A83 		bgt	.L119
+ 886 058a 042B     		cmp	r3, #4
+ 887 058c 00F0C280 		beq	.L58
+ 888 0590 042B     		cmp	r3, #4
+ 889 0592 00F34483 		bgt	.L119
+ 890 0596 032B     		cmp	r3, #3
+ 891 0598 00F08280 		beq	.L59
+ 892 059c 032B     		cmp	r3, #3
+ 893 059e 00F33E83 		bgt	.L119
+ 894 05a2 022B     		cmp	r3, #2
+ 895 05a4 51D0     		beq	.L60
+ 896 05a6 022B     		cmp	r3, #2
+ 897 05a8 00F33983 		bgt	.L119
+ 898 05ac 002B     		cmp	r3, #0
+ 899 05ae 02D0     		beq	.L61
+ 900 05b0 012B     		cmp	r3, #1
+ 901 05b2 26D0     		beq	.L62
+ARM GAS  /tmp/cc1AzyH1.s 			page 36
+
+
+ 902              	.LBB124:
+ 932:Core/Src/ow.c ****   }
+ 903              		.loc 1 932 5
+ 904 05b4 33E3     		b	.L119
+ 905              	.L61:
+ 711:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 906              		.loc 1 711 5
+ 907 05b6 BB6E     		ldr	r3, [r7, #104]
+ 908 05b8 1B68     		ldr	r3, [r3]
+ 909 05ba 1B68     		ldr	r3, [r3]
+ 910 05bc 40F2F312 		movw	r2, #499
+ 911 05c0 DA62     		str	r2, [r3, #44]
+ 912 05c2 BB6E     		ldr	r3, [r7, #104]
+ 913 05c4 1B68     		ldr	r3, [r3]
+ 914 05c6 40F2F312 		movw	r2, #499
+ 915 05ca DA60     		str	r2, [r3, #12]
+ 916 05cc BB6E     		ldr	r3, [r7, #104]
+ 917 05ce 7B66     		str	r3, [r7, #100]
+ 918 05d0 0023     		movs	r3, #0
+ 919 05d2 87F86330 		strb	r3, [r7, #99]
+ 920              	.LBB125:
+ 921              	.LBB126:
+ 947:Core/Src/ow.c **** }
+ 922              		.loc 1 947 62
+ 923 05d6 97F86330 		ldrb	r3, [r7, #99]	@ zero_extendqisi2
+ 924 05da 002B     		cmp	r3, #0
+ 925 05dc 02D0     		beq	.L63
+ 947:Core/Src/ow.c **** }
+ 926              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 927 05de 7B6E     		ldr	r3, [r7, #100]
+ 928 05e0 DB68     		ldr	r3, [r3, #12]
+ 929 05e2 01E0     		b	.L64
+ 930              	.L63:
+ 947:Core/Src/ow.c **** }
+ 931              		.loc 1 947 62 discriminator 2
+ 932 05e4 7B6E     		ldr	r3, [r7, #100]
+ 933 05e6 1B69     		ldr	r3, [r3, #16]
+ 934              	.L64:
+ 947:Core/Src/ow.c **** }
+ 935              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 936 05e8 7A6E     		ldr	r2, [r7, #100]
+ 937 05ea 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 938              		.loc 1 947 29 discriminator 4
+ 939 05ec 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 940              		.loc 1 948 1
+ 941 05ee 00BF     		nop
+ 942              	.LBE126:
+ 943              	.LBE125:
+ 713:Core/Src/ow.c ****     break;
+ 944              		.loc 1 713 16
+ 945 05f0 BB6E     		ldr	r3, [r7, #104]
+ 946 05f2 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 713:Core/Src/ow.c ****     break;
+ 947              		.loc 1 713 23
+ 948 05f6 0133     		adds	r3, r3, #1
+ARM GAS  /tmp/cc1AzyH1.s 			page 37
+
+
+ 949 05f8 DAB2     		uxtb	r2, r3
+ 950 05fa BB6E     		ldr	r3, [r7, #104]
+ 951 05fc 83F84220 		strb	r2, [r3, #66]
+ 714:Core/Src/ow.c **** 
+ 952              		.loc 1 714 5
+ 953 0600 10E3     		b	.L65
+ 954              	.L62:
+ 718:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 955              		.loc 1 718 5
+ 956 0602 BB6E     		ldr	r3, [r7, #104]
+ 957 0604 1B68     		ldr	r3, [r3]
+ 958 0606 1B68     		ldr	r3, [r3]
+ 959 0608 6322     		movs	r2, #99
+ 960 060a DA62     		str	r2, [r3, #44]
+ 961 060c BB6E     		ldr	r3, [r7, #104]
+ 962 060e 1B68     		ldr	r3, [r3]
+ 963 0610 6322     		movs	r2, #99
+ 964 0612 DA60     		str	r2, [r3, #12]
+ 965 0614 BB6E     		ldr	r3, [r7, #104]
+ 966 0616 FB65     		str	r3, [r7, #92]
+ 967 0618 0123     		movs	r3, #1
+ 968 061a 87F85B30 		strb	r3, [r7, #91]
+ 969              	.LBB127:
+ 970              	.LBB128:
+ 947:Core/Src/ow.c **** }
+ 971              		.loc 1 947 62
+ 972 061e 97F85B30 		ldrb	r3, [r7, #91]	@ zero_extendqisi2
+ 973 0622 002B     		cmp	r3, #0
+ 974 0624 02D0     		beq	.L66
+ 947:Core/Src/ow.c **** }
+ 975              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 976 0626 FB6D     		ldr	r3, [r7, #92]
+ 977 0628 DB68     		ldr	r3, [r3, #12]
+ 978 062a 01E0     		b	.L67
+ 979              	.L66:
+ 947:Core/Src/ow.c **** }
+ 980              		.loc 1 947 62 discriminator 2
+ 981 062c FB6D     		ldr	r3, [r7, #92]
+ 982 062e 1B69     		ldr	r3, [r3, #16]
+ 983              	.L67:
+ 947:Core/Src/ow.c **** }
+ 984              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 985 0630 FA6D     		ldr	r2, [r7, #92]
+ 986 0632 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 987              		.loc 1 947 29 discriminator 4
+ 988 0634 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 989              		.loc 1 948 1
+ 990 0636 00BF     		nop
+ 991              	.LBE128:
+ 992              	.LBE127:
+ 720:Core/Src/ow.c ****     break;
+ 993              		.loc 1 720 16
+ 994 0638 BB6E     		ldr	r3, [r7, #104]
+ 995 063a 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 720:Core/Src/ow.c ****     break;
+ARM GAS  /tmp/cc1AzyH1.s 			page 38
+
+
+ 996              		.loc 1 720 23
+ 997 063e 0133     		adds	r3, r3, #1
+ 998 0640 DAB2     		uxtb	r2, r3
+ 999 0642 BB6E     		ldr	r3, [r7, #104]
+ 1000 0644 83F84220 		strb	r2, [r3, #66]
+ 721:Core/Src/ow.c **** 
+ 1001              		.loc 1 721 5
+ 1002 0648 ECE2     		b	.L65
+ 1003              	.L60:
+ 1004 064a BB6E     		ldr	r3, [r7, #104]
+ 1005 064c 7B65     		str	r3, [r7, #84]
+ 1006              	.LBB129:
+ 1007              	.LBB130:
+ 1008              		.loc 1 961 26
+ 1009 064e 7B6D     		ldr	r3, [r7, #84]
+ 1010 0650 9B68     		ldr	r3, [r3, #8]
+ 1011              		.loc 1 961 31
+ 1012 0652 1A69     		ldr	r2, [r3, #16]
+ 1013              		.loc 1 961 53
+ 1014 0654 7B6D     		ldr	r3, [r7, #84]
+ 1015 0656 5B69     		ldr	r3, [r3, #20]
+ 1016              		.loc 1 961 37
+ 1017 0658 1340     		ands	r3, r3, r2
+ 1018              		.loc 1 961 68
+ 1019 065a 002B     		cmp	r3, #0
+ 1020 065c 14BF     		ite	ne
+ 1021 065e 0123     		movne	r3, #1
+ 1022 0660 0023     		moveq	r3, #0
+ 1023 0662 DBB2     		uxtb	r3, r3
+ 1024              	.LBE130:
+ 1025              	.LBE129:
+ 725:Core/Src/ow.c ****     {
+ 1026              		.loc 1 725 8 discriminator 1
+ 1027 0664 002B     		cmp	r3, #0
+ 1028 0666 07D0     		beq	.L69
+ 727:Core/Src/ow.c ****       ow_stop(handle);
+ 1029              		.loc 1 727 21
+ 1030 0668 BB6E     		ldr	r3, [r7, #104]
+ 1031 066a 0322     		movs	r2, #3
+ 1032 066c 83F84B20 		strb	r2, [r3, #75]
+ 728:Core/Src/ow.c ****     }
+ 1033              		.loc 1 728 7
+ 1034 0670 B86E     		ldr	r0, [r7, #104]
+ 1035 0672 FFF7FEFF 		bl	ow_stop
+ 735:Core/Src/ow.c **** 
+ 1036              		.loc 1 735 5
+ 1037 0676 D5E2     		b	.L65
+ 1038              	.L69:
+ 732:Core/Src/ow.c ****       handle->buf.bit_ph++;
+ 1039              		.loc 1 732 7
+ 1040 0678 BB6E     		ldr	r3, [r7, #104]
+ 1041 067a 1B68     		ldr	r3, [r3]
+ 1042 067c 1B68     		ldr	r3, [r3]
+ 1043 067e 40F2F312 		movw	r2, #499
+ 1044 0682 DA62     		str	r2, [r3, #44]
+ 1045 0684 BB6E     		ldr	r3, [r7, #104]
+ 1046 0686 1B68     		ldr	r3, [r3]
+ARM GAS  /tmp/cc1AzyH1.s 			page 39
+
+
+ 1047 0688 40F2F312 		movw	r2, #499
+ 1048 068c DA60     		str	r2, [r3, #12]
+ 733:Core/Src/ow.c ****     }
+ 1049              		.loc 1 733 18
+ 1050 068e BB6E     		ldr	r3, [r7, #104]
+ 1051 0690 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 733:Core/Src/ow.c ****     }
+ 1052              		.loc 1 733 25
+ 1053 0694 0133     		adds	r3, r3, #1
+ 1054 0696 DAB2     		uxtb	r2, r3
+ 1055 0698 BB6E     		ldr	r3, [r7, #104]
+ 1056 069a 83F84220 		strb	r2, [r3, #66]
+ 735:Core/Src/ow.c **** 
+ 1057              		.loc 1 735 5
+ 1058 069e C1E2     		b	.L65
+ 1059              	.L59:
+ 739:Core/Src/ow.c ****     {
+ 1060              		.loc 1 739 25
+ 1061 06a0 BB6E     		ldr	r3, [r7, #104]
+ 1062 06a2 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+ 1063 06a4 1A46     		mov	r2, r3
+ 739:Core/Src/ow.c ****     {
+ 1064              		.loc 1 739 48
+ 1065 06a6 BB6E     		ldr	r3, [r7, #104]
+ 1066 06a8 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 739:Core/Src/ow.c ****     {
+ 1067              		.loc 1 739 9
+ 1068 06ac 42FA03F3 		asr	r3, r2, r3
+ 1069 06b0 03F00103 		and	r3, r3, #1
+ 739:Core/Src/ow.c ****     {
+ 1070              		.loc 1 739 8
+ 1071 06b4 002B     		cmp	r3, #0
+ 1072 06b6 09D0     		beq	.L71
+ 741:Core/Src/ow.c ****     }
+ 1073              		.loc 1 741 7
+ 1074 06b8 BB6E     		ldr	r3, [r7, #104]
+ 1075 06ba 1B68     		ldr	r3, [r3]
+ 1076 06bc 1B68     		ldr	r3, [r3]
+ 1077 06be 0922     		movs	r2, #9
+ 1078 06c0 DA62     		str	r2, [r3, #44]
+ 1079 06c2 BB6E     		ldr	r3, [r7, #104]
+ 1080 06c4 1B68     		ldr	r3, [r3]
+ 1081 06c6 0922     		movs	r2, #9
+ 1082 06c8 DA60     		str	r2, [r3, #12]
+ 1083 06ca 08E0     		b	.L72
+ 1084              	.L71:
+ 745:Core/Src/ow.c ****     }
+ 1085              		.loc 1 745 7
+ 1086 06cc BB6E     		ldr	r3, [r7, #104]
+ 1087 06ce 1B68     		ldr	r3, [r3]
+ 1088 06d0 1B68     		ldr	r3, [r3]
+ 1089 06d2 4522     		movs	r2, #69
+ 1090 06d4 DA62     		str	r2, [r3, #44]
+ 1091 06d6 BB6E     		ldr	r3, [r7, #104]
+ 1092 06d8 1B68     		ldr	r3, [r3]
+ 1093 06da 4522     		movs	r2, #69
+ 1094 06dc DA60     		str	r2, [r3, #12]
+ARM GAS  /tmp/cc1AzyH1.s 			page 40
+
+
+ 1095              	.L72:
+ 1096 06de BB6E     		ldr	r3, [r7, #104]
+ 1097 06e0 3B65     		str	r3, [r7, #80]
+ 1098 06e2 0023     		movs	r3, #0
+ 1099 06e4 87F84F30 		strb	r3, [r7, #79]
+ 1100              	.LBB131:
+ 1101              	.LBB132:
+ 947:Core/Src/ow.c **** }
+ 1102              		.loc 1 947 62
+ 1103 06e8 97F84F30 		ldrb	r3, [r7, #79]	@ zero_extendqisi2
+ 1104 06ec 002B     		cmp	r3, #0
+ 1105 06ee 02D0     		beq	.L73
+ 947:Core/Src/ow.c **** }
+ 1106              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 1107 06f0 3B6D     		ldr	r3, [r7, #80]
+ 1108 06f2 DB68     		ldr	r3, [r3, #12]
+ 1109 06f4 01E0     		b	.L74
+ 1110              	.L73:
+ 947:Core/Src/ow.c **** }
+ 1111              		.loc 1 947 62 discriminator 2
+ 1112 06f6 3B6D     		ldr	r3, [r7, #80]
+ 1113 06f8 1B69     		ldr	r3, [r3, #16]
+ 1114              	.L74:
+ 947:Core/Src/ow.c **** }
+ 1115              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1116 06fa 3A6D     		ldr	r2, [r7, #80]
+ 1117 06fc 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1118              		.loc 1 947 29 discriminator 4
+ 1119 06fe 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1120              		.loc 1 948 1
+ 1121 0700 00BF     		nop
+ 1122              	.LBE132:
+ 1123              	.LBE131:
+ 748:Core/Src/ow.c ****     break;
+ 1124              		.loc 1 748 16
+ 1125 0702 BB6E     		ldr	r3, [r7, #104]
+ 1126 0704 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 748:Core/Src/ow.c ****     break;
+ 1127              		.loc 1 748 23
+ 1128 0708 0133     		adds	r3, r3, #1
+ 1129 070a DAB2     		uxtb	r2, r3
+ 1130 070c BB6E     		ldr	r3, [r7, #104]
+ 1131 070e 83F84220 		strb	r2, [r3, #66]
+ 749:Core/Src/ow.c **** 
+ 1132              		.loc 1 749 5
+ 1133 0712 87E2     		b	.L65
+ 1134              	.L58:
+ 753:Core/Src/ow.c ****     {
+ 1135              		.loc 1 753 25
+ 1136 0714 BB6E     		ldr	r3, [r7, #104]
+ 1137 0716 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+ 1138 0718 1A46     		mov	r2, r3
+ 753:Core/Src/ow.c ****     {
+ 1139              		.loc 1 753 48
+ 1140 071a BB6E     		ldr	r3, [r7, #104]
+ARM GAS  /tmp/cc1AzyH1.s 			page 41
+
+
+ 1141 071c 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 753:Core/Src/ow.c ****     {
+ 1142              		.loc 1 753 9
+ 1143 0720 42FA03F3 		asr	r3, r2, r3
+ 1144 0724 03F00103 		and	r3, r3, #1
+ 753:Core/Src/ow.c ****     {
+ 1145              		.loc 1 753 8
+ 1146 0728 002B     		cmp	r3, #0
+ 1147 072a 09D0     		beq	.L75
+ 755:Core/Src/ow.c ****     }
+ 1148              		.loc 1 755 7
+ 1149 072c BB6E     		ldr	r3, [r7, #104]
+ 1150 072e 1B68     		ldr	r3, [r3]
+ 1151 0730 1B68     		ldr	r3, [r3]
+ 1152 0732 4522     		movs	r2, #69
+ 1153 0734 DA62     		str	r2, [r3, #44]
+ 1154 0736 BB6E     		ldr	r3, [r7, #104]
+ 1155 0738 1B68     		ldr	r3, [r3]
+ 1156 073a 4522     		movs	r2, #69
+ 1157 073c DA60     		str	r2, [r3, #12]
+ 1158 073e 08E0     		b	.L76
+ 1159              	.L75:
+ 759:Core/Src/ow.c ****     }
+ 1160              		.loc 1 759 7
+ 1161 0740 BB6E     		ldr	r3, [r7, #104]
+ 1162 0742 1B68     		ldr	r3, [r3]
+ 1163 0744 1B68     		ldr	r3, [r3]
+ 1164 0746 0922     		movs	r2, #9
+ 1165 0748 DA62     		str	r2, [r3, #44]
+ 1166 074a BB6E     		ldr	r3, [r7, #104]
+ 1167 074c 1B68     		ldr	r3, [r3]
+ 1168 074e 0922     		movs	r2, #9
+ 1169 0750 DA60     		str	r2, [r3, #12]
+ 1170              	.L76:
+ 1171 0752 BB6E     		ldr	r3, [r7, #104]
+ 1172 0754 BB64     		str	r3, [r7, #72]
+ 1173 0756 0123     		movs	r3, #1
+ 1174 0758 87F84730 		strb	r3, [r7, #71]
+ 1175              	.LBB133:
+ 1176              	.LBB134:
+ 947:Core/Src/ow.c **** }
+ 1177              		.loc 1 947 62
+ 1178 075c 97F84730 		ldrb	r3, [r7, #71]	@ zero_extendqisi2
+ 1179 0760 002B     		cmp	r3, #0
+ 1180 0762 02D0     		beq	.L77
+ 947:Core/Src/ow.c **** }
+ 1181              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 1182 0764 BB6C     		ldr	r3, [r7, #72]
+ 1183 0766 DB68     		ldr	r3, [r3, #12]
+ 1184 0768 01E0     		b	.L78
+ 1185              	.L77:
+ 947:Core/Src/ow.c **** }
+ 1186              		.loc 1 947 62 discriminator 2
+ 1187 076a BB6C     		ldr	r3, [r7, #72]
+ 1188 076c 1B69     		ldr	r3, [r3, #16]
+ 1189              	.L78:
+ 947:Core/Src/ow.c **** }
+ARM GAS  /tmp/cc1AzyH1.s 			page 42
+
+
+ 1190              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1191 076e BA6C     		ldr	r2, [r7, #72]
+ 1192 0770 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1193              		.loc 1 947 29 discriminator 4
+ 1194 0772 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1195              		.loc 1 948 1
+ 1196 0774 00BF     		nop
+ 1197              	.LBE134:
+ 1198              	.LBE133:
+ 762:Core/Src/ow.c **** 
+ 1199              		.loc 1 762 16
+ 1200 0776 BB6E     		ldr	r3, [r7, #104]
+ 1201 0778 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 762:Core/Src/ow.c **** 
+ 1202              		.loc 1 762 24
+ 1203 077c 0133     		adds	r3, r3, #1
+ 1204 077e DAB2     		uxtb	r2, r3
+ 1205 0780 BB6E     		ldr	r3, [r7, #104]
+ 1206 0782 83F84320 		strb	r2, [r3, #67]
+ 765:Core/Src/ow.c ****     {
+ 1207              		.loc 1 765 20
+ 1208 0786 BB6E     		ldr	r3, [r7, #104]
+ 1209 0788 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 765:Core/Src/ow.c ****     {
+ 1210              		.loc 1 765 8
+ 1211 078c 082B     		cmp	r3, #8
+ 1212 078e 08D1     		bne	.L79
+ 767:Core/Src/ow.c ****       /* Start reading phase */
+ 1213              		.loc 1 767 27
+ 1214 0790 BB6E     		ldr	r3, [r7, #104]
+ 1215 0792 0022     		movs	r2, #0
+ 1216 0794 83F84320 		strb	r2, [r3, #67]
+ 769:Core/Src/ow.c ****     }
+ 1217              		.loc 1 769 26
+ 1218 0798 BB6E     		ldr	r3, [r7, #104]
+ 1219 079a 0522     		movs	r2, #5
+ 1220 079c 83F84220 		strb	r2, [r3, #66]
+ 776:Core/Src/ow.c **** 
+ 1221              		.loc 1 776 5
+ 1222 07a0 40E2     		b	.L65
+ 1223              	.L79:
+ 774:Core/Src/ow.c ****     }
+ 1224              		.loc 1 774 26
+ 1225 07a2 BB6E     		ldr	r3, [r7, #104]
+ 1226 07a4 0322     		movs	r2, #3
+ 1227 07a6 83F84220 		strb	r2, [r3, #66]
+ 776:Core/Src/ow.c **** 
+ 1228              		.loc 1 776 5
+ 1229 07aa 3BE2     		b	.L65
+ 1230              	.L57:
+ 780:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 1231              		.loc 1 780 5
+ 1232 07ac BB6E     		ldr	r3, [r7, #104]
+ 1233 07ae 1B68     		ldr	r3, [r3]
+ 1234 07b0 1B68     		ldr	r3, [r3]
+ARM GAS  /tmp/cc1AzyH1.s 			page 43
+
+
+ 1235 07b2 0922     		movs	r2, #9
+ 1236 07b4 DA62     		str	r2, [r3, #44]
+ 1237 07b6 BB6E     		ldr	r3, [r7, #104]
+ 1238 07b8 1B68     		ldr	r3, [r3]
+ 1239 07ba 0922     		movs	r2, #9
+ 1240 07bc DA60     		str	r2, [r3, #12]
+ 1241 07be BB6E     		ldr	r3, [r7, #104]
+ 1242 07c0 3B64     		str	r3, [r7, #64]
+ 1243 07c2 0023     		movs	r3, #0
+ 1244 07c4 87F83F30 		strb	r3, [r7, #63]
+ 1245              	.LBB135:
+ 1246              	.LBB136:
+ 947:Core/Src/ow.c **** }
+ 1247              		.loc 1 947 62
+ 1248 07c8 97F83F30 		ldrb	r3, [r7, #63]	@ zero_extendqisi2
+ 1249 07cc 002B     		cmp	r3, #0
+ 1250 07ce 02D0     		beq	.L81
+ 947:Core/Src/ow.c **** }
+ 1251              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 1252 07d0 3B6C     		ldr	r3, [r7, #64]
+ 1253 07d2 DB68     		ldr	r3, [r3, #12]
+ 1254 07d4 01E0     		b	.L82
+ 1255              	.L81:
+ 947:Core/Src/ow.c **** }
+ 1256              		.loc 1 947 62 discriminator 2
+ 1257 07d6 3B6C     		ldr	r3, [r7, #64]
+ 1258 07d8 1B69     		ldr	r3, [r3, #16]
+ 1259              	.L82:
+ 947:Core/Src/ow.c **** }
+ 1260              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1261 07da 3A6C     		ldr	r2, [r7, #64]
+ 1262 07dc 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1263              		.loc 1 947 29 discriminator 4
+ 1264 07de 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1265              		.loc 1 948 1
+ 1266 07e0 00BF     		nop
+ 1267              	.LBE136:
+ 1268              	.LBE135:
+ 782:Core/Src/ow.c ****     break;
+ 1269              		.loc 1 782 16
+ 1270 07e2 BB6E     		ldr	r3, [r7, #104]
+ 1271 07e4 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 782:Core/Src/ow.c ****     break;
+ 1272              		.loc 1 782 23
+ 1273 07e8 0133     		adds	r3, r3, #1
+ 1274 07ea DAB2     		uxtb	r2, r3
+ 1275 07ec BB6E     		ldr	r3, [r7, #104]
+ 1276 07ee 83F84220 		strb	r2, [r3, #66]
+ 783:Core/Src/ow.c **** 
+ 1277              		.loc 1 783 5
+ 1278 07f2 17E2     		b	.L65
+ 1279              	.L56:
+ 787:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 1280              		.loc 1 787 5
+ 1281 07f4 BB6E     		ldr	r3, [r7, #104]
+ARM GAS  /tmp/cc1AzyH1.s 			page 44
+
+
+ 1282 07f6 1B68     		ldr	r3, [r3]
+ 1283 07f8 1B68     		ldr	r3, [r3]
+ 1284 07fa 0922     		movs	r2, #9
+ 1285 07fc DA62     		str	r2, [r3, #44]
+ 1286 07fe BB6E     		ldr	r3, [r7, #104]
+ 1287 0800 1B68     		ldr	r3, [r3]
+ 1288 0802 0922     		movs	r2, #9
+ 1289 0804 DA60     		str	r2, [r3, #12]
+ 1290 0806 BB6E     		ldr	r3, [r7, #104]
+ 1291 0808 BB63     		str	r3, [r7, #56]
+ 1292 080a 0123     		movs	r3, #1
+ 1293 080c 87F83730 		strb	r3, [r7, #55]
+ 1294              	.LBB137:
+ 1295              	.LBB138:
+ 947:Core/Src/ow.c **** }
+ 1296              		.loc 1 947 62
+ 1297 0810 97F83730 		ldrb	r3, [r7, #55]	@ zero_extendqisi2
+ 1298 0814 002B     		cmp	r3, #0
+ 1299 0816 02D0     		beq	.L83
+ 947:Core/Src/ow.c **** }
+ 1300              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 1301 0818 BB6B     		ldr	r3, [r7, #56]
+ 1302 081a DB68     		ldr	r3, [r3, #12]
+ 1303 081c 01E0     		b	.L84
+ 1304              	.L83:
+ 947:Core/Src/ow.c **** }
+ 1305              		.loc 1 947 62 discriminator 2
+ 1306 081e BB6B     		ldr	r3, [r7, #56]
+ 1307 0820 1B69     		ldr	r3, [r3, #16]
+ 1308              	.L84:
+ 947:Core/Src/ow.c **** }
+ 1309              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1310 0822 BA6B     		ldr	r2, [r7, #56]
+ 1311 0824 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1312              		.loc 1 947 29 discriminator 4
+ 1313 0826 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1314              		.loc 1 948 1
+ 1315 0828 00BF     		nop
+ 1316              	.LBE138:
+ 1317              	.LBE137:
+ 789:Core/Src/ow.c ****     break;
+ 1318              		.loc 1 789 16
+ 1319 082a BB6E     		ldr	r3, [r7, #104]
+ 1320 082c 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 789:Core/Src/ow.c ****     break;
+ 1321              		.loc 1 789 23
+ 1322 0830 0133     		adds	r3, r3, #1
+ 1323 0832 DAB2     		uxtb	r2, r3
+ 1324 0834 BB6E     		ldr	r3, [r7, #104]
+ 1325 0836 83F84220 		strb	r2, [r3, #66]
+ 790:Core/Src/ow.c **** 
+ 1326              		.loc 1 790 5
+ 1327 083a F3E1     		b	.L65
+ 1328              	.L55:
+ 794:Core/Src/ow.c ****     if (ow_read_bit(handle))
+ARM GAS  /tmp/cc1AzyH1.s 			page 45
+
+
+ 1329              		.loc 1 794 5
+ 1330 083c BB6E     		ldr	r3, [r7, #104]
+ 1331 083e 1B68     		ldr	r3, [r3]
+ 1332 0840 1B68     		ldr	r3, [r3]
+ 1333 0842 3B22     		movs	r2, #59
+ 1334 0844 DA62     		str	r2, [r3, #44]
+ 1335 0846 BB6E     		ldr	r3, [r7, #104]
+ 1336 0848 1B68     		ldr	r3, [r3]
+ 1337 084a 3B22     		movs	r2, #59
+ 1338 084c DA60     		str	r2, [r3, #12]
+ 1339 084e BB6E     		ldr	r3, [r7, #104]
+ 1340 0850 3B63     		str	r3, [r7, #48]
+ 1341              	.LBB139:
+ 1342              	.LBB140:
+ 1343              		.loc 1 961 26
+ 1344 0852 3B6B     		ldr	r3, [r7, #48]
+ 1345 0854 9B68     		ldr	r3, [r3, #8]
+ 1346              		.loc 1 961 31
+ 1347 0856 1A69     		ldr	r2, [r3, #16]
+ 1348              		.loc 1 961 53
+ 1349 0858 3B6B     		ldr	r3, [r7, #48]
+ 1350 085a 5B69     		ldr	r3, [r3, #20]
+ 1351              		.loc 1 961 37
+ 1352 085c 1340     		ands	r3, r3, r2
+ 1353              		.loc 1 961 68
+ 1354 085e 002B     		cmp	r3, #0
+ 1355 0860 14BF     		ite	ne
+ 1356 0862 0123     		movne	r3, #1
+ 1357 0864 0023     		moveq	r3, #0
+ 1358 0866 DBB2     		uxtb	r3, r3
+ 1359              	.LBE140:
+ 1360              	.LBE139:
+ 795:Core/Src/ow.c ****     {
+ 1361              		.loc 1 795 8 discriminator 1
+ 1362 0868 002B     		cmp	r3, #0
+ 1363 086a 04D0     		beq	.L86
+ 797:Core/Src/ow.c ****     }
+ 1364              		.loc 1 797 26
+ 1365 086c BB6E     		ldr	r3, [r7, #104]
+ 1366 086e 1022     		movs	r2, #16
+ 1367 0870 83F86E20 		strb	r2, [r3, #110]
+ 1368 0874 03E0     		b	.L87
+ 1369              	.L86:
+ 801:Core/Src/ow.c ****     }
+ 1370              		.loc 1 801 26
+ 1371 0876 BB6E     		ldr	r3, [r7, #104]
+ 1372 0878 0022     		movs	r2, #0
+ 1373 087a 83F86E20 		strb	r2, [r3, #110]
+ 1374              	.L87:
+ 803:Core/Src/ow.c ****     break;
+ 1375              		.loc 1 803 16
+ 1376 087e BB6E     		ldr	r3, [r7, #104]
+ 1377 0880 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 803:Core/Src/ow.c ****     break;
+ 1378              		.loc 1 803 23
+ 1379 0884 0133     		adds	r3, r3, #1
+ 1380 0886 DAB2     		uxtb	r2, r3
+ARM GAS  /tmp/cc1AzyH1.s 			page 46
+
+
+ 1381 0888 BB6E     		ldr	r3, [r7, #104]
+ 1382 088a 83F84220 		strb	r2, [r3, #66]
+ 804:Core/Src/ow.c **** 
+ 1383              		.loc 1 804 5
+ 1384 088e C9E1     		b	.L65
+ 1385              	.L54:
+ 808:Core/Src/ow.c ****     ow_write_bit(handle, false);
+ 1386              		.loc 1 808 5
+ 1387 0890 BB6E     		ldr	r3, [r7, #104]
+ 1388 0892 1B68     		ldr	r3, [r3]
+ 1389 0894 1B68     		ldr	r3, [r3]
+ 1390 0896 0922     		movs	r2, #9
+ 1391 0898 DA62     		str	r2, [r3, #44]
+ 1392 089a BB6E     		ldr	r3, [r7, #104]
+ 1393 089c 1B68     		ldr	r3, [r3]
+ 1394 089e 0922     		movs	r2, #9
+ 1395 08a0 DA60     		str	r2, [r3, #12]
+ 1396 08a2 BB6E     		ldr	r3, [r7, #104]
+ 1397 08a4 FB62     		str	r3, [r7, #44]
+ 1398 08a6 0023     		movs	r3, #0
+ 1399 08a8 87F82B30 		strb	r3, [r7, #43]
+ 1400              	.LBB141:
+ 1401              	.LBB142:
+ 947:Core/Src/ow.c **** }
+ 1402              		.loc 1 947 62
+ 1403 08ac 97F82B30 		ldrb	r3, [r7, #43]	@ zero_extendqisi2
+ 1404 08b0 002B     		cmp	r3, #0
+ 1405 08b2 02D0     		beq	.L88
+ 947:Core/Src/ow.c **** }
+ 1406              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 1407 08b4 FB6A     		ldr	r3, [r7, #44]
+ 1408 08b6 DB68     		ldr	r3, [r3, #12]
+ 1409 08b8 01E0     		b	.L89
+ 1410              	.L88:
+ 947:Core/Src/ow.c **** }
+ 1411              		.loc 1 947 62 discriminator 2
+ 1412 08ba FB6A     		ldr	r3, [r7, #44]
+ 1413 08bc 1B69     		ldr	r3, [r3, #16]
+ 1414              	.L89:
+ 947:Core/Src/ow.c **** }
+ 1415              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1416 08be FA6A     		ldr	r2, [r7, #44]
+ 1417 08c0 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1418              		.loc 1 947 29 discriminator 4
+ 1419 08c2 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1420              		.loc 1 948 1
+ 1421 08c4 00BF     		nop
+ 1422              	.LBE142:
+ 1423              	.LBE141:
+ 810:Core/Src/ow.c ****     break;
+ 1424              		.loc 1 810 16
+ 1425 08c6 BB6E     		ldr	r3, [r7, #104]
+ 1426 08c8 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 810:Core/Src/ow.c ****     break;
+ 1427              		.loc 1 810 23
+ARM GAS  /tmp/cc1AzyH1.s 			page 47
+
+
+ 1428 08cc 0133     		adds	r3, r3, #1
+ 1429 08ce DAB2     		uxtb	r2, r3
+ 1430 08d0 BB6E     		ldr	r3, [r7, #104]
+ 1431 08d2 83F84220 		strb	r2, [r3, #66]
+ 811:Core/Src/ow.c **** 
+ 1432              		.loc 1 811 5
+ 1433 08d6 A5E1     		b	.L65
+ 1434              	.L53:
+ 815:Core/Src/ow.c ****     ow_write_bit(handle, true);
+ 1435              		.loc 1 815 5
+ 1436 08d8 BB6E     		ldr	r3, [r7, #104]
+ 1437 08da 1B68     		ldr	r3, [r3]
+ 1438 08dc 1B68     		ldr	r3, [r3]
+ 1439 08de 0922     		movs	r2, #9
+ 1440 08e0 DA62     		str	r2, [r3, #44]
+ 1441 08e2 BB6E     		ldr	r3, [r7, #104]
+ 1442 08e4 1B68     		ldr	r3, [r3]
+ 1443 08e6 0922     		movs	r2, #9
+ 1444 08e8 DA60     		str	r2, [r3, #12]
+ 1445 08ea BB6E     		ldr	r3, [r7, #104]
+ 1446 08ec 7B62     		str	r3, [r7, #36]
+ 1447 08ee 0123     		movs	r3, #1
+ 1448 08f0 87F82330 		strb	r3, [r7, #35]
+ 1449              	.LBB143:
+ 1450              	.LBB144:
+ 947:Core/Src/ow.c **** }
+ 1451              		.loc 1 947 62
+ 1452 08f4 97F82330 		ldrb	r3, [r7, #35]	@ zero_extendqisi2
+ 1453 08f8 002B     		cmp	r3, #0
+ 1454 08fa 02D0     		beq	.L90
+ 947:Core/Src/ow.c **** }
+ 1455              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 1456 08fc 7B6A     		ldr	r3, [r7, #36]
+ 1457 08fe DB68     		ldr	r3, [r3, #12]
+ 1458 0900 01E0     		b	.L91
+ 1459              	.L90:
+ 947:Core/Src/ow.c **** }
+ 1460              		.loc 1 947 62 discriminator 2
+ 1461 0902 7B6A     		ldr	r3, [r7, #36]
+ 1462 0904 1B69     		ldr	r3, [r3, #16]
+ 1463              	.L91:
+ 947:Core/Src/ow.c **** }
+ 1464              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1465 0906 7A6A     		ldr	r2, [r7, #36]
+ 1466 0908 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1467              		.loc 1 947 29 discriminator 4
+ 1468 090a 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1469              		.loc 1 948 1
+ 1470 090c 00BF     		nop
+ 1471              	.LBE144:
+ 1472              	.LBE143:
+ 817:Core/Src/ow.c ****     break;
+ 1473              		.loc 1 817 16
+ 1474 090e BB6E     		ldr	r3, [r7, #104]
+ 1475 0910 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ARM GAS  /tmp/cc1AzyH1.s 			page 48
+
+
+ 817:Core/Src/ow.c ****     break;
+ 1476              		.loc 1 817 23
+ 1477 0914 0133     		adds	r3, r3, #1
+ 1478 0916 DAB2     		uxtb	r2, r3
+ 1479 0918 BB6E     		ldr	r3, [r7, #104]
+ 1480 091a 83F84220 		strb	r2, [r3, #66]
+ 818:Core/Src/ow.c **** 
+ 1481              		.loc 1 818 5
+ 1482 091e 81E1     		b	.L65
+ 1483              	.L52:
+ 822:Core/Src/ow.c ****     if (ow_read_bit(handle))
+ 1484              		.loc 1 822 5
+ 1485 0920 BB6E     		ldr	r3, [r7, #104]
+ 1486 0922 1B68     		ldr	r3, [r3]
+ 1487 0924 1B68     		ldr	r3, [r3]
+ 1488 0926 3B22     		movs	r2, #59
+ 1489 0928 DA62     		str	r2, [r3, #44]
+ 1490 092a BB6E     		ldr	r3, [r7, #104]
+ 1491 092c 1B68     		ldr	r3, [r3]
+ 1492 092e 3B22     		movs	r2, #59
+ 1493 0930 DA60     		str	r2, [r3, #12]
+ 1494 0932 BB6E     		ldr	r3, [r7, #104]
+ 1495 0934 FB61     		str	r3, [r7, #28]
+ 1496              	.LBB145:
+ 1497              	.LBB146:
+ 1498              		.loc 1 961 26
+ 1499 0936 FB69     		ldr	r3, [r7, #28]
+ 1500 0938 9B68     		ldr	r3, [r3, #8]
+ 1501              		.loc 1 961 31
+ 1502 093a 1A69     		ldr	r2, [r3, #16]
+ 1503              		.loc 1 961 53
+ 1504 093c FB69     		ldr	r3, [r7, #28]
+ 1505 093e 5B69     		ldr	r3, [r3, #20]
+ 1506              		.loc 1 961 37
+ 1507 0940 1340     		ands	r3, r3, r2
+ 1508              		.loc 1 961 68
+ 1509 0942 002B     		cmp	r3, #0
+ 1510 0944 14BF     		ite	ne
+ 1511 0946 0123     		movne	r3, #1
+ 1512 0948 0023     		moveq	r3, #0
+ 1513 094a DBB2     		uxtb	r3, r3
+ 1514              	.LBE146:
+ 1515              	.LBE145:
+ 823:Core/Src/ow.c ****     {
+ 1516              		.loc 1 823 8 discriminator 1
+ 1517 094c 002B     		cmp	r3, #0
+ 1518 094e 08D0     		beq	.L93
+ 825:Core/Src/ow.c ****     }
+ 1519              		.loc 1 825 21
+ 1520 0950 BB6E     		ldr	r3, [r7, #104]
+ 1521 0952 93F86E30 		ldrb	r3, [r3, #110]	@ zero_extendqisi2
+ 825:Core/Src/ow.c ****     }
+ 1522              		.loc 1 825 26
+ 1523 0956 43F00103 		orr	r3, r3, #1
+ 1524 095a DAB2     		uxtb	r2, r3
+ 1525 095c BB6E     		ldr	r3, [r7, #104]
+ 1526 095e 83F86E20 		strb	r2, [r3, #110]
+ARM GAS  /tmp/cc1AzyH1.s 			page 49
+
+
+ 1527              	.L93:
+ 827:Core/Src/ow.c **** 
+ 1528              		.loc 1 827 16
+ 1529 0962 BB6E     		ldr	r3, [r7, #104]
+ 1530 0964 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 827:Core/Src/ow.c **** 
+ 1531              		.loc 1 827 23
+ 1532 0968 0133     		adds	r3, r3, #1
+ 1533 096a DAB2     		uxtb	r2, r3
+ 1534 096c BB6E     		ldr	r3, [r7, #104]
+ 1535 096e 83F84220 		strb	r2, [r3, #66]
+ 831:Core/Src/ow.c ****     if (handle->search.val == OW_VAL_DIFF)
+ 1536              		.loc 1 831 37
+ 1537 0972 BB6E     		ldr	r3, [r7, #104]
+ 1538 0974 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 831:Core/Src/ow.c ****     if (handle->search.val == OW_VAL_DIFF)
+ 1539              		.loc 1 831 13
+ 1540 0978 0133     		adds	r3, r3, #1
+ 1541 097a FB76     		strb	r3, [r7, #27]
+ 832:Core/Src/ow.c ****     {
+ 1542              		.loc 1 832 23
+ 1543 097c BB6E     		ldr	r3, [r7, #104]
+ 1544 097e 93F86E30 		ldrb	r3, [r3, #110]	@ zero_extendqisi2
+ 832:Core/Src/ow.c ****     {
+ 1545              		.loc 1 832 8
+ 1546 0982 002B     		cmp	r3, #0
+ 1547 0984 37D1     		bne	.L94
+ 1548              	.LBB147:
+ 834:Core/Src/ow.c ****       if (bit_number < handle->search.last_discrepancy)
+ 1549              		.loc 1 834 15
+ 1550 0986 0023     		movs	r3, #0
+ 1551 0988 BB76     		strb	r3, [r7, #26]
+ 835:Core/Src/ow.c ****       {
+ 1552              		.loc 1 835 38
+ 1553 098a BB6E     		ldr	r3, [r7, #104]
+ 1554 098c 93F86F30 		ldrb	r3, [r3, #111]	@ zero_extendqisi2
+ 835:Core/Src/ow.c ****       {
+ 1555              		.loc 1 835 10
+ 1556 0990 FA7E     		ldrb	r2, [r7, #27]	@ zero_extendqisi2
+ 1557 0992 9A42     		cmp	r2, r3
+ 1558 0994 16D2     		bcs	.L95
+ 838:Core/Src/ow.c ****       }
+ 1559              		.loc 1 838 56
+ 1560 0996 BB6E     		ldr	r3, [r7, #104]
+ 1561 0998 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 838:Core/Src/ow.c ****       }
+ 1562              		.loc 1 838 65
+ 1563 099c DB08     		lsrs	r3, r3, #3
+ 1564 099e DBB2     		uxtb	r3, r3
+ 1565 09a0 1A46     		mov	r2, r3
+ 838:Core/Src/ow.c ****       }
+ 1566              		.loc 1 838 44
+ 1567 09a2 BB6E     		ldr	r3, [r7, #104]
+ 1568 09a4 1344     		add	r3, r3, r2
+ 1569 09a6 93F87230 		ldrb	r3, [r3, #114]	@ zero_extendqisi2
+ 1570 09aa 1A46     		mov	r2, r3
+ 838:Core/Src/ow.c ****       }
+ARM GAS  /tmp/cc1AzyH1.s 			page 50
+
+
+ 1571              		.loc 1 838 85
+ 1572 09ac BB6E     		ldr	r3, [r7, #104]
+ 1573 09ae 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 838:Core/Src/ow.c ****       }
+ 1574              		.loc 1 838 94
+ 1575 09b2 03F00703 		and	r3, r3, #7
+ 838:Core/Src/ow.c ****       }
+ 1576              		.loc 1 838 70
+ 1577 09b6 42FA03F3 		asr	r3, r2, r3
+ 838:Core/Src/ow.c ****       }
+ 1578              		.loc 1 838 100
+ 1579 09ba DBB2     		uxtb	r3, r3
+ 838:Core/Src/ow.c ****       }
+ 1580              		.loc 1 838 20
+ 1581 09bc 03F00103 		and	r3, r3, #1
+ 1582 09c0 BB76     		strb	r3, [r7, #26]
+ 1583 09c2 0EE0     		b	.L96
+ 1584              	.L95:
+ 840:Core/Src/ow.c ****       {
+ 1585              		.loc 1 840 44
+ 1586 09c4 BB6E     		ldr	r3, [r7, #104]
+ 1587 09c6 93F86F30 		ldrb	r3, [r3, #111]	@ zero_extendqisi2
+ 840:Core/Src/ow.c ****       {
+ 1588              		.loc 1 840 15
+ 1589 09ca FA7E     		ldrb	r2, [r7, #27]	@ zero_extendqisi2
+ 1590 09cc 9A42     		cmp	r2, r3
+ 1591 09ce 02D1     		bne	.L97
+ 843:Core/Src/ow.c ****       }
+ 1592              		.loc 1 843 20
+ 1593 09d0 0123     		movs	r3, #1
+ 1594 09d2 BB76     		strb	r3, [r7, #26]
+ 1595 09d4 05E0     		b	.L96
+ 1596              	.L97:
+ 848:Core/Src/ow.c ****         handle->search.last_zero = bit_number;
+ 1597              		.loc 1 848 20
+ 1598 09d6 0023     		movs	r3, #0
+ 1599 09d8 BB76     		strb	r3, [r7, #26]
+ 849:Core/Src/ow.c ****       }
+ 1600              		.loc 1 849 34
+ 1601 09da BB6E     		ldr	r3, [r7, #104]
+ 1602 09dc FA7E     		ldrb	r2, [r7, #27]
+ 1603 09de 83F87020 		strb	r2, [r3, #112]
+ 1604              	.L96:
+ 851:Core/Src/ow.c ****     }
+ 1605              		.loc 1 851 50
+ 1606 09e2 BB7E     		ldrb	r3, [r7, #26]	@ zero_extendqisi2
+ 1607 09e4 002B     		cmp	r3, #0
+ 1608 09e6 01D0     		beq	.L98
+ 851:Core/Src/ow.c ****     }
+ 1609              		.loc 1 851 50 is_stmt 0 discriminator 1
+ 1610 09e8 1022     		movs	r2, #16
+ 1611 09ea 00E0     		b	.L99
+ 1612              	.L98:
+ 851:Core/Src/ow.c ****     }
+ 1613              		.loc 1 851 50 discriminator 2
+ 1614 09ec 0122     		movs	r2, #1
+ 1615              	.L99:
+ARM GAS  /tmp/cc1AzyH1.s 			page 51
+
+
+ 851:Core/Src/ow.c ****     }
+ 1616              		.loc 1 851 26 is_stmt 1 discriminator 4
+ 1617 09ee BB6E     		ldr	r3, [r7, #104]
+ 1618 09f0 83F86E20 		strb	r2, [r3, #110]
+ 1619              	.LBE147:
+ 858:Core/Src/ow.c **** 
+ 1620              		.loc 1 858 5
+ 1621 09f4 15E1     		b	.L120
+ 1622              	.L94:
+ 853:Core/Src/ow.c ****     {
+ 1623              		.loc 1 853 28
+ 1624 09f6 BB6E     		ldr	r3, [r7, #104]
+ 1625 09f8 93F86E30 		ldrb	r3, [r3, #110]	@ zero_extendqisi2
+ 853:Core/Src/ow.c ****     {
+ 1626              		.loc 1 853 13
+ 1627 09fc 112B     		cmp	r3, #17
+ 1628 09fe 40F01081 		bne	.L120
+ 855:Core/Src/ow.c ****       ow_stop(handle);
+ 1629              		.loc 1 855 21
+ 1630 0a02 BB6E     		ldr	r3, [r7, #104]
+ 1631 0a04 0522     		movs	r2, #5
+ 1632 0a06 83F84B20 		strb	r2, [r3, #75]
+ 856:Core/Src/ow.c ****     }
+ 1633              		.loc 1 856 7
+ 1634 0a0a B86E     		ldr	r0, [r7, #104]
+ 1635 0a0c FFF7FEFF 		bl	ow_stop
+ 858:Core/Src/ow.c **** 
+ 1636              		.loc 1 858 5
+ 1637 0a10 07E1     		b	.L120
+ 1638              	.L51:
+ 862:Core/Src/ow.c ****     {
+ 1639              		.loc 1 862 23
+ 1640 0a12 BB6E     		ldr	r3, [r7, #104]
+ 1641 0a14 93F86E30 		ldrb	r3, [r3, #110]	@ zero_extendqisi2
+ 862:Core/Src/ow.c ****     {
+ 1642              		.loc 1 862 8
+ 1643 0a18 102B     		cmp	r3, #16
+ 1644 0a1a 25D1     		bne	.L101
+ 864:Core/Src/ow.c ****       handle->search.rom_id[handle->buf.bit_idx / 8] |= (1 << (handle->buf.bit_idx % 8));
+ 1645              		.loc 1 864 7
+ 1646 0a1c BB6E     		ldr	r3, [r7, #104]
+ 1647 0a1e 1B68     		ldr	r3, [r3]
+ 1648 0a20 1B68     		ldr	r3, [r3]
+ 1649 0a22 0922     		movs	r2, #9
+ 1650 0a24 DA62     		str	r2, [r3, #44]
+ 1651 0a26 BB6E     		ldr	r3, [r7, #104]
+ 1652 0a28 1B68     		ldr	r3, [r3]
+ 1653 0a2a 0922     		movs	r2, #9
+ 1654 0a2c DA60     		str	r2, [r3, #12]
+ 865:Core/Src/ow.c ****     }
+ 1655              		.loc 1 865 40
+ 1656 0a2e BB6E     		ldr	r3, [r7, #104]
+ 1657 0a30 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 865:Core/Src/ow.c ****     }
+ 1658              		.loc 1 865 28
+ 1659 0a34 DB08     		lsrs	r3, r3, #3
+ 1660 0a36 D8B2     		uxtb	r0, r3
+ARM GAS  /tmp/cc1AzyH1.s 			page 52
+
+
+ 1661 0a38 0246     		mov	r2, r0
+ 1662 0a3a BB6E     		ldr	r3, [r7, #104]
+ 1663 0a3c 1344     		add	r3, r3, r2
+ 1664 0a3e 93F87230 		ldrb	r3, [r3, #114]	@ zero_extendqisi2
+ 1665 0a42 5AB2     		sxtb	r2, r3
+ 865:Core/Src/ow.c ****     }
+ 1666              		.loc 1 865 75
+ 1667 0a44 BB6E     		ldr	r3, [r7, #104]
+ 1668 0a46 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 865:Core/Src/ow.c ****     }
+ 1669              		.loc 1 865 84
+ 1670 0a4a 03F00703 		and	r3, r3, #7
+ 865:Core/Src/ow.c ****     }
+ 1671              		.loc 1 865 60
+ 1672 0a4e 0121     		movs	r1, #1
+ 1673 0a50 01FA03F3 		lsl	r3, r1, r3
+ 865:Core/Src/ow.c ****     }
+ 1674              		.loc 1 865 54
+ 1675 0a54 5BB2     		sxtb	r3, r3
+ 1676 0a56 1343     		orrs	r3, r3, r2
+ 1677 0a58 5BB2     		sxtb	r3, r3
+ 865:Core/Src/ow.c ****     }
+ 1678              		.loc 1 865 28
+ 1679 0a5a 0146     		mov	r1, r0
+ 865:Core/Src/ow.c ****     }
+ 1680              		.loc 1 865 54
+ 1681 0a5c DAB2     		uxtb	r2, r3
+ 1682 0a5e BB6E     		ldr	r3, [r7, #104]
+ 1683 0a60 0B44     		add	r3, r3, r1
+ 1684 0a62 83F87220 		strb	r2, [r3, #114]
+ 1685 0a66 08E0     		b	.L102
+ 1686              	.L101:
+ 869:Core/Src/ow.c ****     }
+ 1687              		.loc 1 869 7
+ 1688 0a68 BB6E     		ldr	r3, [r7, #104]
+ 1689 0a6a 1B68     		ldr	r3, [r3]
+ 1690 0a6c 1B68     		ldr	r3, [r3]
+ 1691 0a6e 4522     		movs	r2, #69
+ 1692 0a70 DA62     		str	r2, [r3, #44]
+ 1693 0a72 BB6E     		ldr	r3, [r7, #104]
+ 1694 0a74 1B68     		ldr	r3, [r3]
+ 1695 0a76 4522     		movs	r2, #69
+ 1696 0a78 DA60     		str	r2, [r3, #12]
+ 1697              	.L102:
+ 1698 0a7a BB6E     		ldr	r3, [r7, #104]
+ 1699 0a7c 7B61     		str	r3, [r7, #20]
+ 1700 0a7e 0023     		movs	r3, #0
+ 1701 0a80 FB74     		strb	r3, [r7, #19]
+ 1702              	.LBB148:
+ 1703              	.LBB149:
+ 947:Core/Src/ow.c **** }
+ 1704              		.loc 1 947 62
+ 1705 0a82 FB7C     		ldrb	r3, [r7, #19]	@ zero_extendqisi2
+ 1706 0a84 002B     		cmp	r3, #0
+ 1707 0a86 02D0     		beq	.L103
+ 947:Core/Src/ow.c **** }
+ 1708              		.loc 1 947 62 is_stmt 0 discriminator 1
+ARM GAS  /tmp/cc1AzyH1.s 			page 53
+
+
+ 1709 0a88 7B69     		ldr	r3, [r7, #20]
+ 1710 0a8a DB68     		ldr	r3, [r3, #12]
+ 1711 0a8c 01E0     		b	.L104
+ 1712              	.L103:
+ 947:Core/Src/ow.c **** }
+ 1713              		.loc 1 947 62 discriminator 2
+ 1714 0a8e 7B69     		ldr	r3, [r7, #20]
+ 1715 0a90 1B69     		ldr	r3, [r3, #16]
+ 1716              	.L104:
+ 947:Core/Src/ow.c **** }
+ 1717              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1718 0a92 7A69     		ldr	r2, [r7, #20]
+ 1719 0a94 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1720              		.loc 1 947 29 discriminator 4
+ 1721 0a96 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1722              		.loc 1 948 1
+ 1723 0a98 00BF     		nop
+ 1724              	.LBE149:
+ 1725              	.LBE148:
+ 872:Core/Src/ow.c ****     break;
+ 1726              		.loc 1 872 16
+ 1727 0a9a BB6E     		ldr	r3, [r7, #104]
+ 1728 0a9c 93F84230 		ldrb	r3, [r3, #66]	@ zero_extendqisi2
+ 872:Core/Src/ow.c ****     break;
+ 1729              		.loc 1 872 23
+ 1730 0aa0 0133     		adds	r3, r3, #1
+ 1731 0aa2 DAB2     		uxtb	r2, r3
+ 1732 0aa4 BB6E     		ldr	r3, [r7, #104]
+ 1733 0aa6 83F84220 		strb	r2, [r3, #66]
+ 873:Core/Src/ow.c **** 
+ 1734              		.loc 1 873 5
+ 1735 0aaa BBE0     		b	.L65
+ 1736              	.L49:
+ 877:Core/Src/ow.c ****     {
+ 1737              		.loc 1 877 23
+ 1738 0aac BB6E     		ldr	r3, [r7, #104]
+ 1739 0aae 93F86E30 		ldrb	r3, [r3, #110]	@ zero_extendqisi2
+ 877:Core/Src/ow.c ****     {
+ 1740              		.loc 1 877 8
+ 1741 0ab2 102B     		cmp	r3, #16
+ 1742 0ab4 09D1     		bne	.L105
+ 879:Core/Src/ow.c ****     }
+ 1743              		.loc 1 879 7
+ 1744 0ab6 BB6E     		ldr	r3, [r7, #104]
+ 1745 0ab8 1B68     		ldr	r3, [r3]
+ 1746 0aba 1B68     		ldr	r3, [r3]
+ 1747 0abc 4522     		movs	r2, #69
+ 1748 0abe DA62     		str	r2, [r3, #44]
+ 1749 0ac0 BB6E     		ldr	r3, [r7, #104]
+ 1750 0ac2 1B68     		ldr	r3, [r3]
+ 1751 0ac4 4522     		movs	r2, #69
+ 1752 0ac6 DA60     		str	r2, [r3, #12]
+ 1753 0ac8 08E0     		b	.L106
+ 1754              	.L105:
+ 883:Core/Src/ow.c ****     }
+ARM GAS  /tmp/cc1AzyH1.s 			page 54
+
+
+ 1755              		.loc 1 883 7
+ 1756 0aca BB6E     		ldr	r3, [r7, #104]
+ 1757 0acc 1B68     		ldr	r3, [r3]
+ 1758 0ace 1B68     		ldr	r3, [r3]
+ 1759 0ad0 0922     		movs	r2, #9
+ 1760 0ad2 DA62     		str	r2, [r3, #44]
+ 1761 0ad4 BB6E     		ldr	r3, [r7, #104]
+ 1762 0ad6 1B68     		ldr	r3, [r3]
+ 1763 0ad8 0922     		movs	r2, #9
+ 1764 0ada DA60     		str	r2, [r3, #12]
+ 1765              	.L106:
+ 1766 0adc BB6E     		ldr	r3, [r7, #104]
+ 1767 0ade FB60     		str	r3, [r7, #12]
+ 1768 0ae0 0123     		movs	r3, #1
+ 1769 0ae2 FB72     		strb	r3, [r7, #11]
+ 1770              	.LBB150:
+ 1771              	.LBB151:
+ 947:Core/Src/ow.c **** }
+ 1772              		.loc 1 947 62
+ 1773 0ae4 FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 1774 0ae6 002B     		cmp	r3, #0
+ 1775 0ae8 02D0     		beq	.L107
+ 947:Core/Src/ow.c **** }
+ 1776              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 1777 0aea FB68     		ldr	r3, [r7, #12]
+ 1778 0aec DB68     		ldr	r3, [r3, #12]
+ 1779 0aee 01E0     		b	.L108
+ 1780              	.L107:
+ 947:Core/Src/ow.c **** }
+ 1781              		.loc 1 947 62 discriminator 2
+ 1782 0af0 FB68     		ldr	r3, [r7, #12]
+ 1783 0af2 1B69     		ldr	r3, [r3, #16]
+ 1784              	.L108:
+ 947:Core/Src/ow.c **** }
+ 1785              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 1786 0af4 FA68     		ldr	r2, [r7, #12]
+ 1787 0af6 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 1788              		.loc 1 947 29 discriminator 4
+ 1789 0af8 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 1790              		.loc 1 948 1
+ 1791 0afa 00BF     		nop
+ 1792              	.LBE151:
+ 1793              	.LBE150:
+ 886:Core/Src/ow.c ****     if (handle->buf.bit_idx == 64)
+ 1794              		.loc 1 886 16
+ 1795 0afc BB6E     		ldr	r3, [r7, #104]
+ 1796 0afe 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 886:Core/Src/ow.c ****     if (handle->buf.bit_idx == 64)
+ 1797              		.loc 1 886 24
+ 1798 0b02 0133     		adds	r3, r3, #1
+ 1799 0b04 DAB2     		uxtb	r2, r3
+ 1800 0b06 BB6E     		ldr	r3, [r7, #104]
+ 1801 0b08 83F84320 		strb	r2, [r3, #67]
+ 887:Core/Src/ow.c ****     {
+ 1802              		.loc 1 887 20
+ARM GAS  /tmp/cc1AzyH1.s 			page 55
+
+
+ 1803 0b0c BB6E     		ldr	r3, [r7, #104]
+ 1804 0b0e 93F84330 		ldrb	r3, [r3, #67]	@ zero_extendqisi2
+ 887:Core/Src/ow.c ****     {
+ 1805              		.loc 1 887 8
+ 1806 0b12 402B     		cmp	r3, #64
+ 1807 0b14 7ED1     		bne	.L109
+ 890:Core/Src/ow.c ****       handle->buf.bit_ph = 0;
+ 1808              		.loc 1 890 27
+ 1809 0b16 BB6E     		ldr	r3, [r7, #104]
+ 1810 0b18 0022     		movs	r2, #0
+ 1811 0b1a 83F84320 		strb	r2, [r3, #67]
+ 891:Core/Src/ow.c ****       if (ow_crc(handle->search.rom_id, 7) == handle->search.rom_id[7])
+ 1812              		.loc 1 891 26
+ 1813 0b1e BB6E     		ldr	r3, [r7, #104]
+ 1814 0b20 0022     		movs	r2, #0
+ 1815 0b22 83F84220 		strb	r2, [r3, #66]
+ 892:Core/Src/ow.c ****       {
+ 1816              		.loc 1 892 32
+ 1817 0b26 BB6E     		ldr	r3, [r7, #104]
+ 1818 0b28 7233     		adds	r3, r3, #114
+ 892:Core/Src/ow.c ****       {
+ 1819              		.loc 1 892 11
+ 1820 0b2a 0721     		movs	r1, #7
+ 1821 0b2c 1846     		mov	r0, r3
+ 1822 0b2e FFF7FEFF 		bl	ow_crc
+ 1823 0b32 0346     		mov	r3, r0
+ 1824 0b34 1A46     		mov	r2, r3
+ 892:Core/Src/ow.c ****       {
+ 1825              		.loc 1 892 68 discriminator 1
+ 1826 0b36 BB6E     		ldr	r3, [r7, #104]
+ 1827 0b38 93F87930 		ldrb	r3, [r3, #121]	@ zero_extendqisi2
+ 892:Core/Src/ow.c ****       {
+ 1828              		.loc 1 892 10 discriminator 1
+ 1829 0b3c 9A42     		cmp	r2, r3
+ 1830 0b3e 39D1     		bne	.L110
+ 895:Core/Src/ow.c ****         {
+ 1831              		.loc 1 895 19
+ 1832 0b40 BB6E     		ldr	r3, [r7, #104]
+ 1833 0b42 93F84C30 		ldrb	r3, [r3, #76]	@ zero_extendqisi2
+ 895:Core/Src/ow.c ****         {
+ 1834              		.loc 1 895 12
+ 1835 0b46 002B     		cmp	r3, #0
+ 1836 0b48 16D1     		bne	.L111
+ 897:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1837              		.loc 1 897 40
+ 1838 0b4a BB6E     		ldr	r3, [r7, #104]
+ 1839 0b4c 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ 897:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1840              		.loc 1 897 18
+ 1841 0b50 0933     		adds	r3, r3, #9
+ 1842 0b52 DB00     		lsls	r3, r3, #3
+ 1843 0b54 BA6E     		ldr	r2, [r7, #104]
+ 1844 0b56 1344     		add	r3, r3, r2
+ 1845 0b58 581D     		adds	r0, r3, #5
+ 897:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1846              		.loc 1 897 71
+ 1847 0b5a BB6E     		ldr	r3, [r7, #104]
+ARM GAS  /tmp/cc1AzyH1.s 			page 56
+
+
+ 1848 0b5c 7233     		adds	r3, r3, #114
+ 897:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1849              		.loc 1 897 11
+ 1850 0b5e 0822     		movs	r2, #8
+ 1851 0b60 1946     		mov	r1, r3
+ 1852 0b62 FFF7FEFF 		bl	memcpy
+ 898:Core/Src/ow.c ****         }
+ 1853              		.loc 1 898 17
+ 1854 0b66 BB6E     		ldr	r3, [r7, #104]
+ 1855 0b68 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ 898:Core/Src/ow.c ****         }
+ 1856              		.loc 1 898 31
+ 1857 0b6c 0133     		adds	r3, r3, #1
+ 1858 0b6e DAB2     		uxtb	r2, r3
+ 1859 0b70 BB6E     		ldr	r3, [r7, #104]
+ 1860 0b72 83F86D20 		strb	r2, [r3, #109]
+ 1861 0b76 1DE0     		b	.L110
+ 1862              	.L111:
+ 901:Core/Src/ow.c ****         {
+ 1863              		.loc 1 901 24
+ 1864 0b78 BB6E     		ldr	r3, [r7, #104]
+ 1865 0b7a 93F84C20 		ldrb	r2, [r3, #76]	@ zero_extendqisi2
+ 901:Core/Src/ow.c ****         {
+ 1866              		.loc 1 901 64
+ 1867 0b7e BB6E     		ldr	r3, [r7, #104]
+ 1868 0b80 93F87230 		ldrb	r3, [r3, #114]	@ zero_extendqisi2
+ 901:Core/Src/ow.c ****         {
+ 1869              		.loc 1 901 17
+ 1870 0b84 9A42     		cmp	r2, r3
+ 1871 0b86 15D1     		bne	.L110
+ 903:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1872              		.loc 1 903 40
+ 1873 0b88 BB6E     		ldr	r3, [r7, #104]
+ 1874 0b8a 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ 903:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1875              		.loc 1 903 18
+ 1876 0b8e 0933     		adds	r3, r3, #9
+ 1877 0b90 DB00     		lsls	r3, r3, #3
+ 1878 0b92 BA6E     		ldr	r2, [r7, #104]
+ 1879 0b94 1344     		add	r3, r3, r2
+ 1880 0b96 581D     		adds	r0, r3, #5
+ 903:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1881              		.loc 1 903 71
+ 1882 0b98 BB6E     		ldr	r3, [r7, #104]
+ 1883 0b9a 7233     		adds	r3, r3, #114
+ 903:Core/Src/ow.c ****           handle->rom_id_found++;
+ 1884              		.loc 1 903 11
+ 1885 0b9c 0822     		movs	r2, #8
+ 1886 0b9e 1946     		mov	r1, r3
+ 1887 0ba0 FFF7FEFF 		bl	memcpy
+ 904:Core/Src/ow.c ****         }
+ 1888              		.loc 1 904 17
+ 1889 0ba4 BB6E     		ldr	r3, [r7, #104]
+ 1890 0ba6 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ 904:Core/Src/ow.c ****         }
+ 1891              		.loc 1 904 31
+ 1892 0baa 0133     		adds	r3, r3, #1
+ARM GAS  /tmp/cc1AzyH1.s 			page 57
+
+
+ 1893 0bac DAB2     		uxtb	r2, r3
+ 1894 0bae BB6E     		ldr	r3, [r7, #104]
+ 1895 0bb0 83F86D20 		strb	r2, [r3, #109]
+ 1896              	.L110:
+ 907:Core/Src/ow.c **** 
+ 1897              		.loc 1 907 28
+ 1898 0bb4 BB6E     		ldr	r3, [r7, #104]
+ 1899 0bb6 7233     		adds	r3, r3, #114
+ 907:Core/Src/ow.c **** 
+ 1900              		.loc 1 907 7
+ 1901 0bb8 0822     		movs	r2, #8
+ 1902 0bba 0021     		movs	r1, #0
+ 1903 0bbc 1846     		mov	r0, r3
+ 1904 0bbe FFF7FEFF 		bl	memset
+ 910:Core/Src/ow.c ****       handle->search.last_zero = 0;
+ 1905              		.loc 1 910 55
+ 1906 0bc2 BB6E     		ldr	r3, [r7, #104]
+ 1907 0bc4 93F87020 		ldrb	r2, [r3, #112]	@ zero_extendqisi2
+ 910:Core/Src/ow.c ****       handle->search.last_zero = 0;
+ 1908              		.loc 1 910 39
+ 1909 0bc8 BB6E     		ldr	r3, [r7, #104]
+ 1910 0bca 83F86F20 		strb	r2, [r3, #111]
+ 911:Core/Src/ow.c ****       if (handle->search.last_discrepancy == 0 || handle->rom_id_found == OW_MAX_DEVICE)
+ 1911              		.loc 1 911 32
+ 1912 0bce BB6E     		ldr	r3, [r7, #104]
+ 1913 0bd0 0022     		movs	r2, #0
+ 1914 0bd2 83F87020 		strb	r2, [r3, #112]
+ 912:Core/Src/ow.c ****       {
+ 1915              		.loc 1 912 25
+ 1916 0bd6 BB6E     		ldr	r3, [r7, #104]
+ 1917 0bd8 93F86F30 		ldrb	r3, [r3, #111]	@ zero_extendqisi2
+ 912:Core/Src/ow.c ****       {
+ 1918              		.loc 1 912 10
+ 1919 0bdc 002B     		cmp	r3, #0
+ 1920 0bde 04D0     		beq	.L112
+ 912:Core/Src/ow.c ****       {
+ 1921              		.loc 1 912 57 discriminator 1
+ 1922 0be0 BB6E     		ldr	r3, [r7, #104]
+ 1923 0be2 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ 912:Core/Src/ow.c ****       {
+ 1924              		.loc 1 912 48 discriminator 1
+ 1925 0be6 042B     		cmp	r3, #4
+ 1926 0be8 08D1     		bne	.L113
+ 1927              	.L112:
+ 914:Core/Src/ow.c ****         handle->state = OW_STATE_DONE;
+ 1928              		.loc 1 914 41
+ 1929 0bea BB6E     		ldr	r3, [r7, #104]
+ 1930 0bec 0122     		movs	r2, #1
+ 1931 0bee 83F87120 		strb	r2, [r3, #113]
+ 915:Core/Src/ow.c ****       }
+ 1932              		.loc 1 915 23
+ 1933 0bf2 BB6E     		ldr	r3, [r7, #104]
+ 1934 0bf4 0322     		movs	r2, #3
+ 1935 0bf6 83F84A20 		strb	r2, [r3, #74]
+ 930:Core/Src/ow.c ****   default:
+ 1936              		.loc 1 930 5
+ 1937 0bfa 13E0     		b	.L65
+ARM GAS  /tmp/cc1AzyH1.s 			page 58
+
+
+ 1938              	.L113:
+ 920:Core/Src/ow.c ****         handle->buf.bit_idx = 0;
+ 1939              		.loc 1 920 29
+ 1940 0bfc BB6E     		ldr	r3, [r7, #104]
+ 1941 0bfe F022     		movs	r2, #240
+ 1942 0c00 1A76     		strb	r2, [r3, #24]
+ 921:Core/Src/ow.c ****         handle->buf.bit_ph = 0;
+ 1943              		.loc 1 921 29
+ 1944 0c02 BB6E     		ldr	r3, [r7, #104]
+ 1945 0c04 0022     		movs	r2, #0
+ 1946 0c06 83F84320 		strb	r2, [r3, #67]
+ 922:Core/Src/ow.c ****       }
+ 1947              		.loc 1 922 28
+ 1948 0c0a BB6E     		ldr	r3, [r7, #104]
+ 1949 0c0c 0022     		movs	r2, #0
+ 1950 0c0e 83F84220 		strb	r2, [r3, #66]
+ 930:Core/Src/ow.c ****   default:
+ 1951              		.loc 1 930 5
+ 1952 0c12 07E0     		b	.L65
+ 1953              	.L109:
+ 928:Core/Src/ow.c ****     }
+ 1954              		.loc 1 928 26
+ 1955 0c14 BB6E     		ldr	r3, [r7, #104]
+ 1956 0c16 0522     		movs	r2, #5
+ 1957 0c18 83F84220 		strb	r2, [r3, #66]
+ 930:Core/Src/ow.c ****   default:
+ 1958              		.loc 1 930 5
+ 1959 0c1c 02E0     		b	.L65
+ 1960              	.L119:
+ 932:Core/Src/ow.c ****   }
+ 1961              		.loc 1 932 5
+ 1962 0c1e 00BF     		nop
+ 1963 0c20 00E0     		b	.L65
+ 1964              	.L120:
+ 858:Core/Src/ow.c **** 
+ 1965              		.loc 1 858 5
+ 1966 0c22 00BF     		nop
+ 1967              	.L65:
+ 1968              	.LBE124:
+ 934:Core/Src/ow.c **** #endif
+ 1969              		.loc 1 934 1
+ 1970 0c24 00BF     		nop
+ 1971              	.LBE123:
+ 1972              	.LBE122:
+ 128:Core/Src/ow.c **** #endif
+ 1973              		.loc 1 128 7
+ 1974 0c26 03E0     		b	.L48
+ 1975              	.L116:
+ 133:Core/Src/ow.c ****       break;
+ 1976              		.loc 1 133 7
+ 1977 0c28 7868     		ldr	r0, [r7, #4]
+ 1978 0c2a FFF7FEFF 		bl	ow_stop
+ 134:Core/Src/ow.c ****   }
+ 1979              		.loc 1 134 7
+ 1980 0c2e 00BF     		nop
+ 1981              	.L48:
+ 136:Core/Src/ow.c **** 
+ARM GAS  /tmp/cc1AzyH1.s 			page 59
+
+
+ 1982              		.loc 1 136 1
+ 1983 0c30 00BF     		nop
+ 1984 0c32 A837     		adds	r7, r7, #168
+ 1985              	.LCFI8:
+ 1986              		.cfi_def_cfa_offset 8
+ 1987 0c34 BD46     		mov	sp, r7
+ 1988              	.LCFI9:
+ 1989              		.cfi_def_cfa_register 13
+ 1990              		@ sp needed
+ 1991 0c36 80BD     		pop	{r7, pc}
+ 1992              		.cfi_endproc
+ 1993              	.LFE221:
+ 1995              		.section	.text.ow_crc,"ax",%progbits
+ 1996              		.align	1
+ 1997              		.global	ow_crc
+ 1998              		.syntax unified
+ 1999              		.thumb
+ 2000              		.thumb_func
+ 2002              	ow_crc:
+ 2003              	.LFB222:
+ 146:Core/Src/ow.c ****   uint8_t crc = 0;
+ 2004              		.loc 1 146 1
+ 2005              		.cfi_startproc
+ 2006              		@ args = 0, pretend = 0, frame = 16
+ 2007              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2008              		@ link register save eliminated.
+ 2009 0000 80B4     		push	{r7}
+ 2010              	.LCFI10:
+ 2011              		.cfi_def_cfa_offset 4
+ 2012              		.cfi_offset 7, -4
+ 2013 0002 85B0     		sub	sp, sp, #20
+ 2014              	.LCFI11:
+ 2015              		.cfi_def_cfa_offset 24
+ 2016 0004 00AF     		add	r7, sp, #0
+ 2017              	.LCFI12:
+ 2018              		.cfi_def_cfa_register 7
+ 2019 0006 7860     		str	r0, [r7, #4]
+ 2020 0008 0B46     		mov	r3, r1
+ 2021 000a 7B80     		strh	r3, [r7, #2]	@ movhi
+ 147:Core/Src/ow.c ****   assert_param(data != NULL);
+ 2022              		.loc 1 147 11
+ 2023 000c 0023     		movs	r3, #0
+ 2024 000e FB73     		strb	r3, [r7, #15]
+ 151:Core/Src/ow.c ****   {
+ 2025              		.loc 1 151 9
+ 2026 0010 22E0     		b	.L122
+ 2027              	.L126:
+ 2028              	.LBB152:
+ 153:Core/Src/ow.c ****     for (uint8_t i = 8; i > 0; i--)
+ 2029              		.loc 1 153 27
+ 2030 0012 7B68     		ldr	r3, [r7, #4]
+ 2031 0014 5A1C     		adds	r2, r3, #1
+ 2032 0016 7A60     		str	r2, [r7, #4]
+ 153:Core/Src/ow.c ****     for (uint8_t i = 8; i > 0; i--)
+ 2033              		.loc 1 153 13
+ 2034 0018 1B78     		ldrb	r3, [r3]
+ 2035 001a BB73     		strb	r3, [r7, #14]
+ARM GAS  /tmp/cc1AzyH1.s 			page 60
+
+
+ 2036              	.LBB153:
+ 154:Core/Src/ow.c ****     {
+ 2037              		.loc 1 154 18
+ 2038 001c 0823     		movs	r3, #8
+ 2039 001e 7B73     		strb	r3, [r7, #13]
+ 154:Core/Src/ow.c ****     {
+ 2040              		.loc 1 154 5
+ 2041 0020 17E0     		b	.L123
+ 2042              	.L125:
+ 2043              	.LBB154:
+ 157:Core/Src/ow.c ****       crc >>= 1;
+ 2044              		.loc 1 157 21
+ 2045 0022 FA7B     		ldrb	r2, [r7, #15]
+ 2046 0024 BB7B     		ldrb	r3, [r7, #14]
+ 2047 0026 5340     		eors	r3, r3, r2
+ 2048 0028 DBB2     		uxtb	r3, r3
+ 157:Core/Src/ow.c ****       crc >>= 1;
+ 2049              		.loc 1 157 15
+ 2050 002a 03F00103 		and	r3, r3, #1
+ 2051 002e 3B73     		strb	r3, [r7, #12]
+ 158:Core/Src/ow.c ****       if (mix)
+ 2052              		.loc 1 158 11
+ 2053 0030 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 2054 0032 5B08     		lsrs	r3, r3, #1
+ 2055 0034 FB73     		strb	r3, [r7, #15]
+ 159:Core/Src/ow.c ****       {
+ 2056              		.loc 1 159 10
+ 2057 0036 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
+ 2058 0038 002B     		cmp	r3, #0
+ 2059 003a 04D0     		beq	.L124
+ 161:Core/Src/ow.c ****       }
+ 2060              		.loc 1 161 13
+ 2061 003c FB7B     		ldrb	r3, [r7, #15]
+ 2062 003e 83F07303 		eor	r3, r3, #115
+ 2063 0042 DB43     		mvns	r3, r3
+ 2064 0044 FB73     		strb	r3, [r7, #15]
+ 2065              	.L124:
+ 163:Core/Src/ow.c ****     }
+ 2066              		.loc 1 163 14
+ 2067 0046 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 2068 0048 5B08     		lsrs	r3, r3, #1
+ 2069 004a BB73     		strb	r3, [r7, #14]
+ 2070              	.LBE154:
+ 154:Core/Src/ow.c ****     {
+ 2071              		.loc 1 154 33 discriminator 2
+ 2072 004c 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 2073 004e 013B     		subs	r3, r3, #1
+ 2074 0050 7B73     		strb	r3, [r7, #13]
+ 2075              	.L123:
+ 154:Core/Src/ow.c ****     {
+ 2076              		.loc 1 154 27 discriminator 1
+ 2077 0052 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 2078 0054 002B     		cmp	r3, #0
+ 2079 0056 E4D1     		bne	.L125
+ 2080              	.L122:
+ 2081              	.LBE153:
+ 2082              	.LBE152:
+ARM GAS  /tmp/cc1AzyH1.s 			page 61
+
+
+ 151:Core/Src/ow.c ****   {
+ 2083              		.loc 1 151 13
+ 2084 0058 7B88     		ldrh	r3, [r7, #2]
+ 2085 005a 5A1E     		subs	r2, r3, #1
+ 2086 005c 7A80     		strh	r2, [r7, #2]	@ movhi
+ 151:Core/Src/ow.c ****   {
+ 2087              		.loc 1 151 10
+ 2088 005e 002B     		cmp	r3, #0
+ 2089 0060 D7D1     		bne	.L126
+ 166:Core/Src/ow.c **** }
+ 2090              		.loc 1 166 10
+ 2091 0062 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 167:Core/Src/ow.c **** 
+ 2092              		.loc 1 167 1
+ 2093 0064 1846     		mov	r0, r3
+ 2094 0066 1437     		adds	r7, r7, #20
+ 2095              	.LCFI13:
+ 2096              		.cfi_def_cfa_offset 4
+ 2097 0068 BD46     		mov	sp, r7
+ 2098              	.LCFI14:
+ 2099              		.cfi_def_cfa_register 13
+ 2100              		@ sp needed
+ 2101 006a 80BC     		pop	{r7}
+ 2102              	.LCFI15:
+ 2103              		.cfi_restore 7
+ 2104              		.cfi_def_cfa_offset 0
+ 2105 006c 7047     		bx	lr
+ 2106              		.cfi_endproc
+ 2107              	.LFE222:
+ 2109              		.section	.text.ow_is_busy,"ax",%progbits
+ 2110              		.align	1
+ 2111              		.global	ow_is_busy
+ 2112              		.syntax unified
+ 2113              		.thumb
+ 2114              		.thumb_func
+ 2116              	ow_is_busy:
+ 2117              	.LFB223:
+ 176:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2118              		.loc 1 176 1
+ 2119              		.cfi_startproc
+ 2120              		@ args = 0, pretend = 0, frame = 8
+ 2121              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2122              		@ link register save eliminated.
+ 2123 0000 80B4     		push	{r7}
+ 2124              	.LCFI16:
+ 2125              		.cfi_def_cfa_offset 4
+ 2126              		.cfi_offset 7, -4
+ 2127 0002 83B0     		sub	sp, sp, #12
+ 2128              	.LCFI17:
+ 2129              		.cfi_def_cfa_offset 16
+ 2130 0004 00AF     		add	r7, sp, #0
+ 2131              	.LCFI18:
+ 2132              		.cfi_def_cfa_register 7
+ 2133 0006 7860     		str	r0, [r7, #4]
+ 178:Core/Src/ow.c **** }
+ 2134              		.loc 1 178 17
+ 2135 0008 7B68     		ldr	r3, [r7, #4]
+ARM GAS  /tmp/cc1AzyH1.s 			page 62
+
+
+ 2136 000a 93F84A30 		ldrb	r3, [r3, #74]	@ zero_extendqisi2
+ 178:Core/Src/ow.c **** }
+ 2137              		.loc 1 178 50
+ 2138 000e 002B     		cmp	r3, #0
+ 2139 0010 14BF     		ite	ne
+ 2140 0012 0123     		movne	r3, #1
+ 2141 0014 0023     		moveq	r3, #0
+ 2142 0016 DBB2     		uxtb	r3, r3
+ 179:Core/Src/ow.c **** 
+ 2143              		.loc 1 179 1
+ 2144 0018 1846     		mov	r0, r3
+ 2145 001a 0C37     		adds	r7, r7, #12
+ 2146              	.LCFI19:
+ 2147              		.cfi_def_cfa_offset 4
+ 2148 001c BD46     		mov	sp, r7
+ 2149              	.LCFI20:
+ 2150              		.cfi_def_cfa_register 13
+ 2151              		@ sp needed
+ 2152 001e 80BC     		pop	{r7}
+ 2153              	.LCFI21:
+ 2154              		.cfi_restore 7
+ 2155              		.cfi_def_cfa_offset 0
+ 2156 0020 7047     		bx	lr
+ 2157              		.cfi_endproc
+ 2158              	.LFE223:
+ 2160              		.section	.text.ow_last_error,"ax",%progbits
+ 2161              		.align	1
+ 2162              		.global	ow_last_error
+ 2163              		.syntax unified
+ 2164              		.thumb
+ 2165              		.thumb_func
+ 2167              	ow_last_error:
+ 2168              	.LFB224:
+ 188:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2169              		.loc 1 188 1
+ 2170              		.cfi_startproc
+ 2171              		@ args = 0, pretend = 0, frame = 8
+ 2172              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2173              		@ link register save eliminated.
+ 2174 0000 80B4     		push	{r7}
+ 2175              	.LCFI22:
+ 2176              		.cfi_def_cfa_offset 4
+ 2177              		.cfi_offset 7, -4
+ 2178 0002 83B0     		sub	sp, sp, #12
+ 2179              	.LCFI23:
+ 2180              		.cfi_def_cfa_offset 16
+ 2181 0004 00AF     		add	r7, sp, #0
+ 2182              	.LCFI24:
+ 2183              		.cfi_def_cfa_register 7
+ 2184 0006 7860     		str	r0, [r7, #4]
+ 190:Core/Src/ow.c **** }
+ 2185              		.loc 1 190 16
+ 2186 0008 7B68     		ldr	r3, [r7, #4]
+ 2187 000a 93F84B30 		ldrb	r3, [r3, #75]	@ zero_extendqisi2
+ 191:Core/Src/ow.c **** 
+ 2188              		.loc 1 191 1
+ 2189 000e 1846     		mov	r0, r3
+ARM GAS  /tmp/cc1AzyH1.s 			page 63
+
+
+ 2190 0010 0C37     		adds	r7, r7, #12
+ 2191              	.LCFI25:
+ 2192              		.cfi_def_cfa_offset 4
+ 2193 0012 BD46     		mov	sp, r7
+ 2194              	.LCFI26:
+ 2195              		.cfi_def_cfa_register 13
+ 2196              		@ sp needed
+ 2197 0014 80BC     		pop	{r7}
+ 2198              	.LCFI27:
+ 2199              		.cfi_restore 7
+ 2200              		.cfi_def_cfa_offset 0
+ 2201 0016 7047     		bx	lr
+ 2202              		.cfi_endproc
+ 2203              	.LFE224:
+ 2205              		.section	.text.ow_update_rom_id,"ax",%progbits
+ 2206              		.align	1
+ 2207              		.global	ow_update_rom_id
+ 2208              		.syntax unified
+ 2209              		.thumb
+ 2210              		.thumb_func
+ 2212              	ow_update_rom_id:
+ 2213              	.LFB225:
+ 237:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2214              		.loc 1 237 1
+ 2215              		.cfi_startproc
+ 2216              		@ args = 0, pretend = 0, frame = 8
+ 2217              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2218 0000 80B5     		push	{r7, lr}
+ 2219              	.LCFI28:
+ 2220              		.cfi_def_cfa_offset 8
+ 2221              		.cfi_offset 7, -8
+ 2222              		.cfi_offset 14, -4
+ 2223 0002 82B0     		sub	sp, sp, #8
+ 2224              	.LCFI29:
+ 2225              		.cfi_def_cfa_offset 16
+ 2226 0004 00AF     		add	r7, sp, #0
+ 2227              	.LCFI30:
+ 2228              		.cfi_def_cfa_register 7
+ 2229 0006 7860     		str	r0, [r7, #4]
+ 243:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 2230              		.loc 1 243 21
+ 2231 0008 7868     		ldr	r0, [r7, #4]
+ 2232 000a FFF7FEFF 		bl	ow_start
+ 2233 000e 0346     		mov	r3, r0
+ 2234 0010 1A46     		mov	r2, r3
+ 243:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 2235              		.loc 1 243 19 discriminator 1
+ 2236 0012 7B68     		ldr	r3, [r7, #4]
+ 2237 0014 83F84B20 		strb	r2, [r3, #75]
+ 244:Core/Src/ow.c ****     {
+ 2238              		.loc 1 244 15
+ 2239 0018 7B68     		ldr	r3, [r7, #4]
+ 2240 001a 93F84B30 		ldrb	r3, [r3, #75]	@ zero_extendqisi2
+ 244:Core/Src/ow.c ****     {
+ 2241              		.loc 1 244 8
+ 2242 001e 002B     		cmp	r3, #0
+ 2243 0020 03D0     		beq	.L133
+ARM GAS  /tmp/cc1AzyH1.s 			page 64
+
+
+ 247:Core/Src/ow.c ****       break;
+ 2244              		.loc 1 247 7
+ 2245 0022 7868     		ldr	r0, [r7, #4]
+ 2246 0024 FFF7FEFF 		bl	ow_stop
+ 248:Core/Src/ow.c ****     }
+ 2247              		.loc 1 248 7
+ 2248 0028 18E0     		b	.L134
+ 2249              	.L133:
+ 252:Core/Src/ow.c ****     handle->buf.data[0] = OW_CMD_SEARCH_ROM;
+ 2250              		.loc 1 252 19
+ 2251 002a 7B68     		ldr	r3, [r7, #4]
+ 2252 002c 0222     		movs	r2, #2
+ 2253 002e 83F84A20 		strb	r2, [r3, #74]
+ 253:Core/Src/ow.c ****     handle->rom_id_found = 0;
+ 2254              		.loc 1 253 25
+ 2255 0032 7B68     		ldr	r3, [r7, #4]
+ 2256 0034 F022     		movs	r2, #240
+ 2257 0036 1A76     		strb	r2, [r3, #24]
+ 254:Core/Src/ow.c **** 
+ 2258              		.loc 1 254 26
+ 2259 0038 7B68     		ldr	r3, [r7, #4]
+ 2260 003a 0022     		movs	r2, #0
+ 2261 003c 83F86D20 		strb	r2, [r3, #109]
+ 257:Core/Src/ow.c ****     memset(handle->rom_id, 0, sizeof(handle->rom_id));
+ 2262              		.loc 1 257 12
+ 2263 0040 7B68     		ldr	r3, [r7, #4]
+ 2264 0042 6E33     		adds	r3, r3, #110
+ 257:Core/Src/ow.c ****     memset(handle->rom_id, 0, sizeof(handle->rom_id));
+ 2265              		.loc 1 257 5
+ 2266 0044 0C22     		movs	r2, #12
+ 2267 0046 0021     		movs	r1, #0
+ 2268 0048 1846     		mov	r0, r3
+ 2269 004a FFF7FEFF 		bl	memset
+ 258:Core/Src/ow.c **** 
+ 2270              		.loc 1 258 18
+ 2271 004e 7B68     		ldr	r3, [r7, #4]
+ 2272 0050 4D33     		adds	r3, r3, #77
+ 258:Core/Src/ow.c **** 
+ 2273              		.loc 1 258 5
+ 2274 0052 2022     		movs	r2, #32
+ 2275 0054 0021     		movs	r1, #0
+ 2276 0056 1846     		mov	r0, r3
+ 2277 0058 FFF7FEFF 		bl	memset
+ 2278              	.L134:
+ 262:Core/Src/ow.c **** }
+ 2279              		.loc 1 262 16
+ 2280 005c 7B68     		ldr	r3, [r7, #4]
+ 2281 005e 93F84B30 		ldrb	r3, [r3, #75]	@ zero_extendqisi2
+ 263:Core/Src/ow.c **** #endif
+ 2282              		.loc 1 263 1
+ 2283 0062 1846     		mov	r0, r3
+ 2284 0064 0837     		adds	r7, r7, #8
+ 2285              	.LCFI31:
+ 2286              		.cfi_def_cfa_offset 8
+ 2287 0066 BD46     		mov	sp, r7
+ 2288              	.LCFI32:
+ 2289              		.cfi_def_cfa_register 13
+ARM GAS  /tmp/cc1AzyH1.s 			page 65
+
+
+ 2290              		@ sp needed
+ 2291 0068 80BD     		pop	{r7, pc}
+ 2292              		.cfi_endproc
+ 2293              	.LFE225:
+ 2295              		.section	.text.ow_xfer,"ax",%progbits
+ 2296              		.align	1
+ 2297              		.global	ow_xfer
+ 2298              		.syntax unified
+ 2299              		.thumb
+ 2300              		.thumb_func
+ 2302              	ow_xfer:
+ 2303              	.LFB226:
+ 277:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2304              		.loc 1 277 1
+ 2305              		.cfi_startproc
+ 2306              		@ args = 4, pretend = 0, frame = 24
+ 2307              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2308 0000 80B5     		push	{r7, lr}
+ 2309              	.LCFI33:
+ 2310              		.cfi_def_cfa_offset 8
+ 2311              		.cfi_offset 7, -8
+ 2312              		.cfi_offset 14, -4
+ 2313 0002 86B0     		sub	sp, sp, #24
+ 2314              	.LCFI34:
+ 2315              		.cfi_def_cfa_offset 32
+ 2316 0004 00AF     		add	r7, sp, #0
+ 2317              	.LCFI35:
+ 2318              		.cfi_def_cfa_register 7
+ 2319 0006 F860     		str	r0, [r7, #12]
+ 2320 0008 7A60     		str	r2, [r7, #4]
+ 2321 000a 1A46     		mov	r2, r3
+ 2322 000c 0B46     		mov	r3, r1
+ 2323 000e FB72     		strb	r3, [r7, #11]
+ 2324 0010 1346     		mov	r3, r2	@ movhi
+ 2325 0012 3B81     		strh	r3, [r7, #8]	@ movhi
+ 283:Core/Src/ow.c ****     {
+ 2326              		.loc 1 283 8
+ 2327 0014 7B68     		ldr	r3, [r7, #4]
+ 2328 0016 002B     		cmp	r3, #0
+ 2329 0018 0AD1     		bne	.L137
+ 283:Core/Src/ow.c ****     {
+ 2330              		.loc 1 283 26 discriminator 1
+ 2331 001a 3B89     		ldrh	r3, [r7, #8]
+ 2332 001c 002B     		cmp	r3, #0
+ 2333 001e 07D0     		beq	.L137
+ 285:Core/Src/ow.c ****       ow_stop(handle);
+ 2334              		.loc 1 285 21
+ 2335 0020 FB68     		ldr	r3, [r7, #12]
+ 2336 0022 0422     		movs	r2, #4
+ 2337 0024 83F84B20 		strb	r2, [r3, #75]
+ 286:Core/Src/ow.c ****       break;
+ 2338              		.loc 1 286 7
+ 2339 0028 F868     		ldr	r0, [r7, #12]
+ 2340 002a FFF7FEFF 		bl	ow_stop
+ 287:Core/Src/ow.c ****     }
+ 2341              		.loc 1 287 7
+ 2342 002e 4DE0     		b	.L138
+ARM GAS  /tmp/cc1AzyH1.s 			page 66
+
+
+ 2343              	.L137:
+ 291:Core/Src/ow.c ****     {
+ 2344              		.loc 1 291 15
+ 2345 0030 3A89     		ldrh	r2, [r7, #8]
+ 2346 0032 3B8C     		ldrh	r3, [r7, #32]
+ 2347 0034 1344     		add	r3, r3, r2
+ 291:Core/Src/ow.c ****     {
+ 2348              		.loc 1 291 8
+ 2349 0036 202B     		cmp	r3, #32
+ 2350 0038 07DD     		ble	.L139
+ 293:Core/Src/ow.c ****       ow_stop(handle);
+ 2351              		.loc 1 293 21
+ 2352 003a FB68     		ldr	r3, [r7, #12]
+ 2353 003c 0422     		movs	r2, #4
+ 2354 003e 83F84B20 		strb	r2, [r3, #75]
+ 294:Core/Src/ow.c ****       break;
+ 2355              		.loc 1 294 7
+ 2356 0042 F868     		ldr	r0, [r7, #12]
+ 2357 0044 FFF7FEFF 		bl	ow_stop
+ 295:Core/Src/ow.c ****     }
+ 2358              		.loc 1 295 7
+ 2359 0048 40E0     		b	.L138
+ 2360              	.L139:
+ 299:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 2361              		.loc 1 299 21
+ 2362 004a F868     		ldr	r0, [r7, #12]
+ 2363 004c FFF7FEFF 		bl	ow_start
+ 2364 0050 0346     		mov	r3, r0
+ 2365 0052 1A46     		mov	r2, r3
+ 299:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 2366              		.loc 1 299 19 discriminator 1
+ 2367 0054 FB68     		ldr	r3, [r7, #12]
+ 2368 0056 83F84B20 		strb	r2, [r3, #75]
+ 300:Core/Src/ow.c ****     {
+ 2369              		.loc 1 300 15
+ 2370 005a FB68     		ldr	r3, [r7, #12]
+ 2371 005c 93F84B30 		ldrb	r3, [r3, #75]	@ zero_extendqisi2
+ 300:Core/Src/ow.c ****     {
+ 2372              		.loc 1 300 8
+ 2373 0060 002B     		cmp	r3, #0
+ 2374 0062 03D0     		beq	.L140
+ 302:Core/Src/ow.c ****       break;
+ 2375              		.loc 1 302 7
+ 2376 0064 F868     		ldr	r0, [r7, #12]
+ 2377 0066 FFF7FEFF 		bl	ow_stop
+ 303:Core/Src/ow.c ****     }
+ 2378              		.loc 1 303 7
+ 2379 006a 2FE0     		b	.L138
+ 2380              	.L140:
+ 307:Core/Src/ow.c **** 
+ 2381              		.loc 1 307 19
+ 2382 006c FB68     		ldr	r3, [r7, #12]
+ 2383 006e 0122     		movs	r2, #1
+ 2384 0070 83F84A20 		strb	r2, [r3, #74]
+ 310:Core/Src/ow.c **** 
+ 2385              		.loc 1 310 25
+ 2386 0074 FB68     		ldr	r3, [r7, #12]
+ARM GAS  /tmp/cc1AzyH1.s 			page 67
+
+
+ 2387 0076 CC22     		movs	r2, #204
+ 2388 0078 1A76     		strb	r2, [r3, #24]
+ 313:Core/Src/ow.c **** 
+ 2389              		.loc 1 313 25
+ 2390 007a FB68     		ldr	r3, [r7, #12]
+ 2391 007c FA7A     		ldrb	r2, [r7, #11]
+ 2392 007e 5A76     		strb	r2, [r3, #25]
+ 316:Core/Src/ow.c ****     {
+ 2393              		.loc 1 316 8
+ 2394 0080 7B68     		ldr	r3, [r7, #4]
+ 2395 0082 002B     		cmp	r3, #0
+ 2396 0084 1AD0     		beq	.L141
+ 2397              	.LBB155:
+ 318:Core/Src/ow.c ****       {
+ 2398              		.loc 1 318 21
+ 2399 0086 0023     		movs	r3, #0
+ 2400 0088 FB82     		strh	r3, [r7, #22]	@ movhi
+ 318:Core/Src/ow.c ****       {
+ 2401              		.loc 1 318 7
+ 2402 008a 0CE0     		b	.L142
+ 2403              	.L143:
+ 320:Core/Src/ow.c ****       }
+ 2404              		.loc 1 320 43
+ 2405 008c FB8A     		ldrh	r3, [r7, #22]
+ 2406 008e 7A68     		ldr	r2, [r7, #4]
+ 2407 0090 1A44     		add	r2, r2, r3
+ 320:Core/Src/ow.c ****       }
+ 2408              		.loc 1 320 28
+ 2409 0092 FB8A     		ldrh	r3, [r7, #22]
+ 2410 0094 0233     		adds	r3, r3, #2
+ 320:Core/Src/ow.c ****       }
+ 2411              		.loc 1 320 43
+ 2412 0096 1178     		ldrb	r1, [r2]	@ zero_extendqisi2
+ 320:Core/Src/ow.c ****       }
+ 2413              		.loc 1 320 35
+ 2414 0098 FA68     		ldr	r2, [r7, #12]
+ 2415 009a 1344     		add	r3, r3, r2
+ 2416 009c 0A46     		mov	r2, r1
+ 2417 009e 1A76     		strb	r2, [r3, #24]
+ 318:Core/Src/ow.c ****       {
+ 2418              		.loc 1 318 46 discriminator 3
+ 2419 00a0 FB8A     		ldrh	r3, [r7, #22]
+ 2420 00a2 0133     		adds	r3, r3, #1
+ 2421 00a4 FB82     		strh	r3, [r7, #22]	@ movhi
+ 2422              	.L142:
+ 318:Core/Src/ow.c ****       {
+ 2423              		.loc 1 318 34 discriminator 1
+ 2424 00a6 FA8A     		ldrh	r2, [r7, #22]
+ 2425 00a8 3B89     		ldrh	r3, [r7, #8]
+ 2426 00aa 9A42     		cmp	r2, r3
+ 2427 00ac EED3     		bcc	.L143
+ 2428              	.LBE155:
+ 322:Core/Src/ow.c ****     }
+ 2429              		.loc 1 322 37
+ 2430 00ae 3B89     		ldrh	r3, [r7, #8]	@ movhi
+ 2431 00b0 0233     		adds	r3, r3, #2
+ 2432 00b2 9AB2     		uxth	r2, r3
+ARM GAS  /tmp/cc1AzyH1.s 			page 68
+
+
+ 322:Core/Src/ow.c ****     }
+ 2433              		.loc 1 322 29
+ 2434 00b4 FB68     		ldr	r3, [r7, #12]
+ 2435 00b6 A3F84620 		strh	r2, [r3, #70]	@ movhi
+ 2436 00ba 03E0     		b	.L144
+ 2437              	.L141:
+ 326:Core/Src/ow.c ****     }
+ 2438              		.loc 1 326 29
+ 2439 00bc FB68     		ldr	r3, [r7, #12]
+ 2440 00be 0222     		movs	r2, #2
+ 2441 00c0 A3F84620 		strh	r2, [r3, #70]	@ movhi
+ 2442              	.L144:
+ 330:Core/Src/ow.c **** 
+ 2443              		.loc 1 330 27
+ 2444 00c4 FB68     		ldr	r3, [r7, #12]
+ 2445 00c6 3A8C     		ldrh	r2, [r7, #32]	@ movhi
+ 2446 00c8 A3F84820 		strh	r2, [r3, #72]	@ movhi
+ 2447              	.L138:
+ 334:Core/Src/ow.c **** }
+ 2448              		.loc 1 334 16
+ 2449 00cc FB68     		ldr	r3, [r7, #12]
+ 2450 00ce 93F84B30 		ldrb	r3, [r3, #75]	@ zero_extendqisi2
+ 335:Core/Src/ow.c **** 
+ 2451              		.loc 1 335 1
+ 2452 00d2 1846     		mov	r0, r3
+ 2453 00d4 1837     		adds	r7, r7, #24
+ 2454              	.LCFI36:
+ 2455              		.cfi_def_cfa_offset 8
+ 2456 00d6 BD46     		mov	sp, r7
+ 2457              	.LCFI37:
+ 2458              		.cfi_def_cfa_register 13
+ 2459              		@ sp needed
+ 2460 00d8 80BD     		pop	{r7, pc}
+ 2461              		.cfi_endproc
+ 2462              	.LFE226:
+ 2464              		.section	.text.ow_xfer_by_id,"ax",%progbits
+ 2465              		.align	1
+ 2466              		.global	ow_xfer_by_id
+ 2467              		.syntax unified
+ 2468              		.thumb
+ 2469              		.thumb_func
+ 2471              	ow_xfer_by_id:
+ 2472              	.LFB227:
+ 350:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2473              		.loc 1 350 1
+ 2474              		.cfi_startproc
+ 2475              		@ args = 8, pretend = 0, frame = 24
+ 2476              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2477 0000 80B5     		push	{r7, lr}
+ 2478              	.LCFI38:
+ 2479              		.cfi_def_cfa_offset 8
+ 2480              		.cfi_offset 7, -8
+ 2481              		.cfi_offset 14, -4
+ 2482 0002 86B0     		sub	sp, sp, #24
+ 2483              	.LCFI39:
+ 2484              		.cfi_def_cfa_offset 32
+ 2485 0004 00AF     		add	r7, sp, #0
+ARM GAS  /tmp/cc1AzyH1.s 			page 69
+
+
+ 2486              	.LCFI40:
+ 2487              		.cfi_def_cfa_register 7
+ 2488 0006 F860     		str	r0, [r7, #12]
+ 2489 0008 7B60     		str	r3, [r7, #4]
+ 2490 000a 0B46     		mov	r3, r1
+ 2491 000c FB72     		strb	r3, [r7, #11]
+ 2492 000e 1346     		mov	r3, r2
+ 2493 0010 BB72     		strb	r3, [r7, #10]
+ 356:Core/Src/ow.c ****     {
+ 2494              		.loc 1 356 8
+ 2495 0012 7B68     		ldr	r3, [r7, #4]
+ 2496 0014 002B     		cmp	r3, #0
+ 2497 0016 0AD1     		bne	.L147
+ 356:Core/Src/ow.c ****     {
+ 2498              		.loc 1 356 26 discriminator 1
+ 2499 0018 3B8C     		ldrh	r3, [r7, #32]
+ 2500 001a 002B     		cmp	r3, #0
+ 2501 001c 07D0     		beq	.L147
+ 358:Core/Src/ow.c ****       ow_stop(handle);
+ 2502              		.loc 1 358 21
+ 2503 001e FB68     		ldr	r3, [r7, #12]
+ 2504 0020 0422     		movs	r2, #4
+ 2505 0022 83F84B20 		strb	r2, [r3, #75]
+ 359:Core/Src/ow.c ****       break;
+ 2506              		.loc 1 359 7
+ 2507 0026 F868     		ldr	r0, [r7, #12]
+ 2508 0028 FFF7FEFF 		bl	ow_stop
+ 360:Core/Src/ow.c ****     }
+ 2509              		.loc 1 360 7
+ 2510 002c 78E0     		b	.L148
+ 2511              	.L147:
+ 364:Core/Src/ow.c ****     {
+ 2512              		.loc 1 364 15
+ 2513 002e 3A8C     		ldrh	r2, [r7, #32]
+ 2514 0030 BB8C     		ldrh	r3, [r7, #36]
+ 2515 0032 1344     		add	r3, r3, r2
+ 364:Core/Src/ow.c ****     {
+ 2516              		.loc 1 364 8
+ 2517 0034 202B     		cmp	r3, #32
+ 2518 0036 07DD     		ble	.L149
+ 366:Core/Src/ow.c ****       ow_stop(handle);
+ 2519              		.loc 1 366 21
+ 2520 0038 FB68     		ldr	r3, [r7, #12]
+ 2521 003a 0422     		movs	r2, #4
+ 2522 003c 83F84B20 		strb	r2, [r3, #75]
+ 367:Core/Src/ow.c ****       break;
+ 2523              		.loc 1 367 7
+ 2524 0040 F868     		ldr	r0, [r7, #12]
+ 2525 0042 FFF7FEFF 		bl	ow_stop
+ 368:Core/Src/ow.c ****     }
+ 2526              		.loc 1 368 7
+ 2527 0046 6BE0     		b	.L148
+ 2528              	.L149:
+ 372:Core/Src/ow.c ****     {
+ 2529              		.loc 1 372 16
+ 2530 0048 FB68     		ldr	r3, [r7, #12]
+ 2531 004a 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ARM GAS  /tmp/cc1AzyH1.s 			page 70
+
+
+ 372:Core/Src/ow.c ****     {
+ 2532              		.loc 1 372 8
+ 2533 004e 002B     		cmp	r3, #0
+ 2534 0050 05D0     		beq	.L150
+ 372:Core/Src/ow.c ****     {
+ 2535              		.loc 1 372 57 discriminator 1
+ 2536 0052 FB68     		ldr	r3, [r7, #12]
+ 2537 0054 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ 372:Core/Src/ow.c ****     {
+ 2538              		.loc 1 372 37 discriminator 1
+ 2539 0058 FA7A     		ldrb	r2, [r7, #11]	@ zero_extendqisi2
+ 2540 005a 9A42     		cmp	r2, r3
+ 2541 005c 07D3     		bcc	.L151
+ 2542              	.L150:
+ 374:Core/Src/ow.c ****       ow_stop(handle);
+ 2543              		.loc 1 374 21
+ 2544 005e FB68     		ldr	r3, [r7, #12]
+ 2545 0060 0522     		movs	r2, #5
+ 2546 0062 83F84B20 		strb	r2, [r3, #75]
+ 375:Core/Src/ow.c ****       break;
+ 2547              		.loc 1 375 7
+ 2548 0066 F868     		ldr	r0, [r7, #12]
+ 2549 0068 FFF7FEFF 		bl	ow_stop
+ 376:Core/Src/ow.c ****     }
+ 2550              		.loc 1 376 7
+ 2551 006c 58E0     		b	.L148
+ 2552              	.L151:
+ 380:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 2553              		.loc 1 380 21
+ 2554 006e F868     		ldr	r0, [r7, #12]
+ 2555 0070 FFF7FEFF 		bl	ow_start
+ 2556 0074 0346     		mov	r3, r0
+ 2557 0076 1A46     		mov	r2, r3
+ 380:Core/Src/ow.c ****     if (handle->error != OW_ERR_NONE)
+ 2558              		.loc 1 380 19 discriminator 1
+ 2559 0078 FB68     		ldr	r3, [r7, #12]
+ 2560 007a 83F84B20 		strb	r2, [r3, #75]
+ 381:Core/Src/ow.c ****     {
+ 2561              		.loc 1 381 15
+ 2562 007e FB68     		ldr	r3, [r7, #12]
+ 2563 0080 93F84B30 		ldrb	r3, [r3, #75]	@ zero_extendqisi2
+ 381:Core/Src/ow.c ****     {
+ 2564              		.loc 1 381 8
+ 2565 0084 002B     		cmp	r3, #0
+ 2566 0086 03D0     		beq	.L152
+ 383:Core/Src/ow.c ****       break;
+ 2567              		.loc 1 383 7
+ 2568 0088 F868     		ldr	r0, [r7, #12]
+ 2569 008a FFF7FEFF 		bl	ow_stop
+ 384:Core/Src/ow.c ****     }
+ 2570              		.loc 1 384 7
+ 2571 008e 47E0     		b	.L148
+ 2572              	.L152:
+ 388:Core/Src/ow.c ****     
+ 2573              		.loc 1 388 19
+ 2574 0090 FB68     		ldr	r3, [r7, #12]
+ 2575 0092 0122     		movs	r2, #1
+ARM GAS  /tmp/cc1AzyH1.s 			page 71
+
+
+ 2576 0094 83F84A20 		strb	r2, [r3, #74]
+ 391:Core/Src/ow.c ****     for (uint8_t idx = 0; idx < 8; idx++)
+ 2577              		.loc 1 391 25
+ 2578 0098 FB68     		ldr	r3, [r7, #12]
+ 2579 009a 5522     		movs	r2, #85
+ 2580 009c 1A76     		strb	r2, [r3, #24]
+ 2581              	.LBB156:
+ 392:Core/Src/ow.c ****     {
+ 2582              		.loc 1 392 18
+ 2583 009e 0023     		movs	r3, #0
+ 2584 00a0 FB75     		strb	r3, [r7, #23]
+ 392:Core/Src/ow.c ****     {
+ 2585              		.loc 1 392 5
+ 2586 00a2 10E0     		b	.L153
+ 2587              	.L154:
+ 394:Core/Src/ow.c ****     }
+ 2588              		.loc 1 394 63
+ 2589 00a4 F97A     		ldrb	r1, [r7, #11]	@ zero_extendqisi2
+ 2590 00a6 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 394:Core/Src/ow.c ****     }
+ 2591              		.loc 1 394 26
+ 2592 00a8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 2593 00aa 0133     		adds	r3, r3, #1
+ 394:Core/Src/ow.c ****     }
+ 2594              		.loc 1 394 63
+ 2595 00ac F868     		ldr	r0, [r7, #12]
+ 2596 00ae C900     		lsls	r1, r1, #3
+ 2597 00b0 0144     		add	r1, r1, r0
+ 2598 00b2 0A44     		add	r2, r2, r1
+ 2599 00b4 4D32     		adds	r2, r2, #77
+ 2600 00b6 1178     		ldrb	r1, [r2]	@ zero_extendqisi2
+ 394:Core/Src/ow.c ****     }
+ 2601              		.loc 1 394 33
+ 2602 00b8 FA68     		ldr	r2, [r7, #12]
+ 2603 00ba 1344     		add	r3, r3, r2
+ 2604 00bc 0A46     		mov	r2, r1
+ 2605 00be 1A76     		strb	r2, [r3, #24]
+ 392:Core/Src/ow.c ****     {
+ 2606              		.loc 1 392 39 discriminator 3
+ 2607 00c0 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 2608 00c2 0133     		adds	r3, r3, #1
+ 2609 00c4 FB75     		strb	r3, [r7, #23]
+ 2610              	.L153:
+ 392:Core/Src/ow.c ****     {
+ 2611              		.loc 1 392 31 discriminator 1
+ 2612 00c6 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 2613 00c8 072B     		cmp	r3, #7
+ 2614 00ca EBD9     		bls	.L154
+ 2615              	.LBE156:
+ 398:Core/Src/ow.c **** 
+ 2616              		.loc 1 398 25
+ 2617 00cc FB68     		ldr	r3, [r7, #12]
+ 2618 00ce BA7A     		ldrb	r2, [r7, #10]
+ 2619 00d0 83F82120 		strb	r2, [r3, #33]
+ 401:Core/Src/ow.c ****     {
+ 2620              		.loc 1 401 8
+ 2621 00d4 7B68     		ldr	r3, [r7, #4]
+ARM GAS  /tmp/cc1AzyH1.s 			page 72
+
+
+ 2622 00d6 002B     		cmp	r3, #0
+ 2623 00d8 1AD0     		beq	.L155
+ 2624              	.LBB157:
+ 403:Core/Src/ow.c ****       {
+ 2625              		.loc 1 403 21
+ 2626 00da 0023     		movs	r3, #0
+ 2627 00dc BB82     		strh	r3, [r7, #20]	@ movhi
+ 403:Core/Src/ow.c ****       {
+ 2628              		.loc 1 403 7
+ 2629 00de 0CE0     		b	.L156
+ 2630              	.L157:
+ 405:Core/Src/ow.c ****       }
+ 2631              		.loc 1 405 44
+ 2632 00e0 BB8A     		ldrh	r3, [r7, #20]
+ 2633 00e2 7A68     		ldr	r2, [r7, #4]
+ 2634 00e4 1A44     		add	r2, r2, r3
+ 405:Core/Src/ow.c ****       }
+ 2635              		.loc 1 405 29
+ 2636 00e6 BB8A     		ldrh	r3, [r7, #20]
+ 2637 00e8 0A33     		adds	r3, r3, #10
+ 405:Core/Src/ow.c ****       }
+ 2638              		.loc 1 405 44
+ 2639 00ea 1178     		ldrb	r1, [r2]	@ zero_extendqisi2
+ 405:Core/Src/ow.c ****       }
+ 2640              		.loc 1 405 36
+ 2641 00ec FA68     		ldr	r2, [r7, #12]
+ 2642 00ee 1344     		add	r3, r3, r2
+ 2643 00f0 0A46     		mov	r2, r1
+ 2644 00f2 1A76     		strb	r2, [r3, #24]
+ 403:Core/Src/ow.c ****       {
+ 2645              		.loc 1 403 46 discriminator 3
+ 2646 00f4 BB8A     		ldrh	r3, [r7, #20]
+ 2647 00f6 0133     		adds	r3, r3, #1
+ 2648 00f8 BB82     		strh	r3, [r7, #20]	@ movhi
+ 2649              	.L156:
+ 403:Core/Src/ow.c ****       {
+ 2650              		.loc 1 403 34 discriminator 1
+ 2651 00fa BA8A     		ldrh	r2, [r7, #20]
+ 2652 00fc 3B8C     		ldrh	r3, [r7, #32]
+ 2653 00fe 9A42     		cmp	r2, r3
+ 2654 0100 EED3     		bcc	.L157
+ 2655              	.LBE157:
+ 407:Core/Src/ow.c ****     }
+ 2656              		.loc 1 407 37
+ 2657 0102 3B8C     		ldrh	r3, [r7, #32]	@ movhi
+ 2658 0104 0A33     		adds	r3, r3, #10
+ 2659 0106 9AB2     		uxth	r2, r3
+ 407:Core/Src/ow.c ****     }
+ 2660              		.loc 1 407 29
+ 2661 0108 FB68     		ldr	r3, [r7, #12]
+ 2662 010a A3F84620 		strh	r2, [r3, #70]	@ movhi
+ 2663 010e 03E0     		b	.L158
+ 2664              	.L155:
+ 411:Core/Src/ow.c ****     }
+ 2665              		.loc 1 411 29
+ 2666 0110 FB68     		ldr	r3, [r7, #12]
+ 2667 0112 0A22     		movs	r2, #10
+ARM GAS  /tmp/cc1AzyH1.s 			page 73
+
+
+ 2668 0114 A3F84620 		strh	r2, [r3, #70]	@ movhi
+ 2669              	.L158:
+ 415:Core/Src/ow.c **** 
+ 2670              		.loc 1 415 27
+ 2671 0118 FB68     		ldr	r3, [r7, #12]
+ 2672 011a BA8C     		ldrh	r2, [r7, #36]	@ movhi
+ 2673 011c A3F84820 		strh	r2, [r3, #72]	@ movhi
+ 2674              	.L148:
+ 419:Core/Src/ow.c **** }
+ 2675              		.loc 1 419 16
+ 2676 0120 FB68     		ldr	r3, [r7, #12]
+ 2677 0122 93F84B30 		ldrb	r3, [r3, #75]	@ zero_extendqisi2
+ 420:Core/Src/ow.c **** 
+ 2678              		.loc 1 420 1
+ 2679 0126 1846     		mov	r0, r3
+ 2680 0128 1837     		adds	r7, r7, #24
+ 2681              	.LCFI41:
+ 2682              		.cfi_def_cfa_offset 8
+ 2683 012a BD46     		mov	sp, r7
+ 2684              	.LCFI42:
+ 2685              		.cfi_def_cfa_register 13
+ 2686              		@ sp needed
+ 2687 012c 80BD     		pop	{r7, pc}
+ 2688              		.cfi_endproc
+ 2689              	.LFE227:
+ 2691              		.section	.text.ow_devices,"ax",%progbits
+ 2692              		.align	1
+ 2693              		.global	ow_devices
+ 2694              		.syntax unified
+ 2695              		.thumb
+ 2696              		.thumb_func
+ 2698              	ow_devices:
+ 2699              	.LFB228:
+ 429:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2700              		.loc 1 429 1
+ 2701              		.cfi_startproc
+ 2702              		@ args = 0, pretend = 0, frame = 8
+ 2703              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2704              		@ link register save eliminated.
+ 2705 0000 80B4     		push	{r7}
+ 2706              	.LCFI43:
+ 2707              		.cfi_def_cfa_offset 4
+ 2708              		.cfi_offset 7, -4
+ 2709 0002 83B0     		sub	sp, sp, #12
+ 2710              	.LCFI44:
+ 2711              		.cfi_def_cfa_offset 16
+ 2712 0004 00AF     		add	r7, sp, #0
+ 2713              	.LCFI45:
+ 2714              		.cfi_def_cfa_register 7
+ 2715 0006 7860     		str	r0, [r7, #4]
+ 431:Core/Src/ow.c **** }
+ 2716              		.loc 1 431 16
+ 2717 0008 7B68     		ldr	r3, [r7, #4]
+ 2718 000a 93F86D30 		ldrb	r3, [r3, #109]	@ zero_extendqisi2
+ 432:Core/Src/ow.c **** #endif
+ 2719              		.loc 1 432 1
+ 2720 000e 1846     		mov	r0, r3
+ARM GAS  /tmp/cc1AzyH1.s 			page 74
+
+
+ 2721 0010 0C37     		adds	r7, r7, #12
+ 2722              	.LCFI46:
+ 2723              		.cfi_def_cfa_offset 4
+ 2724 0012 BD46     		mov	sp, r7
+ 2725              	.LCFI47:
+ 2726              		.cfi_def_cfa_register 13
+ 2727              		@ sp needed
+ 2728 0014 80BC     		pop	{r7}
+ 2729              	.LCFI48:
+ 2730              		.cfi_restore 7
+ 2731              		.cfi_def_cfa_offset 0
+ 2732 0016 7047     		bx	lr
+ 2733              		.cfi_endproc
+ 2734              	.LFE228:
+ 2736              		.section	.text.ow_read_resp,"ax",%progbits
+ 2737              		.align	1
+ 2738              		.global	ow_read_resp
+ 2739              		.syntax unified
+ 2740              		.thumb
+ 2741              		.thumb_func
+ 2743              	ow_read_resp:
+ 2744              	.LFB229:
+ 444:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2745              		.loc 1 444 1
+ 2746              		.cfi_startproc
+ 2747              		@ args = 0, pretend = 0, frame = 24
+ 2748              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2749              		@ link register save eliminated.
+ 2750 0000 80B4     		push	{r7}
+ 2751              	.LCFI49:
+ 2752              		.cfi_def_cfa_offset 4
+ 2753              		.cfi_offset 7, -4
+ 2754 0002 87B0     		sub	sp, sp, #28
+ 2755              	.LCFI50:
+ 2756              		.cfi_def_cfa_offset 32
+ 2757 0004 00AF     		add	r7, sp, #0
+ 2758              	.LCFI51:
+ 2759              		.cfi_def_cfa_register 7
+ 2760 0006 F860     		str	r0, [r7, #12]
+ 2761 0008 B960     		str	r1, [r7, #8]
+ 2762 000a 1346     		mov	r3, r2
+ 2763 000c FB80     		strh	r3, [r7, #6]	@ movhi
+ 448:Core/Src/ow.c **** 
+ 2764              		.loc 1 448 12
+ 2765 000e FB68     		ldr	r3, [r7, #12]
+ 2766 0010 B3F84830 		ldrh	r3, [r3, #72]	@ movhi
+ 2767 0014 FB82     		strh	r3, [r7, #22]	@ movhi
+ 451:Core/Src/ow.c ****   {
+ 2768              		.loc 1 451 6
+ 2769 0016 FA88     		ldrh	r2, [r7, #6]
+ 2770 0018 FB8A     		ldrh	r3, [r7, #22]
+ 2771 001a 9A42     		cmp	r2, r3
+ 2772 001c 01D2     		bcs	.L163
+ 453:Core/Src/ow.c ****   }
+ 2773              		.loc 1 453 9
+ 2774 001e FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 2775 0020 FB82     		strh	r3, [r7, #22]	@ movhi
+ARM GAS  /tmp/cc1AzyH1.s 			page 75
+
+
+ 2776              	.L163:
+ 457:Core/Src/ow.c ****   {
+ 2777              		.loc 1 457 29
+ 2778 0022 FB68     		ldr	r3, [r7, #12]
+ 2779 0024 B3F84630 		ldrh	r3, [r3, #70]
+ 457:Core/Src/ow.c ****   {
+ 2780              		.loc 1 457 7
+ 2781 0028 1A46     		mov	r2, r3
+ 457:Core/Src/ow.c ****   {
+ 2782              		.loc 1 457 43
+ 2783 002a FB8A     		ldrh	r3, [r7, #22]
+ 457:Core/Src/ow.c ****   {
+ 2784              		.loc 1 457 41
+ 2785 002c 1344     		add	r3, r3, r2
+ 457:Core/Src/ow.c ****   {
+ 2786              		.loc 1 457 6
+ 2787 002e 2A2B     		cmp	r3, #42
+ 2788 0030 0DD9     		bls	.L164
+ 460:Core/Src/ow.c ****     {
+ 2789              		.loc 1 460 20
+ 2790 0032 FB68     		ldr	r3, [r7, #12]
+ 2791 0034 B3F84630 		ldrh	r3, [r3, #70]
+ 460:Core/Src/ow.c ****     {
+ 2792              		.loc 1 460 8
+ 2793 0038 292B     		cmp	r3, #41
+ 2794 003a 06D8     		bhi	.L165
+ 462:Core/Src/ow.c ****     }
+ 2795              		.loc 1 462 72
+ 2796 003c FB68     		ldr	r3, [r7, #12]
+ 2797 003e B3F84630 		ldrh	r3, [r3, #70]
+ 462:Core/Src/ow.c ****     }
+ 2798              		.loc 1 462 11
+ 2799 0042 C3F12A03 		rsb	r3, r3, #42
+ 2800 0046 FB82     		strh	r3, [r7, #22]	@ movhi
+ 2801 0048 01E0     		b	.L164
+ 2802              	.L165:
+ 466:Core/Src/ow.c ****     }
+ 2803              		.loc 1 466 14
+ 2804 004a 0023     		movs	r3, #0
+ 2805 004c 17E0     		b	.L166
+ 2806              	.L164:
+ 2807              	.LBB158:
+ 471:Core/Src/ow.c ****   {
+ 2808              		.loc 1 471 17
+ 2809 004e 0023     		movs	r3, #0
+ 2810 0050 BB82     		strh	r3, [r7, #20]	@ movhi
+ 471:Core/Src/ow.c ****   {
+ 2811              		.loc 1 471 3
+ 2812 0052 0FE0     		b	.L167
+ 2813              	.L168:
+ 473:Core/Src/ow.c ****   }
+ 2814              		.loc 1 473 45
+ 2815 0054 FB68     		ldr	r3, [r7, #12]
+ 2816 0056 B3F84630 		ldrh	r3, [r3, #70]
+ 2817 005a 1A46     		mov	r2, r3
+ 473:Core/Src/ow.c ****   }
+ 2818              		.loc 1 473 56
+ARM GAS  /tmp/cc1AzyH1.s 			page 76
+
+
+ 2819 005c BB8A     		ldrh	r3, [r7, #20]
+ 2820 005e 1A44     		add	r2, r2, r3
+ 473:Core/Src/ow.c ****   }
+ 2821              		.loc 1 473 9
+ 2822 0060 BB8A     		ldrh	r3, [r7, #20]
+ 2823 0062 B968     		ldr	r1, [r7, #8]
+ 2824 0064 0B44     		add	r3, r3, r1
+ 473:Core/Src/ow.c ****   }
+ 2825              		.loc 1 473 33
+ 2826 0066 F968     		ldr	r1, [r7, #12]
+ 2827 0068 0A44     		add	r2, r2, r1
+ 2828 006a 127E     		ldrb	r2, [r2, #24]	@ zero_extendqisi2
+ 473:Core/Src/ow.c ****   }
+ 2829              		.loc 1 473 15
+ 2830 006c 1A70     		strb	r2, [r3]
+ 471:Core/Src/ow.c ****   {
+ 2831              		.loc 1 471 37 discriminator 3
+ 2832 006e BB8A     		ldrh	r3, [r7, #20]	@ movhi
+ 2833 0070 0133     		adds	r3, r3, #1
+ 2834 0072 BB82     		strh	r3, [r7, #20]	@ movhi
+ 2835              	.L167:
+ 471:Core/Src/ow.c ****   {
+ 2836              		.loc 1 471 30 discriminator 1
+ 2837 0074 BA8A     		ldrh	r2, [r7, #20]
+ 2838 0076 FB8A     		ldrh	r3, [r7, #22]
+ 2839 0078 9A42     		cmp	r2, r3
+ 2840 007a EBD3     		bcc	.L168
+ 2841              	.LBE158:
+ 476:Core/Src/ow.c **** }
+ 2842              		.loc 1 476 10
+ 2843 007c FB8A     		ldrh	r3, [r7, #22]
+ 2844              	.L166:
+ 477:Core/Src/ow.c **** 
+ 2845              		.loc 1 477 1
+ 2846 007e 1846     		mov	r0, r3
+ 2847 0080 1C37     		adds	r7, r7, #28
+ 2848              	.LCFI52:
+ 2849              		.cfi_def_cfa_offset 4
+ 2850 0082 BD46     		mov	sp, r7
+ 2851              	.LCFI53:
+ 2852              		.cfi_def_cfa_register 13
+ 2853              		@ sp needed
+ 2854 0084 80BC     		pop	{r7}
+ 2855              	.LCFI54:
+ 2856              		.cfi_restore 7
+ 2857              		.cfi_def_cfa_offset 0
+ 2858 0086 7047     		bx	lr
+ 2859              		.cfi_endproc
+ 2860              	.LFE229:
+ 2862              		.section	.text.ow_start,"ax",%progbits
+ 2863              		.align	1
+ 2864              		.global	ow_start
+ 2865              		.syntax unified
+ 2866              		.thumb
+ 2867              		.thumb_func
+ 2869              	ow_start:
+ 2870              	.LFB230:
+ARM GAS  /tmp/cc1AzyH1.s 			page 77
+
+
+ 490:Core/Src/ow.c ****   ow_err_t ow_err = OW_ERR_NONE;
+ 2871              		.loc 1 490 1
+ 2872              		.cfi_startproc
+ 2873              		@ args = 0, pretend = 0, frame = 24
+ 2874              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2875 0000 80B5     		push	{r7, lr}
+ 2876              	.LCFI55:
+ 2877              		.cfi_def_cfa_offset 8
+ 2878              		.cfi_offset 7, -8
+ 2879              		.cfi_offset 14, -4
+ 2880 0002 86B0     		sub	sp, sp, #24
+ 2881              	.LCFI56:
+ 2882              		.cfi_def_cfa_offset 32
+ 2883 0004 00AF     		add	r7, sp, #0
+ 2884              	.LCFI57:
+ 2885              		.cfi_def_cfa_register 7
+ 2886 0006 7860     		str	r0, [r7, #4]
+ 491:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 2887              		.loc 1 491 12
+ 2888 0008 0023     		movs	r3, #0
+ 2889 000a FB75     		strb	r3, [r7, #23]
+ 497:Core/Src/ow.c ****     {
+ 2890              		.loc 1 497 15
+ 2891 000c 7B68     		ldr	r3, [r7, #4]
+ 2892 000e 93F84A30 		ldrb	r3, [r3, #74]	@ zero_extendqisi2
+ 497:Core/Src/ow.c ****     {
+ 2893              		.loc 1 497 8
+ 2894 0012 002B     		cmp	r3, #0
+ 2895 0014 02D0     		beq	.L170
+ 499:Core/Src/ow.c ****       break;
+ 2896              		.loc 1 499 14
+ 2897 0016 0123     		movs	r3, #1
+ 2898 0018 FB75     		strb	r3, [r7, #23]
+ 500:Core/Src/ow.c ****     }
+ 2899              		.loc 1 500 7
+ 2900 001a 40E0     		b	.L171
+ 2901              	.L170:
+ 2902 001c 7B68     		ldr	r3, [r7, #4]
+ 2903 001e FB60     		str	r3, [r7, #12]
+ 2904 0020 0123     		movs	r3, #1
+ 2905 0022 FB72     		strb	r3, [r7, #11]
+ 2906              	.LBB159:
+ 2907              	.LBB160:
+ 947:Core/Src/ow.c **** }
+ 2908              		.loc 1 947 62
+ 2909 0024 FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 2910 0026 002B     		cmp	r3, #0
+ 2911 0028 02D0     		beq	.L172
+ 947:Core/Src/ow.c **** }
+ 2912              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 2913 002a FB68     		ldr	r3, [r7, #12]
+ 2914 002c DB68     		ldr	r3, [r3, #12]
+ 2915 002e 01E0     		b	.L173
+ 2916              	.L172:
+ 947:Core/Src/ow.c **** }
+ 2917              		.loc 1 947 62 discriminator 2
+ 2918 0030 FB68     		ldr	r3, [r7, #12]
+ARM GAS  /tmp/cc1AzyH1.s 			page 78
+
+
+ 2919 0032 1B69     		ldr	r3, [r3, #16]
+ 2920              	.L173:
+ 947:Core/Src/ow.c **** }
+ 2921              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 2922 0034 FA68     		ldr	r2, [r7, #12]
+ 2923 0036 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 2924              		.loc 1 947 29 discriminator 4
+ 2925 0038 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 2926              		.loc 1 948 1
+ 2927 003a 00BF     		nop
+ 2928 003c 7B68     		ldr	r3, [r7, #4]
+ 2929 003e 3B61     		str	r3, [r7, #16]
+ 2930              	.LBE160:
+ 2931              	.LBE159:
+ 2932              	.LBB161:
+ 2933              	.LBB162:
+ 2934              		.loc 1 961 26
+ 2935 0040 3B69     		ldr	r3, [r7, #16]
+ 2936 0042 9B68     		ldr	r3, [r3, #8]
+ 2937              		.loc 1 961 31
+ 2938 0044 1A69     		ldr	r2, [r3, #16]
+ 2939              		.loc 1 961 53
+ 2940 0046 3B69     		ldr	r3, [r7, #16]
+ 2941 0048 5B69     		ldr	r3, [r3, #20]
+ 2942              		.loc 1 961 37
+ 2943 004a 1340     		ands	r3, r3, r2
+ 2944              		.loc 1 961 68
+ 2945 004c 002B     		cmp	r3, #0
+ 2946 004e 14BF     		ite	ne
+ 2947 0050 0123     		movne	r3, #1
+ 2948 0052 0023     		moveq	r3, #0
+ 2949 0054 DBB2     		uxtb	r3, r3
+ 2950              	.LBE162:
+ 2951              	.LBE161:
+ 505:Core/Src/ow.c ****     {
+ 2952              		.loc 1 505 8 discriminator 1
+ 2953 0056 002B     		cmp	r3, #0
+ 2954 0058 02D1     		bne	.L175
+ 507:Core/Src/ow.c ****       break;
+ 2955              		.loc 1 507 14
+ 2956 005a 0223     		movs	r3, #2
+ 2957 005c FB75     		strb	r3, [r7, #23]
+ 508:Core/Src/ow.c ****     }
+ 2958              		.loc 1 508 7
+ 2959 005e 1EE0     		b	.L171
+ 2960              	.L175:
+ 512:Core/Src/ow.c ****     memset(&handle->buf, 0, sizeof(ow_buf_t));
+ 2961              		.loc 1 512 5
+ 2962 0060 7B68     		ldr	r3, [r7, #4]
+ 2963 0062 1B68     		ldr	r3, [r3]
+ 2964 0064 1B68     		ldr	r3, [r3]
+ 2965 0066 0022     		movs	r2, #0
+ 2966 0068 1A61     		str	r2, [r3, #16]
+ 513:Core/Src/ow.c **** 
+ 2967              		.loc 1 513 12
+ARM GAS  /tmp/cc1AzyH1.s 			page 79
+
+
+ 2968 006a 7B68     		ldr	r3, [r7, #4]
+ 2969 006c 1833     		adds	r3, r3, #24
+ 513:Core/Src/ow.c **** 
+ 2970              		.loc 1 513 5
+ 2971 006e 3222     		movs	r2, #50
+ 2972 0070 0021     		movs	r1, #0
+ 2973 0072 1846     		mov	r0, r3
+ 2974 0074 FFF7FEFF 		bl	memset
+ 516:Core/Src/ow.c ****     __HAL_TIM_SET_AUTORELOAD(handle->config.tim_handle, OW_TIM_RST_DET - 1);
+ 2975              		.loc 1 516 5
+ 2976 0078 7B68     		ldr	r3, [r7, #4]
+ 2977 007a 1B68     		ldr	r3, [r3]
+ 2978 007c 1B68     		ldr	r3, [r3]
+ 2979 007e 0022     		movs	r2, #0
+ 2980 0080 5A62     		str	r2, [r3, #36]
+ 517:Core/Src/ow.c ****     HAL_TIM_Base_Start_IT(handle->config.tim_handle);
+ 2981              		.loc 1 517 5
+ 2982 0082 7B68     		ldr	r3, [r7, #4]
+ 2983 0084 1B68     		ldr	r3, [r3]
+ 2984 0086 1B68     		ldr	r3, [r3]
+ 2985 0088 6322     		movs	r2, #99
+ 2986 008a DA62     		str	r2, [r3, #44]
+ 2987 008c 7B68     		ldr	r3, [r7, #4]
+ 2988 008e 1B68     		ldr	r3, [r3]
+ 2989 0090 6322     		movs	r2, #99
+ 2990 0092 DA60     		str	r2, [r3, #12]
+ 518:Core/Src/ow.c **** 
+ 2991              		.loc 1 518 5
+ 2992 0094 7B68     		ldr	r3, [r7, #4]
+ 2993 0096 1B68     		ldr	r3, [r3]
+ 2994 0098 1846     		mov	r0, r3
+ 2995 009a FFF7FEFF 		bl	HAL_TIM_Base_Start_IT
+ 2996              	.L171:
+ 522:Core/Src/ow.c **** }
+ 2997              		.loc 1 522 10
+ 2998 009e FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 523:Core/Src/ow.c **** 
+ 2999              		.loc 1 523 1
+ 3000 00a0 1846     		mov	r0, r3
+ 3001 00a2 1837     		adds	r7, r7, #24
+ 3002              	.LCFI58:
+ 3003              		.cfi_def_cfa_offset 8
+ 3004 00a4 BD46     		mov	sp, r7
+ 3005              	.LCFI59:
+ 3006              		.cfi_def_cfa_register 13
+ 3007              		@ sp needed
+ 3008 00a6 80BD     		pop	{r7, pc}
+ 3009              		.cfi_endproc
+ 3010              	.LFE230:
+ 3012              		.section	.text.ow_stop,"ax",%progbits
+ 3013              		.align	1
+ 3014              		.global	ow_stop
+ 3015              		.syntax unified
+ 3016              		.thumb
+ 3017              		.thumb_func
+ 3019              	ow_stop:
+ 3020              	.LFB231:
+ARM GAS  /tmp/cc1AzyH1.s 			page 80
+
+
+ 531:Core/Src/ow.c ****   assert_param(handle != NULL);
+ 3021              		.loc 1 531 1
+ 3022              		.cfi_startproc
+ 3023              		@ args = 0, pretend = 0, frame = 16
+ 3024              		@ frame_needed = 1, uses_anonymous_args = 0
+ 3025 0000 80B5     		push	{r7, lr}
+ 3026              	.LCFI60:
+ 3027              		.cfi_def_cfa_offset 8
+ 3028              		.cfi_offset 7, -8
+ 3029              		.cfi_offset 14, -4
+ 3030 0002 84B0     		sub	sp, sp, #16
+ 3031              	.LCFI61:
+ 3032              		.cfi_def_cfa_offset 24
+ 3033 0004 00AF     		add	r7, sp, #0
+ 3034              	.LCFI62:
+ 3035              		.cfi_def_cfa_register 7
+ 3036 0006 7860     		str	r0, [r7, #4]
+ 535:Core/Src/ow.c **** 
+ 3037              		.loc 1 535 3
+ 3038 0008 7B68     		ldr	r3, [r7, #4]
+ 3039 000a 1B68     		ldr	r3, [r3]
+ 3040 000c 1846     		mov	r0, r3
+ 3041 000e FFF7FEFF 		bl	HAL_TIM_Base_Stop_IT
+ 3042 0012 7B68     		ldr	r3, [r7, #4]
+ 3043 0014 FB60     		str	r3, [r7, #12]
+ 3044 0016 0123     		movs	r3, #1
+ 3045 0018 FB72     		strb	r3, [r7, #11]
+ 3046              	.LBB163:
+ 3047              	.LBB164:
+ 947:Core/Src/ow.c **** }
+ 3048              		.loc 1 947 62
+ 3049 001a FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 3050 001c 002B     		cmp	r3, #0
+ 3051 001e 02D0     		beq	.L178
+ 947:Core/Src/ow.c **** }
+ 3052              		.loc 1 947 62 is_stmt 0 discriminator 1
+ 3053 0020 FB68     		ldr	r3, [r7, #12]
+ 3054 0022 DB68     		ldr	r3, [r3, #12]
+ 3055 0024 01E0     		b	.L179
+ 3056              	.L178:
+ 947:Core/Src/ow.c **** }
+ 3057              		.loc 1 947 62 discriminator 2
+ 3058 0026 FB68     		ldr	r3, [r7, #12]
+ 3059 0028 1B69     		ldr	r3, [r3, #16]
+ 3060              	.L179:
+ 947:Core/Src/ow.c **** }
+ 3061              		.loc 1 947 17 is_stmt 1 discriminator 4
+ 3062 002a FA68     		ldr	r2, [r7, #12]
+ 3063 002c 9268     		ldr	r2, [r2, #8]
+ 947:Core/Src/ow.c **** }
+ 3064              		.loc 1 947 29 discriminator 4
+ 3065 002e 9361     		str	r3, [r2, #24]
+ 948:Core/Src/ow.c **** 
+ 3066              		.loc 1 948 1
+ 3067 0030 00BF     		nop
+ 3068              	.LBE164:
+ 3069              	.LBE163:
+ARM GAS  /tmp/cc1AzyH1.s 			page 81
+
+
+ 541:Core/Src/ow.c **** 
+ 3070              		.loc 1 541 17
+ 3071 0032 7B68     		ldr	r3, [r7, #4]
+ 3072 0034 0022     		movs	r2, #0
+ 3073 0036 83F84A20 		strb	r2, [r3, #74]
+ 544:Core/Src/ow.c ****   {
+ 3074              		.loc 1 544 21
+ 3075 003a 7B68     		ldr	r3, [r7, #4]
+ 3076 003c 5B68     		ldr	r3, [r3, #4]
+ 544:Core/Src/ow.c ****   {
+ 3077              		.loc 1 544 6
+ 3078 003e 002B     		cmp	r3, #0
+ 3079 0040 06D0     		beq	.L181
+ 546:Core/Src/ow.c ****   }
+ 3080              		.loc 1 546 19
+ 3081 0042 7B68     		ldr	r3, [r7, #4]
+ 3082 0044 5B68     		ldr	r3, [r3, #4]
+ 546:Core/Src/ow.c ****   }
+ 3083              		.loc 1 546 5
+ 3084 0046 7A68     		ldr	r2, [r7, #4]
+ 3085 0048 92F84B20 		ldrb	r2, [r2, #75]	@ zero_extendqisi2
+ 3086 004c 1046     		mov	r0, r2
+ 3087 004e 9847     		blx	r3
+ 3088              	.LVL0:
+ 3089              	.L181:
+ 548:Core/Src/ow.c **** 
+ 3090              		.loc 1 548 1
+ 3091 0050 00BF     		nop
+ 3092 0052 1037     		adds	r7, r7, #16
+ 3093              	.LCFI63:
+ 3094              		.cfi_def_cfa_offset 8
+ 3095 0054 BD46     		mov	sp, r7
+ 3096              	.LCFI64:
+ 3097              		.cfi_def_cfa_register 13
+ 3098              		@ sp needed
+ 3099 0056 80BD     		pop	{r7, pc}
+ 3100              		.cfi_endproc
+ 3101              	.LFE231:
+ 3103              		.text
+ 3104              	.Letext0:
+ 3105              		.file 2 "/home/fabio/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/machin
+ 3106              		.file 3 "/home/fabio/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_s
+ 3107              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f411xe.h"
+ 3108              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 3109              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 3110              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h"
+ 3111              		.file 8 "Core/Inc/ow.h"
+ 3112              		.file 9 "/home/fabio/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/string
+ARM GAS  /tmp/cc1AzyH1.s 			page 82
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 ow.c
+     /tmp/cc1AzyH1.s:21     .text.ow_init:00000000 $t
+     /tmp/cc1AzyH1.s:27     .text.ow_init:00000000 ow_init
+     /tmp/cc1AzyH1.s:144    .text.ow_callback:00000000 $t
+     /tmp/cc1AzyH1.s:150    .text.ow_callback:00000000 ow_callback
+     /tmp/cc1AzyH1.s:3019   .text.ow_stop:00000000 ow_stop
+     /tmp/cc1AzyH1.s:2002   .text.ow_crc:00000000 ow_crc
+     /tmp/cc1AzyH1.s:1996   .text.ow_crc:00000000 $t
+     /tmp/cc1AzyH1.s:2110   .text.ow_is_busy:00000000 $t
+     /tmp/cc1AzyH1.s:2116   .text.ow_is_busy:00000000 ow_is_busy
+     /tmp/cc1AzyH1.s:2161   .text.ow_last_error:00000000 $t
+     /tmp/cc1AzyH1.s:2167   .text.ow_last_error:00000000 ow_last_error
+     /tmp/cc1AzyH1.s:2206   .text.ow_update_rom_id:00000000 $t
+     /tmp/cc1AzyH1.s:2212   .text.ow_update_rom_id:00000000 ow_update_rom_id
+     /tmp/cc1AzyH1.s:2869   .text.ow_start:00000000 ow_start
+     /tmp/cc1AzyH1.s:2296   .text.ow_xfer:00000000 $t
+     /tmp/cc1AzyH1.s:2302   .text.ow_xfer:00000000 ow_xfer
+     /tmp/cc1AzyH1.s:2465   .text.ow_xfer_by_id:00000000 $t
+     /tmp/cc1AzyH1.s:2471   .text.ow_xfer_by_id:00000000 ow_xfer_by_id
+     /tmp/cc1AzyH1.s:2692   .text.ow_devices:00000000 $t
+     /tmp/cc1AzyH1.s:2698   .text.ow_devices:00000000 ow_devices
+     /tmp/cc1AzyH1.s:2737   .text.ow_read_resp:00000000 $t
+     /tmp/cc1AzyH1.s:2743   .text.ow_read_resp:00000000 ow_read_resp
+     /tmp/cc1AzyH1.s:2863   .text.ow_start:00000000 $t
+     /tmp/cc1AzyH1.s:3013   .text.ow_stop:00000000 $t
+
+UNDEFINED SYMBOLS
+HAL_TIM_RegisterCallback
+memcpy
+memset
+HAL_TIM_Base_Start_IT
+HAL_TIM_Base_Stop_IT
